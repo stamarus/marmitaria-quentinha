@@ -1,0 +1,16 @@
+{
+  "name": "Marmitaria Quentinha Caseira",
+  "short_name": "Marmitaria",
+  "description": "Cardápio e Pedidos via WhatsApp sem taxas",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fffaf5",
+  "theme_color": "#c0392b",
+  "icons": [
+    {
+      "src": "watermarked_img_14074362198608020855.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
