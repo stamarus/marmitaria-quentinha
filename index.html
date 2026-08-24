@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Marmitaria Quentinha Caseira - Cardápio & Pedidos</title>
-  <meta name="description" content="Peça sua marmita caseira deliciosa direto pelo WhatsApp sem taxas!">
+  <title>Marmitaria Família - Feijoada & Parmegiana (Xaxim)</title>
+  <meta name="description" content="A melhor comida caseira do Xaxim! Feijoada completa, parmegianas suculentas e marmitex quentinhas com entrega rápida.">
   <meta name="theme-color" content="#C0392B">
   
   <!-- Tailwind CSS CDN -->
@@ -66,20 +66,20 @@
   <header class="bg-white shadow-sm border-b border-warm-200 sticky top-0 z-30">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <img src="watermarked_img_14074362198608020855.jpg" alt="Marmitaria Quentinha Caseira" class="w-12 h-12 rounded-full object-cover border-2 border-brand-500 shadow-sm">
+        <img src="watermarked_img_14074362198608020855.jpg" alt="Marmitaria Família" class="w-12 h-12 rounded-full object-cover border-2 border-brand-500 shadow-sm">
         <div>
-          <h1 class="font-bold text-gray-900 text-base leading-tight">Marmitaria Quentinha Caseira</h1>
+          <h1 class="font-bold text-gray-900 text-base leading-tight">Marmitaria Família</h1>
           <div class="flex items-center space-x-2 text-xs text-gray-500">
             <span class="inline-flex items-center text-emerald-600 font-semibold">
               <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Aberto hoje
             </span>
             <span>•</span>
-            <span>Entrega rápida</span>
+            <span class="text-gray-600 font-medium">📍 Xaxim, Curitiba</span>
           </div>
         </div>
       </div>
 
-      <button onclick="openAdminModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition" title="Painel do Igor">
+      <button onclick="openAdminModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition" title="Painel do Dono">
         <i data-lucide="settings" class="w-5 h-5"></i>
       </button>
     </div>
@@ -87,18 +87,18 @@
 
   <!-- HERO BANNER -->
   <div class="max-w-xl mx-auto px-4 pt-4">
-    <div class="bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
+    <div class="bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
       <div class="relative z-10">
-        <span class="bg-white/20 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Comida Caseira de Verdade</span>
-        <h2 class="text-xl font-bold mt-2 font-serif">Sabor do Lar com Amor 🍲</h2>
-        <p class="text-xs text-brand-100 mt-1">Marmitas quentinhas, ingredientes frescos e tempero artesanal. Faça seu pedido em segundos!</p>
+        <span class="bg-white/20 backdrop-blur-sm text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-amber-200">Especialistas em Feijoada & Parmegiana</span>
+        <h2 class="text-xl font-bold mt-2 font-serif">Sabor Caseiro de Família 🍲</h2>
+        <p class="text-xs text-brand-100 mt-1 leading-relaxed">Feijoada no capricho, parmegianas suculentas e marmitex fartos com tempero de mãe. Peça direto sem taxas!</p>
         
         <div class="flex items-center space-x-3 mt-3 text-xs text-white/90">
-          <div class="flex items-center bg-black/20 px-2.5 py-1 rounded-lg">
+          <div class="flex items-center bg-black/25 px-2.5 py-1 rounded-lg">
             <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-amber-300"></i> 11h às 14h30
           </div>
-          <div class="flex items-center bg-black/20 px-2.5 py-1 rounded-lg">
-            <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 text-emerald-300"></i> Pix & Cartão
+          <div class="flex items-center bg-black/25 px-2.5 py-1 rounded-lg">
+            <i data-lucide="bike" class="w-3.5 h-3.5 mr-1 text-emerald-300"></i> Entrega Rápida
           </div>
         </div>
       </div>
@@ -109,14 +109,20 @@
   <!-- CATEGORY NAVIGATION -->
   <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2">
     <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1" id="categoryTabs">
-      <button onclick="selectCategory('marmitas')" class="cat-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
-        🍛 Marmitas & Pratos
+      <button onclick="selectCategory('marmitas')" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
+        🍛 Marmitex do Dia
       </button>
-      <button onclick="selectCategory('bebidas')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+      <button onclick="selectCategory('especiais')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        🥘 Feijoadas & Parmegianas
+      </button>
+      <button onclick="selectCategory('porcoes')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        🍟 Porções & Extras
+      </button>
+      <button onclick="selectCategory('bebidas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
         🥤 Bebidas
       </button>
-      <button onclick="selectCategory('sobremesas')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
-        🍮 Sobremesas & Extras
+      <button onclick="selectCategory('sobremesas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        🍮 Sobremesas
       </button>
     </div>
   </div>
@@ -143,14 +149,14 @@
     </button>
   </div>
 
-  <!-- CUSTOMIZATION MODAL (FOR MARMITAS) -->
+  <!-- CUSTOMIZATION MODAL (FOR MARMITAS & ESPECIAIS) -->
   <div id="customModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
       <!-- Modal Header -->
       <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-warm-50">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded">Monte sua marmita</span>
-          <h3 class="font-bold text-gray-900 text-base mt-0.5" id="modalItemTitle">Marmita Tradicional</h3>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded" id="modalBadge">Monte seu prato</span>
+          <h3 class="font-bold text-gray-900 text-base mt-0.5" id="modalItemTitle">Marmitex Tradicional</h3>
         </div>
         <button onclick="closeCustomModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -161,7 +167,7 @@
       <div class="p-4 overflow-y-auto space-y-5 text-sm">
         
         <!-- Step 1: Tamanho -->
-        <div>
+        <div id="sizeStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
               <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">1</span>
@@ -175,7 +181,7 @@
         </div>
 
         <!-- Step 2: Opção de Carne / Proteína -->
-        <div>
+        <div id="meatStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
               <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">2</span>
@@ -189,7 +195,7 @@
         </div>
 
         <!-- Step 3: Acompanhamentos -->
-        <div>
+        <div id="sideStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
               <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">3</span>
@@ -203,11 +209,11 @@
         </div>
 
         <!-- Step 4: Salada -->
-        <div>
+        <div id="saladStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
               <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">4</span>
-              Salada do Dia
+              Salada Fresca
             </h4>
             <span class="text-[11px] text-gray-500">Escolha 1</span>
           </div>
@@ -221,7 +227,7 @@
           <label class="block font-bold text-gray-900 mb-1.5 flex items-center">
             <i data-lucide="message-square" class="w-4 h-4 mr-1 text-gray-500"></i> Observações adicionais
           </label>
-          <textarea id="itemNotes" placeholder="Ex: pouco sal, feijão separado, sem cebola..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-gray-50 resize-none h-16"></textarea>
+          <textarea id="itemNotes" placeholder="Ex: pouco sal, feijão por cima do arroz, sem cebola, talher descartável..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-gray-50 resize-none h-16"></textarea>
         </div>
 
       </div>
@@ -283,7 +289,7 @@
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="setDeliveryType('delivery')" id="btnDelivery" class="p-3 rounded-xl border-2 border-brand-700 bg-brand-50 text-brand-700 font-bold flex items-center justify-center space-x-2 transition">
               <i data-lucide="bike" class="w-4 h-4"></i>
-              <span>Entrega</span>
+              <span>Entrega (Delivery)</span>
             </button>
             <button type="button" onclick="setDeliveryType('retirada')" id="btnRetirada" class="p-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold flex items-center justify-center space-x-2 transition">
               <i data-lucide="store" class="w-4 h-4"></i>
@@ -300,22 +306,22 @@
 
           <div>
             <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Seu Nome Completo *</label>
-            <input type="text" id="custName" placeholder="Ex: João da Silva" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
+            <input type="text" id="custName" placeholder="Ex: Carlos Eduardo" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
           </div>
 
           <div>
-            <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Seu WhatsApp *</label>
+            <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Seu Telefone / WhatsApp *</label>
             <input type="tel" id="custPhone" placeholder="(41) 99999-9999" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
           </div>
 
           <div id="addressSection" class="space-y-2 pt-1 border-t border-gray-100">
             <div>
-              <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Rua e Número *</label>
-              <input type="text" id="custAddress" placeholder="Rua, Número e Bairro" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
+              <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Endereço de Entrega (Rua e Número) *</label>
+              <input type="text" id="custAddress" placeholder="Rua das Flores, 123 - Xaxim" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Complemento / Ponto de Referência</label>
-              <input type="text" id="custComp" placeholder="Apto, Bloco, Casa dos fundos..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
+              <input type="text" id="custComp" placeholder="Apto 302, Bloco B, Próximo ao mercado..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
             </div>
           </div>
         </div>
@@ -348,7 +354,7 @@
           <div id="pixBox" class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="font-bold text-[11px] flex items-center">
-                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> Chave Pix do Igor:
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> Chave Pix do Negão:
               </span>
               <button onclick="copyPixKey()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded-lg flex items-center space-x-1 shadow-sm">
                 <i data-lucide="copy" class="w-3 h-3"></i>
@@ -400,7 +406,7 @@
       <div class="p-4 bg-brand-700 text-white flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <i data-lucide="shield-check" class="w-5 h-5"></i>
-          <h3 class="font-bold text-base">Painel do Igor (Dono)</h3>
+          <h3 class="font-bold text-base">Painel do Dono (Igor)</h3>
         </div>
         <button onclick="closeAdminModal()" class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-brand-800">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -425,7 +431,7 @@
           </div>
 
           <div class="pt-2 border-t border-gray-100">
-            <h4 class="font-bold text-gray-900 mb-2">Gerenciar Carnes do Dia:</h4>
+            <h4 class="font-bold text-gray-900 mb-2">Pausar / Liberar Carnes do Dia:</h4>
             <div id="adminMeatsList" class="space-y-1.5">
               <!-- Rendered via JS -->
             </div>
@@ -449,12 +455,14 @@
       pixKey: '41985294063',
       deliveryFee: 5.00,
       meats: [
-        { id: 'bife', name: 'Bife Bovino Acebolado', available: true },
-        { id: 'frango_grelhado', name: 'Filé de Frango Grelhado', available: true },
-        { id: 'parmegiana_frango', name: 'Parmegiana de Frango Crocante', available: true },
-        { id: 'calabresa', name: 'Calabresa Fatiada com Cebola', available: true },
-        { id: 'feijoada', name: 'Feijoada Completa da Casa', available: true },
-        { id: 'costelinha', name: 'Costelinha de Porco Assada', available: true }
+        { id: 'bife_acebolado', name: 'Bife Bovino Acebolado', available: true },
+        { id: 'bife_milanesa', name: 'Bife Bovino à Milanesa Crocante', available: true },
+        { id: 'frango_grelhado', name: 'Filé de Frango Grelhado Suculento', available: true },
+        { id: 'frango_milanesa', name: 'Filé de Frango à Milanesa', available: true },
+        { id: 'calabresa_acebolada', name: 'Calabresa Defumada Acebolada', available: true },
+        { id: 'bisteca_suina', name: 'Bisteca Suína Grelhada na Chapa', available: true },
+        { id: 'costelinha_porco', name: 'Costelinha de Porco Assada', available: true },
+        { id: 'frango_parmegiana', name: 'Parmegiana de Frango (Individual)', available: true }
       ]
     };
 
@@ -463,61 +471,103 @@
 
     // SIZES DEFINITION
     const SIZES = [
-      { id: 'P', name: 'Pequena (P)', weight: 'aprox. 450g', price: 18.00 },
-      { id: 'M', name: 'Média (M)', weight: 'aprox. 650g', price: 22.00, popular: true },
-      { id: 'G', name: 'Grande (G)', weight: 'aprox. 850g', price: 26.00 }
+      { id: 'P', name: 'Marmitex Pequena (P)', weight: 'aprox. 450g • 1 Carne', price: 18.00 },
+      { id: 'M', name: 'Marmitex Média (M)', weight: 'aprox. 650g • 2 Carnes', price: 22.00, popular: true },
+      { id: 'G', name: 'Marmitex Grande (G)', weight: 'aprox. 850g • 2 a 3 Carnes', price: 26.00 }
     ];
 
     // SIDES (ACOMPANHAMENTOS)
     const SIDES = [
-      'Arroz Branco', 'Arroz Integral', 'Feijão Carioca', 'Feijão Preto',
-      'Batata Frita Crocante', 'Purê de Batata Cremoso', 'Farofa Especial da Casa', 'Macarrão Alho e Óleo'
+      'Arroz Branco Soltinho', 'Arroz Integral', 'Feijão Carioca Caseiro', 'Feijão Preto',
+      'Batata Frita Crocante', 'Purê de Batata Cremoso', 'Farofa Especial da Casa', 'Macarrão ao Alho e Óleo', 'Couve Refogada'
     ];
 
     // SALADS
     const SALADS = [
-      'Alface e Tomate', 'Cenoura e Beterraba', 'Vinagrete Caseiro', 'Sem Salada'
+      'Alface Fresca & Tomate', 'Cenoura Ralada & Beterraba', 'Vinagrete Especial', 'Maionese de Batata Caseira', 'Sem Salada'
     ];
 
-    // OTHER MENU ITEMS
+    // COMPLETE REPLICATED MENU FROM IFOOD
     const MENU_ITEMS = {
       marmitas: [
         {
-          id: 'marmita_dia',
-          name: 'Marmita Caseira Tradicional',
-          description: 'A clássica refeição caseira com arroz, feijão, acompanhamentos à sua escolha, salada fresca e carne do dia.',
+          id: 'marmitex_dia',
+          name: 'Marmitex Tradicional do Dia',
+          description: 'A clássica refeição caseira com arroz, feijão, 4 acompanhamentos à sua escolha, salada fresca e carne do dia.',
           priceFrom: 18.00,
           image: 'watermarked_img_14074362198608020855.jpg',
           isCustomizable: true
         },
         {
-          id: 'feijoada_especial',
-          name: 'Feijoada Completa Especial',
-          description: 'Feijão preto com carnes nobres, arroz branco, couve refogada, farofa crocante, torresmo e laranja.',
-          priceFrom: 25.00,
-          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400&q=80',
-          isCustomizable: true
-        },
-        {
-          id: 'parmegiana_executiva',
-          name: 'Parmegiana Executiva com Fritas',
-          description: 'Filé empanado coberto com queijo derretido e molho de tomate caseiro + arroz branco e batata frita.',
-          priceFrom: 28.00,
-          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80',
+          id: 'marmitex_executivo',
+          name: 'Marmitex Executivo Especial',
+          description: 'Porção reforçada de proteína, arroz branco, feijão carioca, batata frita crocante, farofa artesanal e maionese de batata.',
+          priceFrom: 24.00,
+          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80',
           isCustomizable: true
         }
       ],
+      especiais: [
+        {
+          id: 'feijoada_individual',
+          name: 'Feijoada Completa da Família (Individual)',
+          description: 'Feijão preto encorpado com carnes nobres (costelinha, lombo, paio e calabresa). Acompanha arroz branco, couve refogada, farofa crocante, torresmo pururuca e fatias de laranja.',
+          price: 32.00,
+          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
+          isCustomizable: false
+        },
+        {
+          id: 'feijoada_dupla',
+          name: 'Feijoada Completa Família (Serve 2 Pessoas)',
+          description: 'Porção farta de feijoada completa com todas as carnes nobres + arroz branco duplo, couve, farofa da casa, bastante torresmo e laranja.',
+          price: 58.00,
+          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
+          isCustomizable: false
+        },
+        {
+          id: 'parmegiana_carne_ind',
+          name: 'Bife à Parmegiana de Carne Bovina',
+          description: 'Bife bovino macio empanado, coberto com muito queijo mussarela derretido e molho de tomate artesanal. Acompanha arroz branco e batata frita.',
+          price: 34.00,
+          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&q=80',
+          isCustomizable: false
+        },
+        {
+          id: 'parmegiana_frango_ind',
+          name: 'Parmegiana de Filé de Frango',
+          description: 'Filé de peito de frango crocante com queijo mussarela gratinado e molho caseiro. Acompanha arroz branco e batata frita.',
+          price: 29.00,
+          image: 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=500&q=80',
+          isCustomizable: false
+        },
+        {
+          id: 'parmegiana_familia_2p',
+          name: 'Parmegiana Família (Serve 2 a 3 Pessoas)',
+          description: 'Travessa farta de parmegiana (carne ou frango) coberta com queijo derretido e molho artesanal + arroz branco farto e muita batata frita.',
+          price: 59.00,
+          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&q=80',
+          isCustomizable: false
+        }
+      ],
+      porcoes: [
+        { id: 'porcao_torresmo', name: 'Porção de Torresmo Pururuca (250g)', description: 'Torresminho crocante e sequinho frito na hora', price: 18.00, image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80' },
+        { id: 'porcao_fritas', name: 'Porção de Batata Frita Crocante (350g)', description: 'Fritas douradas e salpicadas com orégano', price: 16.00, image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80' },
+        { id: 'porcao_maionese', name: 'Pote de Maionese de Batata Caseira (250g)', description: 'Receita tradicional de família com cheiro-verde', price: 10.00, image: 'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400&q=80' },
+        { id: 'ovo_frito_extra', name: 'Ovo Frito na Manteiga (Extra)', description: 'Gema mole ou dura para coroar sua marmita', price: 3.50, image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' },
+        { id: 'farofa_extra', name: 'Pote de Farofa Especial da Casa (150g)', description: 'Crocante com bacon e temperos especiais', price: 6.00, image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&q=80' }
+      ],
       bebidas: [
-        { id: 'coca_lata', name: 'Coca-Cola Lata 350ml', description: 'Original ou Zero (bem gelada)', price: 6.00, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
-        { id: 'guarana_lata', name: 'Guaraná Antarctica Lata 350ml', description: 'Tradicional gelado', price: 6.00, image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80' },
-        { id: 'coca_2l', name: 'Coca-Cola 2 Litros', description: 'Garrafa 2L gelada', price: 13.00, image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&q=80' },
-        { id: 'suco_laranja', name: 'Suco Natural de Laranja 500ml', description: 'Feito na hora 100% da fruta', price: 8.00, image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&q=80' },
+        { id: 'coca_lata', name: 'Coca-Cola Lata 350ml', description: 'Original ou Sem Açúcar (geladíssima)', price: 6.00, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
+        { id: 'guarana_lata', name: 'Guaraná Antarctica Lata 350ml', description: 'O clássico sabor brasileiro gelado', price: 6.00, image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80' },
+        { id: 'coca_2l', name: 'Coca-Cola Garrafa 2 Litros', description: 'Ideal para almoço em família', price: 14.00, image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&q=80' },
+        { id: 'guarana_2l', name: 'Guaraná Antarctica 2 Litros', description: 'Garrafa 2L bem gelada', price: 13.00, image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400&q=80' },
+        { id: 'suco_laranja', name: 'Suco Natural de Laranja 500ml', description: '100% fruta natural espremida na hora', price: 9.00, image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&q=80' },
         { id: 'agua_mineral', name: 'Água Mineral 500ml', description: 'Com ou sem gás', price: 3.50, image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=400&q=80' }
       ],
       sobremesas: [
-        { id: 'pudim', name: 'Pudim de Leite Condensado', description: 'Fatia generosa com calda de caramelo caseira', price: 7.00, image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?w=400&q=80' },
-        { id: 'mousse_maracuja', name: 'Mousse de Maracujá Cremoso', description: 'Pote 150ml com sementinhas', price: 6.50, image: 'https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=400&q=80' },
-        { id: 'ovo_frito_extra', name: 'Ovo Frito na Manteiga (Extra)', description: 'Adicional para sua marmita', price: 3.00, image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' }
+        { id: 'pudim_leite', name: 'Pudim de Leite Condensado Caseiro', description: 'Fatia generosa, sem furinhos, com calda de caramelo brilhante', price: 8.00, image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?w=400&q=80' },
+        { id: 'mousse_maracuja', name: 'Mousse de Maracujá Cremoso', description: 'Pote 150ml feito com a fruta e sementes', price: 7.00, image: 'https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=400&q=80' },
+        { id: 'mousse_chocolate', name: 'Mousse de Chocolate Tradicional', description: 'Pote 150ml aveludado e saboroso', price: 7.00, image: 'https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=400&q=80' }
       ]
     };
 
@@ -527,8 +577,8 @@
     let currentModalItem = null;
     let selectedSize = SIZES[1]; // default M
     let selectedMeat = null;
-    let selectedSides = ['Arroz Branco', 'Feijão Carioca', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
-    let selectedSalad = 'Alface e Tomate';
+    let selectedSides = ['Arroz Branco Soltinho', 'Feijão Carioca Caseiro', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
+    let selectedSalad = 'Alface Fresca & Tomate';
     let modalQty = 1;
     let deliveryType = 'delivery';
     let selectedPayMethod = 'Pix';
@@ -571,9 +621,9 @@
     function selectCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition';
+        btn.className = 'cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition';
       });
-      event.currentTarget.className = 'cat-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition';
+      event.currentTarget.className = 'cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition';
       renderMenu();
     }
 
@@ -601,8 +651,8 @@
       modalQty = 1;
       selectedSize = SIZES[1]; // default M
       selectedMeat = storeConfig.meats.find(m => m.available)?.name || 'Bife Bovino Acebolado';
-      selectedSides = ['Arroz Branco', 'Feijão Carioca', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
-      selectedSalad = 'Alface e Tomate';
+      selectedSides = ['Arroz Branco Soltinho', 'Feijão Carioca Caseiro', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
+      selectedSalad = 'Alface Fresca & Tomate';
       document.getElementById('itemNotes').value = '';
 
       document.getElementById('modalItemTitle').innerText = item.name;
@@ -713,7 +763,7 @@
       closeCustomModal();
     }
 
-    // DIRECT ADD (BEBIDAS / SOBREMESAS)
+    // DIRECT ADD (BEBIDAS / SOBREMESAS / ESPECIAIS)
     function addToCartDirect(item) {
       const existing = cart.find(i => i.name === item.name);
       if (existing) {
@@ -884,7 +934,7 @@
       const total = subtotal + fee;
 
       // BUILD FORMATTED WHATSAPP MESSAGE
-      let msg = `🍲 *NOVO PEDIDO - MARMITARIA QUENTINHA CASEIRA*\n`;
+      let msg = `🍲 *NOVO PEDIDO - MARMITARIA FAMÍLIA (XAXIM)*\n`;
       msg += `----------------------------------------\n`;
       msg += `👤 *Cliente:* ${name}\n`;
       msg += `📱 *Telefone:* ${phone}\n`;
