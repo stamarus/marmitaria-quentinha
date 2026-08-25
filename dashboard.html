@@ -1179,12 +1179,17 @@
           <div>
             <div class="flex items-center justify-between">
               <h3 class="font-extrabold text-sm text-gray-900">${order.cliente_nome}</h3>
-              ${cleanPhone ? `
-                <a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-xs font-bold flex items-center space-x-1 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                  <i data-lucide="message-circle" class="w-3 h-3"></i>
-                  <span>WhatsApp</span>
-                </a>
-              ` : ''}
+              <div class="flex items-center space-x-1">
+                ${cleanPhone ? `
+                  <button onclick="notifyCustomerWhatsApp('${order.id}')" class="text-emerald-700 hover:text-emerald-800 text-[11px] font-bold flex items-center space-x-1 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-200 transition" title="Enviar Mensagem de Status no WhatsApp do Cliente">
+                    <i data-lucide="bell" class="w-3 h-3 text-emerald-600"></i>
+                    <span>Avisar Cliente</span>
+                  </button>
+                  <a href="https://wa.me/55${cleanPhone}" target="_blank" class="text-gray-600 hover:text-emerald-700 text-xs font-bold p-1 rounded-lg hover:bg-gray-100 transition" title="Conversar no WhatsApp">
+                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  </a>
+                ` : ''}
+              </div>
             </div>
             <p class="text-xs text-gray-500 mt-0.5">${order.cliente_telefone || ''}</p>
           </div>
@@ -1253,8 +1258,12 @@
             ` : ''}
           </div>
         ` : `
-          <div class="pt-2 mt-2 border-t border-gray-100 text-right">
-            <button onclick="updateOrderStatus('${order.id}', 'pendente')" class="text-[11px] text-gray-400 hover:text-gray-700 underline">
+          <div class="pt-2 mt-2 border-t border-gray-100 text-right flex justify-between items-center">
+            <button onclick="notifyCustomerWhatsApp('${order.id}', 'finalizado')" class="text-[11px] text-emerald-600 font-bold hover:underline flex items-center space-x-1">
+              <i data-lucide="message-circle" class="w-3 h-3"></i>
+              <span>Enviar agradecimento</span>
+            </button>
+            <button onclick="updateOrderStatus('${order.id}', 'pendente', false)" class="text-[11px] text-gray-400 hover:text-gray-700 underline">
               Reabrir pedido
             </button>
           </div>
@@ -1263,7 +1272,44 @@
       return card;
     }
 
-    async function updateOrderStatus(orderId, newStatus) {
+    // CUSTOMER WHATSAPP NOTIFICATION
+    function notifyCustomerWhatsApp(orderId, statusOverride = null) {
+      let order = allOrders.find(o => String(o.id) === String(orderId));
+      if (!order && window.lastHistoricalOrders) {
+        order = window.lastHistoricalOrders.find(o => String(o.id) === String(orderId));
+      }
+      if (!order) {
+        showToast('Pedido não encontrado.', true);
+        return;
+      }
+
+      const cleanPhone = (order.cliente_telefone || '').replace(/\D/g, '');
+      if (!cleanPhone) {
+        alert('Telefone do cliente não encontrado neste pedido.');
+        return;
+      }
+
+      const status = statusOverride || order.status;
+      const firstName = (order.cliente_nome || 'Cliente').split(' ')[0];
+      let msg = '';
+
+      if (status === 'em_preparo') {
+        msg = `🍲 Olá, *${firstName}*! Passando para avisar que o seu pedido *#${order.id}* na *Marmitaria Família* foi confirmado e já está sendo preparado com todo o capricho! Em breve te avisamos quando sair para entrega. ✨`;
+      } else if (status === 'saiu_entrega') {
+        msg = `🛵 Oba, *${firstName}*! Seu pedido *#${order.id}* da *Marmitaria Família* acabou de sair para entrega com o nosso motoboy! Fique atento(a) ao seu endereço/interfone. Bom almoço! 🍲`;
+      } else if (status === 'finalizado') {
+        msg = `✅ Olá, *${firstName}*! Seu pedido *#${order.id}* foi concluído/entregue! Esperamos que aproveite a sua refeição feita no capricho. Se puder, nos conte o que achou! A *Marmitaria Família* agradece sua preferência. 🍲❤️`;
+      } else if (status === 'cancelado') {
+        msg = `⚠️ Olá, *${firstName}*! O seu pedido *#${order.id}* na *Marmitaria Família* foi cancelado. Qualquer dúvida estamos à disposição!`;
+      } else {
+        msg = `🍲 Olá, *${firstName}*! Estamos acompanhando o seu pedido *#${order.id}* na *Marmitaria Família*. Qualquer dúvida estamos à disposição!`;
+      }
+
+      const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    async function updateOrderStatus(orderId, newStatus, promptNotification = true) {
       if (!supabaseClient) return;
       try {
         const { error } = await supabaseClient
@@ -1275,7 +1321,22 @@
           alert('Erro ao atualizar pedido: ' + error.message);
         } else {
           loadOrders();
-          showToast('Status do pedido atualizado');
+          showToast('Status atualizado: ' + newStatus);
+
+          if (promptNotification && (newStatus === 'em_preparo' || newStatus === 'saiu_entrega' || newStatus === 'finalizado')) {
+            const statusLabels = {
+              'em_preparo': 'Preparo Iniciado',
+              'saiu_entrega': 'Saiu para Entrega',
+              'finalizado': 'Pedido Entregue'
+            };
+            const label = statusLabels[newStatus] || newStatus;
+            setTimeout(() => {
+              const sendMsg = confirm(`Status alterado para "${label}"! Deseja enviar mensagem no WhatsApp do cliente agora?`);
+              if (sendMsg) {
+                notifyCustomerWhatsApp(orderId, newStatus);
+              }
+            }, 300);
+          }
         }
       } catch(err) {
         console.error(err);
