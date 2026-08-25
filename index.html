@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Marmitaria Família - Feijoada & Parmegiana (Xaxim)</title>
-  <meta name="description" content="A melhor comida caseira do Xaxim! Feijoada completa, parmegianas suculentas e marmitex quentinhas com entrega rápida.">
+  <title>Marmitaria Família - Cardápio do Negão (Xaxim)</title>
+  <meta name="description" content="Comida caseira de verdade no Xaxim! Feijoada completa, marmitex fartos, parmegiana e marmita econômica de 10 reais com entrega rápida.">
   <meta name="theme-color" content="#C0392B">
+  <link rel="manifest" href="manifest.json">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -58,6 +59,13 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
   </style>
 </head>
 <body class="bg-warm-50 text-gray-800 min-h-screen pb-28">
@@ -89,16 +97,16 @@
   <div class="max-w-xl mx-auto px-4 pt-4">
     <div class="bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
       <div class="relative z-10">
-        <span class="bg-white/20 backdrop-blur-sm text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-amber-200">Especialistas em Feijoada & Parmegiana</span>
-        <h2 class="text-xl font-bold mt-2 font-serif">Sabor Caseiro de Família 🍲</h2>
-        <p class="text-xs text-brand-100 mt-1 leading-relaxed">Feijoada no capricho, parmegianas suculentas e marmitex fartos com tempero de mãe. Peça direto sem taxas!</p>
+        <span class="bg-white/20 backdrop-blur-sm text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider text-amber-200">Sabor Caseiro no Capricho</span>
+        <h2 class="text-xl font-bold mt-2 font-serif">Almoço Quentinho & Saboroso 🍲</h2>
+        <p class="text-xs text-brand-100 mt-1 leading-relaxed">Feijoadas completas, parmegianas suculentas e marmitas tradicionais. Peça direto no WhatsApp sem taxas de app!</p>
         
         <div class="flex items-center space-x-3 mt-3 text-xs text-white/90">
           <div class="flex items-center bg-black/25 px-2.5 py-1 rounded-lg">
             <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-amber-300"></i> 11h às 14h30
           </div>
           <div class="flex items-center bg-black/25 px-2.5 py-1 rounded-lg">
-            <i data-lucide="bike" class="w-3.5 h-3.5 mr-1 text-emerald-300"></i> Entrega Rápida
+            <i data-lucide="bike" class="w-3.5 h-3.5 mr-1 text-emerald-300"></i> Entrega no Xaxim
           </div>
         </div>
       </div>
@@ -109,26 +117,37 @@
   <!-- CATEGORY NAVIGATION -->
   <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2">
     <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1" id="categoryTabs">
-      <button onclick="selectCategory('marmitas')" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
-        🍛 Marmitex do Dia
+      <button onclick="selectCategory('marmitas')" id="tab_marmitas" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
+        🍛 Marmitas (P & M)
       </button>
-      <button onclick="selectCategory('especiais')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
-        🥘 Feijoadas & Parmegianas
+      <button onclick="selectCategory('marmita10')" id="tab_marmita10" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        💰 Marmita R$ 10
       </button>
-      <button onclick="selectCategory('porcoes')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
-        🍟 Porções & Extras
+      <button onclick="selectCategory('feijoada')" id="tab_feijoada" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        🥘 Feijoada & Kits
       </button>
-      <button onclick="selectCategory('bebidas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+      <button onclick="selectCategory('adicionais')" id="tab_adicionais" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+        🍗 Adicionais & Porções
+      </button>
+      <button onclick="selectCategory('bebidas')" id="tab_bebidas" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
         🥤 Bebidas
-      </button>
-      <button onclick="selectCategory('sobremesas')" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
-        🍮 Sobremesas
       </button>
     </div>
   </div>
 
+  <!-- INFO BADGE ACOMPANHAMENTOS -->
+  <div class="max-w-xl mx-auto px-4 pt-2">
+    <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-xs text-amber-900 flex items-start space-x-2 shadow-sm">
+      <i data-lucide="sparkles" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+      <div class="leading-tight">
+        <strong class="font-bold text-amber-950">Acompanhamentos das Marmitas Tradicionais:</strong>
+        <p class="text-[11px] text-amber-800 mt-0.5">Arroz soltinho, feijão caseiro, purê de batata, farofa especial, macarrão e salada.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- MENU LIST -->
-  <main class="max-w-xl mx-auto px-4 pt-2 space-y-3" id="menuContainer">
+  <main class="max-w-xl mx-auto px-4 pt-3 space-y-3" id="menuContainer">
     <!-- Items dynamically loaded by JavaScript -->
   </main>
 
@@ -149,14 +168,14 @@
     </button>
   </div>
 
-  <!-- CUSTOMIZATION MODAL (FOR MARMITAS & ESPECIAIS) -->
+  <!-- CUSTOMIZATION MODAL (FOR MARMITAS & MARMITA R$ 10) -->
   <div id="customModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
       <!-- Modal Header -->
       <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-warm-50">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded" id="modalBadge">Monte seu prato</span>
-          <h3 class="font-bold text-gray-900 text-base mt-0.5" id="modalItemTitle">Marmitex Tradicional</h3>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2 py-0.5 rounded" id="modalBadge">Personalize sua Marmita</span>
+          <h3 class="font-bold text-gray-900 text-base mt-0.5" id="modalItemTitle">Filé de Frango à Milanesa</h3>
         </div>
         <button onclick="closeCustomModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -166,7 +185,7 @@
       <!-- Modal Body (Scrollable) -->
       <div class="p-4 overflow-y-auto space-y-5 text-sm">
         
-        <!-- Step 1: Tamanho -->
+        <!-- Section: Tamanho (Para Marmitas P e M) -->
         <div id="sizeStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
@@ -175,93 +194,74 @@
             </h4>
             <span class="text-[11px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Obrigatório</span>
           </div>
-          <div class="grid grid-cols-3 gap-2" id="sizeOptions">
+          <div class="grid grid-cols-2 gap-2.5" id="sizeOptions">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Step 2: Opção de Carne / Proteína -->
-        <div id="meatStepSection">
+        <!-- Section: Mistura (Para Marmita R$ 10) -->
+        <div id="misturaStepSection" class="hidden">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
-              <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">2</span>
-              Carne do Dia (Escolha 1)
+              <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">1</span>
+              Escolha a Mistura
             </h4>
-            <span class="text-[11px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Obrigatório</span>
+            <span class="text-[11px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">1 Opção</span>
           </div>
-          <div class="space-y-2" id="meatOptions">
+          <div class="space-y-2" id="misturaOptions">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Step 3: Acompanhamentos -->
+        <!-- Section: Acompanhamentos (Personalizáveis) -->
         <div id="sideStepSection">
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
-              <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">3</span>
-              Acompanhamentos
+              <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold" id="stepAcompNum">2</span>
+              Acompanhamentos Inclusos
             </h4>
-            <span class="text-[11px] text-gray-500">Marque o que deseja</span>
+            <span class="text-[11px] text-gray-500 font-medium">Desmarque se não quiser algum</span>
           </div>
           <div class="grid grid-cols-2 gap-2" id="sideOptions">
             <!-- Rendered dynamically -->
           </div>
         </div>
 
-        <!-- Step 4: Salada -->
-        <div id="saladStepSection">
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="font-bold text-gray-900 flex items-center">
-              <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold">4</span>
-              Salada Fresca
-            </h4>
-            <span class="text-[11px] text-gray-500">Escolha 1</span>
-          </div>
-          <div class="grid grid-cols-2 gap-2" id="saladOptions">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- Step 5: Observação -->
+        <!-- Section: Observações -->
         <div>
-          <label class="block font-bold text-gray-900 mb-1.5 flex items-center">
-            <i data-lucide="message-square" class="w-4 h-4 mr-1 text-gray-500"></i> Observações adicionais
-          </label>
-          <textarea id="itemNotes" placeholder="Ex: pouco sal, feijão por cima do arroz, sem cebola, talher descartável..." class="w-full text-xs p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-gray-50 resize-none h-16"></textarea>
+          <label class="block font-bold text-gray-900 text-xs mb-1.5">Alguma observação?</label>
+          <input type="text" id="itemNotes" placeholder="Ex: Caprichar no purê, sem cebola, etc." class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
         </div>
 
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-gray-100 bg-warm-50 flex items-center space-x-3">
-        <div class="flex items-center border border-gray-200 rounded-xl bg-white p-1">
-          <button onclick="changeModalQty(-1)" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-lg">
-            <i data-lucide="minus" class="w-4 h-4"></i>
+      <div class="p-4 border-t border-gray-100 bg-warm-50 flex items-center justify-between">
+        <div class="flex items-center space-x-2 bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
+          <button onclick="changeModalQty(-1)" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 text-sm">
+            -
           </button>
-          <span class="w-8 text-center font-bold text-sm" id="modalQty">1</span>
-          <button onclick="changeModalQty(1)" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-lg">
-            <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="w-6 text-center font-bold text-sm" id="modalQty">1</span>
+          <button onclick="changeModalQty(1)" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-700 text-sm">
+            +
           </button>
         </div>
 
-        <button onclick="confirmAddToCart()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-between text-sm transition active:scale-[0.98]">
+        <button onclick="confirmAddToCart()" class="flex-1 ml-3 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-between text-xs transition active:scale-[0.98]">
           <span>Adicionar à Sacola</span>
-          <span id="modalTotalPrice">R$ 0,00</span>
+          <span id="modalTotalPrice" class="text-sm font-extrabold text-amber-300">R$ 0,00</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- CHECKOUT / ORDER REVIEW MODAL -->
+  <!-- CHECKOUT MODAL -->
   <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
-      
       <!-- Checkout Header -->
       <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-warm-50">
         <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center">
-            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          </div>
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-700"></i>
           <h3 class="font-bold text-gray-900 text-base">Finalizar Pedido</h3>
         </div>
         <button onclick="closeCheckoutModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200">
@@ -272,20 +272,20 @@
       <!-- Checkout Body -->
       <div class="p-4 overflow-y-auto space-y-4 text-xs">
         
-        <!-- Cart Items Summary -->
-        <div class="bg-gray-50 rounded-2xl p-3 border border-gray-100 space-y-2.5">
-          <div class="flex items-center justify-between border-b border-gray-200 pb-2">
-            <span class="font-bold text-gray-700 uppercase tracking-wider text-[10px]">Itens Escolhidos</span>
-            <button onclick="clearCart()" class="text-rose-600 font-semibold hover:underline text-[11px]">Esvaziar</button>
+        <!-- Cart Items List -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="font-bold text-gray-900">Itens Selecionados</h4>
+            <button onclick="clearCart()" class="text-[11px] text-red-600 hover:underline">Esvaziar sacola</button>
           </div>
-          <div id="checkoutItemsList" class="space-y-2">
-            <!-- Items rendered here -->
+          <div id="checkoutItemsList" class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+            <!-- Items rendered via JS -->
           </div>
         </div>
 
-        <!-- Delivery Type -->
-        <div>
-          <label class="block font-bold text-gray-900 mb-1.5">Tipo de Entrega</label>
+        <!-- Delivery Option -->
+        <div class="pt-2 border-t border-gray-100">
+          <label class="block font-bold text-gray-900 mb-1.5">Como deseja receber?</label>
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="setDeliveryType('delivery')" id="btnDelivery" class="p-3 rounded-xl border-2 border-brand-700 bg-brand-50 text-brand-700 font-bold flex items-center justify-center space-x-2 transition">
               <i data-lucide="bike" class="w-4 h-4"></i>
@@ -293,60 +293,45 @@
             </button>
             <button type="button" onclick="setDeliveryType('retirada')" id="btnRetirada" class="p-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold flex items-center justify-center space-x-2 transition">
               <i data-lucide="store" class="w-4 h-4"></i>
-              <span>Retirar no Balcão</span>
+              <span>Retirada no Balcão</span>
             </button>
           </div>
         </div>
 
-        <!-- Customer Data Form -->
-        <div class="space-y-2.5 bg-white p-3 rounded-2xl border border-gray-200">
-          <h4 class="font-bold text-gray-900 text-xs flex items-center text-brand-700">
-            <i data-lucide="user" class="w-3.5 h-3.5 mr-1"></i> Seus Dados
-          </h4>
-
+        <!-- Customer Info Form -->
+        <div class="space-y-2.5 pt-2 border-t border-gray-100">
           <div>
-            <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Seu Nome Completo *</label>
-            <input type="text" id="custName" placeholder="Ex: Carlos Eduardo" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
+            <label class="block font-bold text-gray-700 mb-1">Seu Nome *</label>
+            <input type="text" id="custName" placeholder="Como podemos te chamar?" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
+          </div>
+          
+          <div>
+            <label class="block font-bold text-gray-700 mb-1">Seu Telefone / WhatsApp *</label>
+            <input type="tel" id="custPhone" placeholder="(41) 99999-9999" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
           </div>
 
-          <div>
-            <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Seu Telefone / WhatsApp *</label>
-            <input type="tel" id="custPhone" placeholder="(41) 99999-9999" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
-          </div>
-
-          <div id="addressSection" class="space-y-2 pt-1 border-t border-gray-100">
-            <div>
-              <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Endereço de Entrega (Rua e Número) *</label>
-              <input type="text" id="custAddress" placeholder="Rua das Flores, 123 - Xaxim" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-gray-700 mb-0.5">Complemento / Ponto de Referência</label>
-              <input type="text" id="custComp" placeholder="Apto 302, Bloco B, Próximo ao mercado..." class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs">
-            </div>
+          <div id="addressSection">
+            <label class="block font-bold text-gray-700 mb-1">Endereço de Entrega Completo *</label>
+            <input type="text" id="custAddress" placeholder="Rua, número e bairro (Xaxim e região)" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
+            <input type="text" id="custComp" placeholder="Complemento / Ponto de Referência (Apto, Bloco, etc.)" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50 mt-1.5">
           </div>
         </div>
 
         <!-- Payment Method -->
-        <div class="space-y-2 bg-white p-3 rounded-2xl border border-gray-200">
-          <h4 class="font-bold text-gray-900 text-xs flex items-center text-brand-700">
-            <i data-lucide="credit-card" class="w-3.5 h-3.5 mr-1"></i> Forma de Pagamento
-          </h4>
-
+        <div class="pt-2 border-t border-gray-100 space-y-2">
+          <label class="block font-bold text-gray-900">Forma de Pagamento</label>
           <div class="grid grid-cols-3 gap-2">
-            <label class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-brand-700 bg-brand-50 text-brand-700 font-bold cursor-pointer transition pay-label" id="payPixLabel">
-              <input type="radio" name="payMethod" value="Pix" checked onchange="updatePayMethod('Pix')" class="hidden">
+            <label id="payPixLabel" class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-brand-700 bg-brand-50 text-brand-700 font-bold cursor-pointer transition pay-label" onclick="updatePayMethod('Pix')">
               <i data-lucide="qr-code" class="w-4 h-4 mb-1"></i>
-              <span class="text-[11px]">Pix</span>
+              <span>Pix</span>
             </label>
-            <label class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold cursor-pointer transition pay-label" id="payCardLabel">
-              <input type="radio" name="payMethod" value="Cartão (Maquininha)" onchange="updatePayMethod('Cartão')" class="hidden">
+            <label id="payCardLabel" class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold cursor-pointer transition pay-label" onclick="updatePayMethod('Cartão')">
               <i data-lucide="credit-card" class="w-4 h-4 mb-1"></i>
-              <span class="text-[11px]">Cartão</span>
+              <span>Cartão</span>
             </label>
-            <label class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold cursor-pointer transition pay-label" id="payCashLabel">
-              <input type="radio" name="payMethod" value="Dinheiro" onchange="updatePayMethod('Dinheiro')" class="hidden">
+            <label id="payCashLabel" class="flex flex-col items-center justify-center p-2.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold cursor-pointer transition pay-label" onclick="updatePayMethod('Dinheiro')">
               <i data-lucide="banknote" class="w-4 h-4 mb-1"></i>
-              <span class="text-[11px]">Dinheiro</span>
+              <span>Dinheiro</span>
             </label>
           </div>
 
@@ -362,7 +347,7 @@
               </button>
             </div>
             <p class="font-mono text-xs font-bold text-emerald-800 bg-white/80 p-1.5 rounded border border-emerald-200 select-all" id="pixKeyDisplay">41985294063</p>
-            <p class="text-[10px] text-emerald-700">Pague no seu banco e anexe o comprovante na conversa do WhatsApp que vai abrir!</p>
+            <p class="text-[10px] text-emerald-700">Pague no seu banco e envie o comprovante na conversa do WhatsApp que abrirá a seguir!</p>
           </div>
 
           <!-- CASH TROCO BOX -->
@@ -394,7 +379,7 @@
       <div class="p-4 border-t border-gray-100 bg-warm-50">
         <button onclick="sendOrderToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg flex items-center justify-center space-x-2 text-sm transition active:scale-[0.98]">
           <i data-lucide="send" class="w-5 h-5"></i>
-          <span>Enviar Pedido pelo WhatsApp</span>
+          <span>Enviar Pedido no WhatsApp</span>
         </button>
       </div>
     </div>
@@ -429,13 +414,6 @@
             <label class="block font-bold text-gray-700 mb-1">Taxa de Entrega Padrão (R$)</label>
             <input type="number" step="0.5" id="adminDeliveryFee" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 text-xs">
           </div>
-
-          <div class="pt-2 border-t border-gray-100">
-            <h4 class="font-bold text-gray-900 mb-2">Pausar / Liberar Carnes do Dia:</h4>
-            <div id="adminMeatsList" class="space-y-1.5">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
         </div>
       </div>
 
@@ -453,121 +431,139 @@
     const DEFAULT_CONFIG = {
       whatsapp: '5541985294063',
       pixKey: '41985294063',
-      deliveryFee: 5.00,
-      meats: [
-        { id: 'bife_acebolado', name: 'Bife Bovino Acebolado', available: true },
-        { id: 'bife_milanesa', name: 'Bife Bovino à Milanesa Crocante', available: true },
-        { id: 'frango_grelhado', name: 'Filé de Frango Grelhado Suculento', available: true },
-        { id: 'frango_milanesa', name: 'Filé de Frango à Milanesa', available: true },
-        { id: 'calabresa_acebolada', name: 'Calabresa Defumada Acebolada', available: true },
-        { id: 'bisteca_suina', name: 'Bisteca Suína Grelhada na Chapa', available: true },
-        { id: 'costelinha_porco', name: 'Costelinha de Porco Assada', available: true },
-        { id: 'frango_parmegiana', name: 'Parmegiana de Frango (Individual)', available: true }
-      ]
+      deliveryFee: 5.00
     };
 
     // LOAD STORE CONFIG
     let storeConfig = JSON.parse(localStorage.getItem('marmitaria_config')) || DEFAULT_CONFIG;
 
-    // SIZES DEFINITION
-    const SIZES = [
-      { id: 'P', name: 'Marmitex Pequena (P)', weight: 'aprox. 450g • 1 Carne', price: 18.00 },
-      { id: 'M', name: 'Marmitex Média (M)', weight: 'aprox. 650g • 2 Carnes', price: 22.00, popular: true },
-      { id: 'G', name: 'Marmitex Grande (G)', weight: 'aprox. 850g • 2 a 3 Carnes', price: 26.00 }
+    // DEFAULT SIDES FOR TRADITIONAL MARMITAS
+    const DEFAULT_MARMITA_SIDES = [
+      'Arroz Branco Soltinho',
+      'Feijão Caseiro',
+      'Purê de Batata Cremoso',
+      'Farofa da Casa',
+      'Macarrão Especial',
+      'Salada Fresca'
     ];
 
-    // SIDES (ACOMPANHAMENTOS)
-    const SIDES = [
-      'Arroz Branco Soltinho', 'Arroz Integral', 'Feijão Carioca Caseiro', 'Feijão Preto',
-      'Batata Frita Crocante', 'Purê de Batata Cremoso', 'Farofa Especial da Casa', 'Macarrão ao Alho e Óleo', 'Couve Refogada'
+    // DEFAULT SIDES FOR MARMITA R$ 10
+    const DEFAULT_MARMITA10_SIDES = [
+      'Arroz Branco Soltinho',
+      'Feijão Caseiro',
+      'Farofa da Casa'
     ];
 
-    // SALADS
-    const SALADS = [
-      'Alface Fresca & Tomate', 'Cenoura Ralada & Beterraba', 'Vinagrete Especial', 'Maionese de Batata Caseira', 'Sem Salada'
-    ];
-
-    // COMPLETE REPLICATED MENU FROM IFOOD
+    // MENU ITEMS DEFINED ACCORDING TO IGOR'S EXACT CARDAPIO
     const MENU_ITEMS = {
       marmitas: [
         {
-          id: 'marmitex_dia',
-          name: 'Marmitex Tradicional do Dia',
-          description: 'A clássica refeição caseira com arroz, feijão, 4 acompanhamentos à sua escolha, salada fresca e carne do dia.',
-          priceFrom: 18.00,
-          image: 'watermarked_img_14074362198608020855.jpg',
-          isCustomizable: true
+          id: 'frango_milanesa',
+          name: 'Filé de Frango à Milanesa',
+          description: 'Filé de frango empanado super crocante e suculento. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500&q=80',
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual econômica', price: 15.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta e reforçada', price: 22.90, popular: true }
+          ]
         },
         {
-          id: 'marmitex_executivo',
-          name: 'Marmitex Executivo Especial',
-          description: 'Porção reforçada de proteína, arroz branco, feijão carioca, batata frita crocante, farofa artesanal e maionese de batata.',
-          priceFrom: 24.00,
-          image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&q=80',
-          isCustomizable: true
-        }
-      ],
-      especiais: [
-        {
-          id: 'feijoada_individual',
-          name: 'Feijoada Completa da Família (Individual)',
-          description: 'Feijão preto encorpado com carnes nobres (costelinha, lombo, paio e calabresa). Acompanha arroz branco, couve refogada, farofa crocante, torresmo pururuca e fatias de laranja.',
-          price: 32.00,
-          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
-          isCustomizable: false
-        },
-        {
-          id: 'feijoada_dupla',
-          name: 'Feijoada Completa Família (Serve 2 Pessoas)',
-          description: 'Porção farta de feijoada completa com todas as carnes nobres + arroz branco duplo, couve, farofa da casa, bastante torresmo e laranja.',
-          price: 58.00,
-          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
-          isCustomizable: false
-        },
-        {
-          id: 'parmegiana_carne_ind',
-          name: 'Bife à Parmegiana de Carne Bovina',
-          description: 'Bife bovino macio empanado, coberto com muito queijo mussarela derretido e molho de tomate artesanal. Acompanha arroz branco e batata frita.',
-          price: 34.00,
-          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&q=80',
-          isCustomizable: false
-        },
-        {
-          id: 'parmegiana_frango_ind',
-          name: 'Parmegiana de Filé de Frango',
-          description: 'Filé de peito de frango crocante com queijo mussarela gratinado e molho caseiro. Acompanha arroz branco e batata frita.',
-          price: 29.00,
+          id: 'frango_parmegiana',
+          name: 'Filé de Frango à Parmegiana',
+          description: 'Filé de frango empanado coberto com molho de tomate caseiro e queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
           image: 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=500&q=80',
-          isCustomizable: false
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 18.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta com bastante queijo', price: 25.90, popular: true }
+          ]
         },
         {
-          id: 'parmegiana_familia_2p',
-          name: 'Parmegiana Família (Serve 2 a 3 Pessoas)',
-          description: 'Travessa farta de parmegiana (carne ou frango) coberta com queijo derretido e molho artesanal + arroz branco farto e muita batata frita.',
-          price: 59.00,
-          image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&q=80',
-          isCustomizable: false
+          id: 'frango_barbecue',
+          name: 'Filé de Frango Milanesa c/ Molho Barbecue',
+          description: 'Filé de frango crocante finalizado com molho barbecue especial da casa. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          image: 'https://images.unsplash.com/photo-1527477321055-436158a2b00d?w=500&q=80',
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 16.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 23.90, popular: true }
+          ]
+        },
+        {
+          id: 'omelete_queijo',
+          name: 'Marmita Omelete com Queijo',
+          description: 'Omelete fofinho e temperado, recheado com queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          image: 'https://images.unsplash.com/photo-1510693206972-df098062cb71?w=500&q=80',
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+          ]
+        },
+        {
+          id: 'calabresa_acebolada',
+          name: 'Calabresa Acebolada',
+          description: 'Calabresa defumada fatiada e dourada na chapa com cebola suculenta. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=500&q=80',
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+          ]
         }
       ],
-      porcoes: [
-        { id: 'porcao_torresmo', name: 'Porção de Torresmo Pururuca (250g)', description: 'Torresminho crocante e sequinho frito na hora', price: 18.00, image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80' },
-        { id: 'porcao_fritas', name: 'Porção de Batata Frita Crocante (350g)', description: 'Fritas douradas e salpicadas com orégano', price: 16.00, image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80' },
-        { id: 'porcao_maionese', name: 'Pote de Maionese de Batata Caseira (250g)', description: 'Receita tradicional de família com cheiro-verde', price: 10.00, image: 'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=400&q=80' },
-        { id: 'ovo_frito_extra', name: 'Ovo Frito na Manteiga (Extra)', description: 'Gema mole ou dura para coroar sua marmita', price: 3.50, image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' },
-        { id: 'farofa_extra', name: 'Pote de Farofa Especial da Casa (150g)', description: 'Crocante com bacon e temperos especiais', price: 6.00, image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&q=80' }
+      marmita10: [
+        {
+          id: 'marmita_economica_10',
+          name: 'Marmita Econômica (350g)',
+          description: 'Marmitinha de 350 gramas com arroz soltinho, feijão caseiro, farofa e 1 opção de mistura à sua escolha.',
+          image: 'watermarked_img_14074362198608020855.jpg',
+          type: 'marmita_10',
+          price: 10.00,
+          misturas: [
+            'Bistequinha',
+            'Calabresa',
+            'Omelete',
+            'Linguiça Toscana'
+          ]
+        }
+      ],
+      feijoada: [
+        {
+          id: 'marmita_feijoada',
+          name: 'Marmita de Feijoada Completa',
+          description: 'Feijão preto encorpado com courinho, paio, calabresa, costelinha defumada, carne suína e bacon. Acompanha vinagrete, torresmo crocante, couve, arroz e farofa.',
+          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
+          type: 'marmita_sizes',
+          sizes: [
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 20.00 },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 25.00, popular: true }
+          ]
+        },
+        {
+          id: 'kit_feijoada_2p',
+          name: 'Kit Feijoada Completa (2 Pessoas)',
+          description: 'Feijoada farta com courinho, paio, calabresa, costelinha defumada, carne suína e bacon. Acompanha porções generosas de vinagrete, torresmo pururuca, couve refogada, arroz branco e farofa.',
+          price: 50.00,
+          image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&q=80',
+          type: 'direct'
+        }
+      ],
+      adicionais: [
+        { id: 'add_frango_milanesa', name: 'Adicional: Filé de Frango à Milanesa', description: 'Filé crocante extra frito na hora', price: 6.00, type: 'direct', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80' },
+        { id: 'add_frango_parmegiana', name: 'Adicional: Filé de Frango à Parmegiana', description: 'Filé à parmegiana extra com molho e queijo', price: 8.00, type: 'direct', image: 'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&q=80' },
+        { id: 'add_calabresa', name: 'Adicional: Calabresa Acebolada', description: 'Porção extra de calabresa com cebola', price: 7.00, type: 'direct', image: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=400&q=80' },
+        { id: 'porcao_torresmo', name: 'Porção de Torresmo Pururuca (250g)', description: 'Torresminho crocante e sequinho', price: 18.00, type: 'direct', image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80' },
+        { id: 'porcao_fritas', name: 'Porção de Batata Frita Crocante (350g)', description: 'Fritas douradas e sequinhas', price: 16.00, type: 'direct', image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80' },
+        { id: 'ovo_frito', name: 'Ovo Frito na Manteiga (Extra)', description: 'Gema mole ou no ponto desejado', price: 3.50, type: 'direct', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' }
       ],
       bebidas: [
-        { id: 'coca_lata', name: 'Coca-Cola Lata 350ml', description: 'Original ou Sem Açúcar (geladíssima)', price: 6.00, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
-        { id: 'guarana_lata', name: 'Guaraná Antarctica Lata 350ml', description: 'O clássico sabor brasileiro gelado', price: 6.00, image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80' },
-        { id: 'coca_2l', name: 'Coca-Cola Garrafa 2 Litros', description: 'Ideal para almoço em família', price: 14.00, image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&q=80' },
-        { id: 'guarana_2l', name: 'Guaraná Antarctica 2 Litros', description: 'Garrafa 2L bem gelada', price: 13.00, image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400&q=80' },
-        { id: 'suco_laranja', name: 'Suco Natural de Laranja 500ml', description: '100% fruta natural espremida na hora', price: 9.00, image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&q=80' },
-        { id: 'agua_mineral', name: 'Água Mineral 500ml', description: 'Com ou sem gás', price: 3.50, image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=400&q=80' }
-      ],
-      sobremesas: [
-        { id: 'pudim_leite', name: 'Pudim de Leite Condensado Caseiro', description: 'Fatia generosa, sem furinhos, com calda de caramelo brilhante', price: 8.00, image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?w=400&q=80' },
-        { id: 'mousse_maracuja', name: 'Mousse de Maracujá Cremoso', description: 'Pote 150ml feito com a fruta e sementes', price: 7.00, image: 'https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=400&q=80' },
-        { id: 'mousse_chocolate', name: 'Mousse de Chocolate Tradicional', description: 'Pote 150ml aveludado e saboroso', price: 7.00, image: 'https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=400&q=80' }
+        { id: 'cine_200ml', name: 'Refrigerante Cine 200 ml', description: 'Geladinho no tamanho ideal', price: 4.00, type: 'direct', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
+        { id: 'guarana_200ml', name: 'Guaraná Antarctica 200 ml', description: 'O clássico refrigerante gelado', price: 5.00, type: 'direct', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80' },
+        { id: 'kuat_2l', name: 'Refrigerante Kuat 2 Litros', description: 'Garrafa 2L geladíssima para a família', price: 13.00, type: 'direct', image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400&q=80' },
+        { id: 'coca_2l', name: 'Coca-Cola 2 Litros', description: 'Garrafa 2L super gelada', price: 14.00, type: 'direct', image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&q=80' },
+        { id: 'agua_mineral', name: 'Água Mineral 500ml', description: 'Com ou sem gás', price: 3.50, type: 'direct', image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=400&q=80' }
       ]
     };
 
@@ -575,10 +571,9 @@
     let currentCategory = 'marmitas';
     let cart = JSON.parse(localStorage.getItem('marmitaria_cart')) || [];
     let currentModalItem = null;
-    let selectedSize = SIZES[1]; // default M
-    let selectedMeat = null;
-    let selectedSides = ['Arroz Branco Soltinho', 'Feijão Carioca Caseiro', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
-    let selectedSalad = 'Alface Fresca & Tomate';
+    let selectedSize = null;
+    let selectedMistura = 'Bistequinha';
+    let selectedSides = [];
     let modalQty = 1;
     let deliveryType = 'delivery';
     let selectedPayMethod = 'Pix';
@@ -593,9 +588,13 @@
         const card = document.createElement('div');
         card.className = 'bg-white rounded-2xl p-3.5 shadow-sm border border-warm-100 flex space-x-3 items-center hover:shadow-md transition';
         
-        const priceFormatted = item.isCustomizable 
-          ? `A partir de R$ ${item.priceFrom.toFixed(2).replace('.', ',')}`
-          : `R$ ${item.price.toFixed(2).replace('.', ',')}`;
+        let priceFormatted = '';
+        if (item.type === 'marmita_sizes') {
+          const minPrice = Math.min(...item.sizes.map(s => s.price));
+          priceFormatted = `A partir de R$ ${minPrice.toFixed(2).replace('.', ',')}`;
+        } else {
+          priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
+        }
 
         card.innerHTML = `
           <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 flex-shrink-0">
@@ -606,7 +605,7 @@
               <span class="font-extrabold text-brand-700 text-sm">${priceFormatted}</span>
               <button onclick="handleItemClick('${item.id}', '${currentCategory}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 border border-brand-200/60 transition active:scale-95">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>${item.isCustomizable ? 'Montar' : 'Pedir'}</span>
+                <span>${item.type !== 'direct' ? 'Montar' : 'Pedir'}</span>
               </button>
             </div>
           </div>
@@ -623,7 +622,10 @@
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.className = 'cat-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition';
       });
-      event.currentTarget.className = 'cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition';
+      const activeTab = document.getElementById('tab_' + cat);
+      if (activeTab) {
+        activeTab.className = 'cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition';
+      }
       renderMenu();
     }
 
@@ -632,7 +634,7 @@
       const item = MENU_ITEMS[category].find(i => i.id === itemId);
       if (!item) return;
 
-      if (item.isCustomizable) {
+      if (item.type === 'marmita_sizes' || item.type === 'marmita_10') {
         openCustomModal(item);
       } else {
         addToCartDirect({
@@ -649,54 +651,74 @@
     function openCustomModal(item) {
       currentModalItem = item;
       modalQty = 1;
-      selectedSize = SIZES[1]; // default M
-      selectedMeat = storeConfig.meats.find(m => m.available)?.name || 'Bife Bovino Acebolado';
-      selectedSides = ['Arroz Branco Soltinho', 'Feijão Carioca Caseiro', 'Batata Frita Crocante', 'Farofa Especial da Casa'];
-      selectedSalad = 'Alface Fresca & Tomate';
       document.getElementById('itemNotes').value = '';
-
       document.getElementById('modalItemTitle').innerText = item.name;
       document.getElementById('modalQty').innerText = modalQty;
 
-      // Render Sizes
-      const sizeContainer = document.getElementById('sizeOptions');
-      sizeContainer.innerHTML = SIZES.map(s => `
-        <button type="button" onclick="selectSize('${s.id}')" id="sizeBtn_${s.id}" class="p-2.5 rounded-xl border-2 text-center transition ${selectedSize.id === s.id ? 'border-brand-700 bg-brand-50 text-brand-900 font-bold' : 'border-gray-200 bg-white text-gray-700'}">
-          <p class="text-xs font-bold">${s.name}</p>
-          <p class="text-[10px] text-gray-500">${s.weight}</p>
-          <p class="text-xs font-extrabold text-brand-700 mt-1">R$ ${s.price.toFixed(2).replace('.', ',')}</p>
-        </button>
-      `).join('');
-
-      // Render Meats
-      const meatContainer = document.getElementById('meatOptions');
-      meatContainer.innerHTML = storeConfig.meats.map(m => `
-        <label class="flex items-center justify-between p-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer ${!m.available ? 'opacity-40 pointer-events-none' : ''}">
-          <div class="flex items-center space-x-2">
-            <input type="radio" name="meatSelection" value="${m.name}" ${m.name === selectedMeat ? 'checked' : ''} onchange="selectedMeat='${m.name}'" class="text-brand-600 focus:ring-brand-500">
-            <span class="text-xs font-medium text-gray-800">${m.name}</span>
-          </div>
-          ${!m.available ? '<span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">Esgotado</span>' : ''}
-        </label>
-      `).join('');
-
-      // Render Sides
+      const sizeSection = document.getElementById('sizeStepSection');
+      const misturaSection = document.getElementById('misturaStepSection');
       const sideContainer = document.getElementById('sideOptions');
-      sideContainer.innerHTML = SIDES.map(side => `
-        <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
-          <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
-          <span class="text-gray-700">${side}</span>
-        </label>
-      `).join('');
+      const stepAcompNum = document.getElementById('stepAcompNum');
 
-      // Render Salads
-      const saladContainer = document.getElementById('saladOptions');
-      saladContainer.innerHTML = SALADS.map(salad => `
-        <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
-          <input type="radio" name="saladSelection" value="${salad}" ${salad === selectedSalad ? 'checked' : ''} onchange="selectedSalad='${salad}'" class="text-brand-600 focus:ring-brand-500">
-          <span class="text-gray-700">${salad}</span>
-        </label>
-      `).join('');
+      if (item.type === 'marmita_sizes') {
+        sizeSection.classList.remove('hidden');
+        misturaSection.classList.add('hidden');
+        document.getElementById('modalBadge').innerText = 'Escolha o Tamanho & Acompanhamentos';
+        stepAcompNum.innerText = '2';
+
+        selectedSize = item.sizes[1] || item.sizes[0]; // default M
+        selectedSides = [...DEFAULT_MARMITA_SIDES];
+
+        // Render Sizes
+        const sizeContainer = document.getElementById('sizeOptions');
+        sizeContainer.innerHTML = item.sizes.map(s => `
+          <button type="button" onclick="selectSize('${s.id}')" id="sizeBtn_${s.id}" class="p-3 rounded-xl border-2 text-left transition ${selectedSize.id === s.id ? 'border-brand-700 bg-brand-50 text-brand-900 font-bold' : 'border-gray-200 bg-white text-gray-700'}">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold">${s.name}</span>
+              ${s.popular ? '<span class="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded font-bold uppercase">Mais Pedida</span>' : ''}
+            </div>
+            <p class="text-[10px] text-gray-500 mt-0.5">${s.desc}</p>
+            <p class="text-xs font-extrabold text-brand-700 mt-1.5">R$ ${s.price.toFixed(2).replace('.', ',')}</p>
+          </button>
+        `).join('');
+
+        // Render Marmita Sides
+        sideContainer.innerHTML = DEFAULT_MARMITA_SIDES.map(side => `
+          <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
+            <span class="text-gray-700 font-medium">${side}</span>
+          </label>
+        `).join('');
+
+      } else if (item.type === 'marmita_10') {
+        sizeSection.classList.add('hidden');
+        misturaSection.classList.remove('hidden');
+        document.getElementById('modalBadge').innerText = 'Marmita Econômica (350g) - R$ 10,00';
+        stepAcompNum.innerText = '2';
+
+        selectedMistura = item.misturas[0];
+        selectedSides = [...DEFAULT_MARMITA10_SIDES];
+
+        // Render Misturas
+        const misturaContainer = document.getElementById('misturaOptions');
+        misturaContainer.innerHTML = item.misturas.map(mist => `
+          <label class="flex items-center justify-between p-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer">
+            <div class="flex items-center space-x-2">
+              <input type="radio" name="misturaSelection" value="${mist}" ${mist === selectedMistura ? 'checked' : ''} onchange="selectedMistura='${mist}'" class="text-brand-600 focus:ring-brand-500">
+              <span class="text-xs font-bold text-gray-800">${mist}</span>
+            </div>
+            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Inclusa</span>
+          </label>
+        `).join('');
+
+        // Render Marmita 10 Sides
+        sideContainer.innerHTML = DEFAULT_MARMITA10_SIDES.map(side => `
+          <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
+            <span class="text-gray-700 font-medium">${side}</span>
+          </label>
+        `).join('');
+      }
 
       updateModalPrice();
       document.getElementById('customModal').classList.remove('hidden');
@@ -704,13 +726,13 @@
     }
 
     function selectSize(sizeId) {
-      selectedSize = SIZES.find(s => s.id === sizeId);
-      SIZES.forEach(s => {
+      selectedSize = currentModalItem.sizes.find(s => s.id === sizeId);
+      currentModalItem.sizes.forEach(s => {
         const btn = document.getElementById('sizeBtn_' + s.id);
         if (s.id === sizeId) {
-          btn.className = 'p-2.5 rounded-xl border-2 text-center transition border-brand-700 bg-brand-50 text-brand-900 font-bold';
+          btn.className = 'p-3 rounded-xl border-2 text-left transition border-brand-700 bg-brand-50 text-brand-900 font-bold';
         } else {
-          btn.className = 'p-2.5 rounded-xl border-2 text-center transition border-gray-200 bg-white text-gray-700';
+          btn.className = 'p-3 rounded-xl border-2 text-left transition border-gray-200 bg-white text-gray-700';
         }
       });
       updateModalPrice();
@@ -731,7 +753,13 @@
     }
 
     function updateModalPrice() {
-      const total = selectedSize.price * modalQty;
+      let unitPrice = 0;
+      if (currentModalItem.type === 'marmita_sizes') {
+        unitPrice = selectedSize.price;
+      } else if (currentModalItem.type === 'marmita_10') {
+        unitPrice = currentModalItem.price;
+      }
+      const total = unitPrice * modalQty;
       document.getElementById('modalTotalPrice').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
     }
 
@@ -739,22 +767,36 @@
       document.getElementById('customModal').classList.add('hidden');
     }
 
-    // CONFIRM MARMITA TO CART
+    // CONFIRM CUSTOM TO CART
     function confirmAddToCart() {
       const notes = document.getElementById('itemNotes').value.trim();
-      const details = [
-        `Tam: ${selectedSize.name}`,
-        `Carne: ${selectedMeat}`,
-        `Acomp: ${selectedSides.join(', ') || 'Nenhum'}`,
-        `Salada: ${selectedSalad}`,
-        notes ? `Obs: ${notes}` : ''
-      ].filter(Boolean).join(' | ');
+      let itemName = '';
+      let details = '';
+      let unitPrice = 0;
+
+      if (currentModalItem.type === 'marmita_sizes') {
+        itemName = `${currentModalItem.name} (${selectedSize.id})`;
+        unitPrice = selectedSize.price;
+        details = [
+          `Tamanho: ${selectedSize.name}`,
+          `Acompanhamentos: ${selectedSides.join(', ') || 'Nenhum'}`,
+          notes ? `Obs: ${notes}` : ''
+        ].filter(Boolean).join(' | ');
+      } else if (currentModalItem.type === 'marmita_10') {
+        itemName = `Marmita Econômica R$ 10 (350g)`;
+        unitPrice = currentModalItem.price;
+        details = [
+          `Mistura: ${selectedMistura}`,
+          `Acompanhamentos: ${selectedSides.join(', ') || 'Nenhum'}`,
+          notes ? `Obs: ${notes}` : ''
+        ].filter(Boolean).join(' | ');
+      }
 
       const cartItem = {
         id: currentModalItem.id + '_' + Date.now(),
-        name: `${currentModalItem.name} (${selectedSize.id})`,
+        name: itemName,
         details: details,
-        price: selectedSize.price,
+        price: unitPrice,
         qty: modalQty
       };
 
@@ -763,7 +805,7 @@
       closeCustomModal();
     }
 
-    // DIRECT ADD (BEBIDAS / SOBREMESAS / ESPECIAIS)
+    // DIRECT ADD (BEBIDAS / ADICIONAIS / KIT)
     function addToCartDirect(item) {
       const existing = cart.find(i => i.name === item.name);
       if (existing) {
@@ -820,7 +862,7 @@
         row.innerHTML = `
           <div class="flex-1 pr-2">
             <p class="font-bold text-gray-900">${item.qty}x ${item.name}</p>
-            <p class="text-[11px] text-gray-500 leading-tight">${item.details}</p>
+            <p class="text-[11px] text-gray-500 leading-tight">${item.details || ''}</p>
             <p class="font-semibold text-brand-700 text-xs mt-0.5">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</p>
           </div>
           <button onclick="removeItem(${index})" class="text-gray-400 hover:text-red-600 p-1">
@@ -968,10 +1010,10 @@
         msg += `🪙 *Troco para:* ${troco}\n`;
       }
       if (selectedPayMethod === 'Pix') {
-        msg += `⚡ *Chave Pix:* ${storeConfig.pixKey} (Favor anexar comprovante)\n`;
+        msg += `⚡ *Chave Pix:* ${storeConfig.pixKey} (Favor anexar o comprovante)\n`;
       }
       msg += `----------------------------------------\n`;
-      msg += `_Pedido gerado automaticamente pelo Cardápio Digital._`;
+      msg += `_Pedido gerado pelo Cardápio Digital._`;
 
       const encoded = encodeURIComponent(msg);
       const url = `https://wa.me/${storeConfig.whatsapp}?text=${encoded}`;
@@ -991,23 +1033,8 @@
       document.getElementById('adminPixKey').value = storeConfig.pixKey;
       document.getElementById('adminDeliveryFee').value = storeConfig.deliveryFee;
 
-      const meatList = document.getElementById('adminMeatsList');
-      meatList.innerHTML = storeConfig.meats.map((m, idx) => `
-        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200">
-          <span class="font-medium text-gray-800">${m.name}</span>
-          <button type="button" onclick="toggleAdminMeat(${idx})" class="px-2.5 py-1 rounded text-[11px] font-bold ${m.available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
-            ${m.available ? 'Disponível' : 'Esgotado'}
-          </button>
-        </div>
-      `).join('');
-
       document.getElementById('adminModal').classList.remove('hidden');
       lucide.createIcons();
-    }
-
-    function toggleAdminMeat(idx) {
-      storeConfig.meats[idx].available = !storeConfig.meats[idx].available;
-      openAdminModal();
     }
 
     function saveAdminSettings() {
