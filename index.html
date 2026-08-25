@@ -559,11 +559,11 @@
         { id: 'ovo_frito', name: 'Ovo Frito na Manteiga (Extra)', description: 'Gema mole ou no ponto desejado', price: 3.50, type: 'direct', image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80' }
       ],
       bebidas: [
-        { id: 'cine_200ml', name: 'Refrigerante Cine 200 ml', description: 'Geladinho no tamanho ideal', price: 4.00, type: 'direct', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80' },
-        { id: 'guarana_200ml', name: 'Guaraná Antarctica 200 ml', description: 'O clássico refrigerante gelado', price: 5.00, type: 'direct', image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&q=80' },
-        { id: 'kuat_2l', name: 'Refrigerante Kuat 2 Litros', description: 'Garrafa 2L geladíssima para a família', price: 13.00, type: 'direct', image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400&q=80' },
-        { id: 'coca_2l', name: 'Coca-Cola 2 Litros', description: 'Garrafa 2L super gelada', price: 14.00, type: 'direct', image: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&q=80' },
-        { id: 'agua_mineral', name: 'Água Mineral 500ml', description: 'Com ou sem gás', price: 3.50, type: 'direct', image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=400&q=80' }
+        { id: 'cini_200ml', name: 'Refrigerante Cini 200 ml', description: 'O clássico refrigerante paranaense bem gelado', price: 4.00, type: 'direct', image: 'img/cini200ml.jfif' },
+        { id: 'guarana_200ml', name: 'Guaraná Antarctica 200 ml', description: 'O tradicional guaraná geladinho (200ml)', price: 5.00, type: 'direct', image: 'img/guarana200ml.png' },
+        { id: 'kuat_2l', name: 'Refrigerante Kuat 2 Litros', description: 'Garrafa 2L geladíssima para a família', price: 13.00, type: 'direct', image: 'img/kuat2litros.png' },
+        { id: 'coca_2l', name: 'Coca-Cola 2 Litros', description: 'Garrafa 2L super gelada', price: 14.00, type: 'direct', image: 'img/cocacola2litros.jfif' },
+        { id: 'agua_mineral', name: 'Água Mineral 500ml', description: 'Com ou sem gás geladinha', price: 3.50, type: 'direct', image: 'img/agua_mineral_500ml.jfif' }
       ]
     };
 
@@ -1027,7 +1027,7 @@
     // ADMIN MODAL LOGIC
     function openAdminModal() {
       const pin = prompt('Digite a senha de administrador:', '');
-      if (pin !== '1234' && pin !== 'igor') {
+      if (pin !== 'M4rm1t4r14') {
         alert('Senha incorreta.');
         return;
       }
