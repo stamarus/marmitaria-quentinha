@@ -29,6 +29,13 @@
               700: '#c0392b',
               800: '#a93226',
               900: '#641e16',
+            },
+            warm: {
+              50: '#fffaf5',
+              100: '#fef3e7',
+              200: '#fde5cc',
+              800: '#3e2723',
+              900: '#271714',
             }
           },
           fontFamily: {
@@ -42,16 +49,24 @@
 
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .pulse-amber {
-      animation: pulseGlow 1.8s infinite;
-    }
+    .pulse-amber { animation: pulseGlow 1.8s infinite; }
     @keyframes pulseGlow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
       50% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0); }
     }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="fixed top-4 right-4 z-50 transform transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none">
+    <div class="bg-gray-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-2 text-xs font-bold border border-gray-700">
+      <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400" id="toastIcon"></i>
+      <span id="toastMessage">Ação realizada com sucesso</span>
+    </div>
+  </div>
 
   <!-- AUTH OVERLAY -->
   <div id="authScreen" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -60,7 +75,7 @@
         <i data-lucide="lock" class="w-8 h-8"></i>
       </div>
       <h2 class="text-xl font-bold text-gray-900">Painel do Negão</h2>
-      <p class="text-xs text-gray-500 mt-1 mb-5">Digite a senha de administrador para acessar os pedidos</p>
+      <p class="text-xs text-gray-500 mt-1 mb-5">Digite a senha de administrador para acessar o painel</p>
       
       <form onsubmit="handleAuth(event)" class="space-y-4">
         <input type="password" id="adminPassInput" placeholder="Senha de acesso" class="w-full p-3.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-center font-bold tracking-widest text-sm bg-gray-50">
@@ -86,41 +101,47 @@
           <div>
             <div class="flex items-center space-x-2">
               <h1 class="font-extrabold text-base text-gray-900 leading-none">Marmitaria Família</h1>
-              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center">
+              <span id="storeStatusPill" class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> AO VIVO
               </span>
             </div>
-            <p class="text-xs text-gray-500 mt-0.5 font-medium" id="currentDateDisplay">Terça-feira, 25 de Agosto</p>
+            <p class="text-xs text-gray-500 mt-0.5 font-medium" id="currentDateDisplay">Hoje</p>
           </div>
         </div>
 
         <!-- TABS & ACTIONS -->
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
           
-          <nav class="flex space-x-1 bg-gray-100 p-1 rounded-xl text-xs font-bold">
-            <button onclick="switchTab('hoje')" id="tabBtn_hoje" class="px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition">
-              📅 Pedidos de Hoje
+          <nav class="flex space-x-1 bg-gray-100 p-1 rounded-xl text-xs font-bold overflow-x-auto hide-scrollbar">
+            <button onclick="switchTab('hoje')" id="tabBtn_hoje" class="px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap">
+              📅 Pedidos
             </button>
-            <button onclick="switchTab('historico')" id="tabBtn_historico" class="px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition">
-              📜 Histórico Anterior
+            <button onclick="switchTab('historico')" id="tabBtn_historico" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+              📜 Histórico
+            </button>
+            <button onclick="switchTab('cardapio')" id="tabBtn_cardapio" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+              🍽️ Cardápio
+            </button>
+            <button onclick="switchTab('config')" id="tabBtn_config" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+              ⚙️ Horários & Config
             </button>
           </nav>
 
           <!-- SOUND TOGGLE -->
           <button onclick="toggleAudio()" id="audioToggleBtn" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center space-x-1.5 text-xs font-bold transition shadow-sm" title="Alerta Sonoro">
             <i data-lucide="volume-2" class="w-4 h-4 text-emerald-600" id="audioIcon"></i>
-            <span class="hidden md:inline" id="audioStatusText">Som Ativo</span>
+            <span class="hidden xl:inline" id="audioStatusText">Som Ativo</span>
           </button>
 
           <!-- REFRESH -->
-          <button onclick="loadOrders()" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition shadow-sm" title="Recarregar Pedidos">
+          <button onclick="handleRefresh()" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition shadow-sm" title="Recarregar">
             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
           </button>
 
-          <!-- VOLTAR AO CARDAPIO -->
-          <a href="index.html" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition shadow-sm text-xs font-bold flex items-center space-x-1" title="Ver Cardápio">
+          <!-- CARDAPIO CLIENTE -->
+          <a href="index.html" target="_blank" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition shadow-sm text-xs font-bold flex items-center space-x-1" title="Ver Cardápio do Cliente">
             <i data-lucide="external-link" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Cardápio</span>
+            <span class="hidden md:inline">Ver Loja</span>
           </a>
 
           <!-- LOGOUT -->
@@ -183,7 +204,7 @@
 
         </div>
 
-        <!-- FRAME 1: PEDIDOS EM ANDAMENTO (ORDEM CRONOLÓGICA) -->
+        <!-- FRAME 1: PEDIDOS EM ANDAMENTO -->
         <section class="space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -255,8 +276,276 @@
 
       </div>
 
+      <!-- VIEW 3: GERENCIAR CARDÁPIO -->
+      <div id="viewCardapio" class="hidden space-y-6">
+        
+        <!-- Header & Action Bar -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-lg font-extrabold text-gray-900">Gestão do Cardápio</h2>
+              <span class="bg-brand-50 text-brand-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-brand-200" id="totalMenuItemsCount">0 itens</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Ative, pause (esgote) ou edite os preços e itens do seu cardápio em tempo real.</p>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="openItemModal(null)" class="bg-brand-700 hover:bg-brand-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1.5 shadow-md transition active:scale-95">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Adicionar Novo Item</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1">
+          <button onclick="filterCardapioCategory('all')" id="btnFilter_all" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-brand-700 text-white shadow-sm transition">
+            🍽️ Todos
+          </button>
+          <button onclick="filterCardapioCategory('marmitas')" id="btnFilter_marmitas" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🍛 Marmitas Tradicionais
+          </button>
+          <button onclick="filterCardapioCategory('marmita10')" id="btnFilter_marmita10" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            💰 Marmita R$ 10
+          </button>
+          <button onclick="filterCardapioCategory('feijoada')" id="btnFilter_feijoada" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🥘 Feijoada & Kits
+          </button>
+          <button onclick="filterCardapioCategory('adicionais')" id="btnFilter_adicionais" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🍗 Adicionais & Porções
+          </button>
+          <button onclick="filterCardapioCategory('bebidas')" id="btnFilter_bebidas" class="cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🥤 Bebidas
+          </button>
+        </div>
+
+        <!-- Items Container -->
+        <div id="cardapioItemsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamic cardapio product cards -->
+        </div>
+
+      </div>
+
+      <!-- VIEW 4: HORÁRIOS & CONFIGURAÇÕES -->
+      <div id="viewConfig" class="hidden space-y-6">
+        
+        <div class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm max-w-3xl mx-auto space-y-6">
+          
+          <div class="border-b border-gray-100 pb-4">
+            <h2 class="text-lg font-extrabold text-gray-900 flex items-center space-x-2">
+              <i data-lucide="settings" class="w-5 h-5 text-brand-700"></i>
+              <span>Horários e Configurações da Loja</span>
+            </h2>
+            <p class="text-xs text-gray-500 mt-1">Configure o horário de expediente, modo de abertura e dados de pagamento.</p>
+          </div>
+
+          <!-- Store Status Mode -->
+          <div class="space-y-3">
+            <label class="block text-xs font-extrabold text-gray-800 uppercase tracking-wider">Status Operacional da Loja</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              
+              <label class="relative flex flex-col p-3.5 border-2 rounded-2xl cursor-pointer transition hover:bg-gray-50" id="labelModeAuto">
+                <input type="radio" name="storeStatusMode" value="auto" class="sr-only" onchange="handleModeChange('auto')">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-gray-900">🤖 Automático</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Abre e fecha conforme o horário configurado abaixo.</p>
+              </label>
+
+              <label class="relative flex flex-col p-3.5 border-2 rounded-2xl cursor-pointer transition hover:bg-gray-50" id="labelModeOpen">
+                <input type="radio" name="storeStatusMode" value="aberta" class="sr-only" onchange="handleModeChange('aberta')">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-emerald-800">🟢 Forçar Aberta</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Mantém a loja recebendo pedidos independente do horário.</p>
+              </label>
+
+              <label class="relative flex flex-col p-3.5 border-2 rounded-2xl cursor-pointer transition hover:bg-gray-50" id="labelModeClosed">
+                <input type="radio" name="storeStatusMode" value="fechada" class="sr-only" onchange="handleModeChange('fechada')">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-red-800">🔴 Forçar Fechada</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Bloqueia pedidos imediatos (ex: feriado, imprevisto).</p>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- Working Hours & Days -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Horário de Abertura</label>
+              <input type="time" id="cfgOpenTime" value="11:00" class="w-full p-3 rounded-xl border border-gray-200 text-sm font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Horário de Fechamento</label>
+              <input type="time" id="cfgCloseTime" value="14:30" class="w-full p-3 rounded-xl border border-gray-200 text-sm font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50">
+            </div>
+          </div>
+
+          <!-- Working Days -->
+          <div class="space-y-2 pt-2">
+            <label class="block text-xs font-bold text-gray-700">Dias de Funcionamento</label>
+            <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_dom" value="0" class="rounded text-brand-600 mb-1">
+                <span>Dom</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_seg" value="1" class="rounded text-brand-600 mb-1" checked>
+                <span>Seg</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_ter" value="2" class="rounded text-brand-600 mb-1" checked>
+                <span>Ter</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_qua" value="3" class="rounded text-brand-600 mb-1" checked>
+                <span>Qua</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_qui" value="4" class="rounded text-brand-600 mb-1" checked>
+                <span>Qui</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_sex" value="5" class="rounded text-brand-600 mb-1" checked>
+                <span>Sex</span>
+              </label>
+              <label class="flex flex-col items-center justify-center p-2 rounded-xl border border-gray-200 cursor-pointer text-xs font-bold hover:bg-gray-50">
+                <input type="checkbox" id="day_sab" value="6" class="rounded text-brand-600 mb-1" checked>
+                <span>Sáb</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Business Info (WhatsApp, Pix, Delivery Fee) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">WhatsApp de Pedidos</label>
+              <input type="text" id="cfgWhatsapp" value="5541985294063" class="w-full p-3 rounded-xl border border-gray-200 text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Chave Pix</label>
+              <input type="text" id="cfgPixKey" value="41985294063" class="w-full p-3 rounded-xl border border-gray-200 text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1.5">Taxa de Entrega (R$)</label>
+              <input type="number" step="0.5" id="cfgDeliveryFee" value="5.00" class="w-full p-3 rounded-xl border border-gray-200 text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50">
+            </div>
+          </div>
+
+          <!-- Custom Closed Message -->
+          <div class="pt-2">
+            <label class="block text-xs font-bold text-gray-700 mb-1.5">Mensagem quando a Loja estiver Fechada</label>
+            <textarea id="cfgClosedMessage" rows="2" class="w-full p-3 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50" placeholder="Ex: Estamos fechados no momento. Nosso atendimento é de Seg a Sáb, das 11h às 14h30."></textarea>
+          </div>
+
+          <!-- Save Button -->
+          <div class="pt-4 border-t border-gray-100 flex justify-end">
+            <button onclick="saveStoreConfig()" class="w-full sm:w-auto bg-brand-700 hover:bg-brand-800 text-white font-bold px-8 py-3.5 rounded-2xl text-xs transition shadow-lg flex items-center justify-center space-x-2 active:scale-95">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              <span>Salvar Horários & Configurações</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
     </main>
 
+  </div>
+
+  <!-- MODAL: ADICIONAR / EDITAR ITEM DO CARDÁPIO -->
+  <div id="itemEditModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
+      
+      <!-- Header -->
+      <div class="p-4 bg-brand-700 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="utensils" class="w-5 h-5"></i>
+          <h3 class="font-bold text-base" id="modalItemHeaderTitle">Adicionar Item ao Cardápio</h3>
+        </div>
+        <button onclick="closeItemModal()" class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-brand-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body Form -->
+      <form onsubmit="handleSaveItem(event)" class="p-5 overflow-y-auto space-y-4 text-xs flex-1">
+        <input type="hidden" id="editItemId">
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Categoria do Produto</label>
+          <select id="editItemCategory" onchange="handleCategoryTypeChange()" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white focus:ring-2 focus:ring-brand-500">
+            <option value="marmitas">🍛 Marmitas Tradicionais (P e M)</option>
+            <option value="marmita10">💰 Marmita R$ 10 (Econômica)</option>
+            <option value="feijoada">🥘 Feijoada & Kits</option>
+            <option value="adicionais">🍗 Adicionais & Porções</option>
+            <option value="bebidas">🥤 Bebidas</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Nome do Produto</label>
+          <input type="text" id="editItemName" required placeholder="Ex: Filé de Frango à Parmegiana" class="w-full p-2.5 rounded-xl border border-gray-300 font-medium focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Descrição detalhada / Acompanhamentos</label>
+          <textarea id="editItemDesc" rows="2" placeholder="Ex: Acompanha arroz, feijão, purê, farofa..." class="w-full p-2.5 rounded-xl border border-gray-300 font-normal focus:ring-2 focus:ring-brand-500"></textarea>
+        </div>
+
+        <!-- Price Configuration based on Category / Type -->
+        <div id="sectionPriceSizes" class="space-y-2 p-3 bg-brand-50/60 rounded-2xl border border-brand-100">
+          <p class="font-extrabold text-brand-900">Preços por Tamanho (P e M)</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-gray-700 mb-1">Preço Marmita P (R$)</label>
+              <input type="number" step="0.10" id="editPriceP" value="15.00" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+            </div>
+            <div>
+              <label class="block font-bold text-gray-700 mb-1">Preço Marmita M (R$)</label>
+              <input type="number" step="0.10" id="editPriceM" value="22.90" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+            </div>
+          </div>
+        </div>
+
+        <div id="sectionPriceSingle" class="hidden space-y-1">
+          <label class="block font-bold text-gray-700 mb-1">Preço Unitário (R$)</label>
+          <input type="number" step="0.10" id="editPriceSingle" value="10.00" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1">Caminho ou Link da Imagem</label>
+          <input type="text" id="editItemImage" placeholder="Ex: img/marmita_milanesa.jpg ou https://..." class="w-full p-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-brand-500">
+          <p class="text-[10px] text-gray-400 mt-1">Exemplos: img/marmita_parmegiana.jpg, img/cini200ml.jfif, img/marmita_feijoada.jpg</p>
+        </div>
+
+        <div class="pt-2">
+          <label class="flex items-center space-x-2.5 p-3 rounded-2xl border border-gray-200 bg-gray-50 cursor-pointer">
+            <input type="checkbox" id="editItemDisponivel" checked class="w-4 h-4 rounded text-brand-600">
+            <div>
+              <span class="font-bold text-gray-900">Item Disponível para Venda</span>
+              <p class="text-[11px] text-gray-500">Desmarque para pausar ou marcar como esgotado temporariamente.</p>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100 flex space-x-2">
+          <button type="button" onclick="closeItemModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 rounded-xl transition shadow-md">
+            Salvar Item
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 
   <!-- SCRIPT LOGIC -->
@@ -267,7 +556,9 @@
     
     let supabaseClient = null;
     try {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
     } catch(e) {
       console.error('Supabase init error:', e);
     }
@@ -277,8 +568,263 @@
     let allOrders = [];
     let knownOrderIds = new Set();
     let audioCtx = null;
+    let currentCardapioCategory = 'all';
 
-    // WEB AUDIO SOUND BEEP (No external audio file required!)
+    // DEFAULT MENU ITEMS (SEED / FALLBACK)
+    const DEFAULT_CARDAPIO = [
+      {
+        id: 'frango_milanesa',
+        categoria: 'marmitas',
+        nome: 'Filé de Frango à Milanesa',
+        descricao: 'Filé de frango empanado super crocante e suculento. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual econômica', price: 15.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta e reforçada', price: 22.90, popular: true }
+        ],
+        preco: 15.00,
+        image: 'img/marmita_milanesa.jpg',
+        disponivel: true,
+        ordem: 1
+      },
+      {
+        id: 'frango_parmegiana',
+        categoria: 'marmitas',
+        nome: 'Filé de Frango à Parmegiana',
+        descricao: 'Filé de frango empanado coberto com molho de tomate caseiro e queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 18.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta com bastante queijo', price: 25.90, popular: true }
+        ],
+        preco: 18.00,
+        image: 'img/marmita_parmegiana.jpg',
+        disponivel: true,
+        ordem: 2
+      },
+      {
+        id: 'frango_barbecue',
+        categoria: 'marmitas',
+        nome: 'Filé de Frango Milanesa c/ Molho Barbecue',
+        descricao: 'Filé de frango crocante finalizado com molho barbecue especial da casa. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 16.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 23.90, popular: true }
+        ],
+        preco: 16.00,
+        image: 'img/marmita_barbecue.jpg',
+        disponivel: true,
+        ordem: 3
+      },
+      {
+        id: 'omelete_queijo',
+        categoria: 'marmitas',
+        nome: 'Marmita Omelete com Queijo',
+        descricao: 'Omelete fofinho e temperado, recheado com queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+        ],
+        preco: 15.00,
+        image: 'img/marmita_omelete.jpg',
+        disponivel: true,
+        ordem: 4
+      },
+      {
+        id: 'calabresa_acebolada',
+        categoria: 'marmitas',
+        nome: 'Calabresa Acebolada',
+        descricao: 'Calabresa defumada fatiada e dourada na chapa com cebola suculenta. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+        ],
+        preco: 15.00,
+        image: 'img/marmita_calabresa.jpg',
+        disponivel: true,
+        ordem: 5
+      },
+      {
+        id: 'marmita_economica_10',
+        categoria: 'marmita10',
+        nome: 'Marmita Econômica (350g)',
+        descricao: 'Marmitinha de 350 gramas com arroz soltinho, feijão caseiro, farofa e 1 opção de mistura (Bistequinha, Calabresa, Omelete ou Linguiça).',
+        type: 'marmita_10',
+        preco: 10.00,
+        misturas: ['Bistequinha', 'Calabresa', 'Omelete', 'Linguiça Toscana'],
+        image: 'img/marmita_economica.jpg',
+        disponivel: true,
+        ordem: 6
+      },
+      {
+        id: 'marmita_feijoada',
+        categoria: 'feijoada',
+        nome: 'Marmita de Feijoada Completa',
+        descricao: 'Feijão preto encorpado com paio, calabresa, costelinha defumada, carne suína e bacon. Acompanha vinagrete, torresmo crocante, couve, arroz e farofa.',
+        type: 'marmita_sizes',
+        sizes: [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 20.00 },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 25.00, popular: true }
+        ],
+        preco: 20.00,
+        image: 'img/marmita_feijoada.jpg',
+        disponivel: true,
+        ordem: 7
+      },
+      {
+        id: 'kit_feijoada_2p',
+        categoria: 'feijoada',
+        nome: 'Kit Feijoada Completa (2 Pessoas)',
+        descricao: 'Feijoada farta para 2 pessoas com porções generosas de vinagrete, torresmo pururuca, couve refogada, arroz branco e farofa.',
+        type: 'direct',
+        preco: 50.00,
+        image: 'img/kit_feijoada.jpg',
+        disponivel: true,
+        ordem: 8
+      },
+      {
+        id: 'add_frango_milanesa',
+        categoria: 'adicionais',
+        nome: 'Adicional: Filé de Frango à Milanesa',
+        descricao: 'Filé crocante extra frito na hora',
+        type: 'direct',
+        preco: 6.00,
+        image: 'img/marmita_milanesa.jpg',
+        disponivel: true,
+        ordem: 9
+      },
+      {
+        id: 'add_frango_parmegiana',
+        categoria: 'adicionais',
+        nome: 'Adicional: Filé de Frango à Parmegiana',
+        descricao: 'Filé à parmegiana extra com molho e queijo',
+        type: 'direct',
+        preco: 8.00,
+        image: 'img/marmita_parmegiana.jpg',
+        disponivel: true,
+        ordem: 10
+      },
+      {
+        id: 'add_calabresa',
+        categoria: 'adicionais',
+        nome: 'Adicional: Calabresa Acebolada',
+        descricao: 'Porção extra de calabresa com cebola',
+        type: 'direct',
+        preco: 7.00,
+        image: 'img/marmita_calabresa.jpg',
+        disponivel: true,
+        ordem: 11
+      },
+      {
+        id: 'porcao_torresmo',
+        categoria: 'adicionais',
+        nome: 'Porção de Torresmo Pururuca (250g)',
+        descricao: 'Torresminho crocante e sequinho',
+        type: 'direct',
+        preco: 18.00,
+        image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=80',
+        disponivel: true,
+        ordem: 12
+      },
+      {
+        id: 'porcao_fritas',
+        categoria: 'adicionais',
+        nome: 'Porção de Batata Frita Crocante (350g)',
+        descricao: 'Fritas douradas e sequinhas',
+        type: 'direct',
+        preco: 16.00,
+        image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80',
+        disponivel: true,
+        ordem: 13
+      },
+      {
+        id: 'ovo_frito',
+        categoria: 'adicionais',
+        nome: 'Ovo Frito na Manteiga (Extra)',
+        descricao: 'Gema mole ou no ponto desejado',
+        type: 'direct',
+        preco: 3.50,
+        image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80',
+        disponivel: true,
+        ordem: 14
+      },
+      {
+        id: 'cini_200ml',
+        categoria: 'bebidas',
+        nome: 'Refrigerante Cini 200 ml',
+        descricao: 'O clássico refrigerante paranaense bem gelado',
+        type: 'direct',
+        preco: 4.00,
+        image: 'img/cini200ml.jfif',
+        disponivel: true,
+        ordem: 15
+      },
+      {
+        id: 'guarana_200ml',
+        categoria: 'bebidas',
+        nome: 'Guaraná Antarctica 200 ml',
+        descricao: 'O tradicional guaraná geladinho (200ml)',
+        type: 'direct',
+        preco: 5.00,
+        image: 'img/guarana200ml.png',
+        disponivel: true,
+        ordem: 16
+      },
+      {
+        id: 'kuat_2l',
+        categoria: 'bebidas',
+        nome: 'Refrigerante Kuat 2 Litros',
+        descricao: 'Garrafa 2L geladíssima para a família',
+        type: 'direct',
+        preco: 13.00,
+        image: 'img/kuat2litros.png',
+        disponivel: true,
+        ordem: 17
+      },
+      {
+        id: 'coca_2l',
+        categoria: 'bebidas',
+        nome: 'Coca-Cola 2 Litros',
+        descricao: 'Garrafa 2L super gelada',
+        type: 'direct',
+        preco: 14.00,
+        image: 'img/cocacola2litros.jfif',
+        disponivel: true,
+        ordem: 18
+      },
+      {
+        id: 'agua_mineral',
+        categoria: 'bebidas',
+        nome: 'Água Mineral 500ml',
+        descricao: 'Com ou sem gás geladinha',
+        type: 'direct',
+        preco: 3.50,
+        image: 'img/agua_mineral_500ml.jfif',
+        disponivel: true,
+        ordem: 19
+      }
+    ];
+
+    let cardapioItems = JSON.parse(localStorage.getItem('marmitaria_cardapio_admin')) || [...DEFAULT_CARDAPIO];
+
+    // DEFAULT STORE CONFIG
+    const DEFAULT_CONFIG = {
+      status_modo: 'auto', // 'auto', 'aberta', 'fechada'
+      horario_abertura: '11:00',
+      horario_fechamento: '14:30',
+      dias_funcionamento: [1, 2, 3, 4, 5, 6], // Seg a Sáb
+      whatsapp: '5541985294063',
+      pix_key: '41985294063',
+      taxa_entrega: 5.00,
+      mensagem_fechado: 'Estamos fechados no momento. Nosso horário de atendimento é de Segunda a Sábado, das 11h às 14h30.'
+    };
+
+    let storeConfig = JSON.parse(localStorage.getItem('marmitaria_config')) || DEFAULT_CONFIG;
+
+    // WEB AUDIO SOUND BEEP
     function playOrderBeep() {
       if (!audioEnabled) return;
       try {
@@ -315,10 +861,33 @@
         icon.className = 'w-4 h-4 text-emerald-600';
         text.innerText = 'Som Ativo';
         playOrderBeep();
+        showToast('Alerta sonoro ativado');
       } else {
         icon.className = 'w-4 h-4 text-gray-400';
         text.innerText = 'Som Mudo';
+        showToast('Alerta sonoro desativado');
       }
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      
+      text.innerText = msg;
+      if (isError) {
+        icon.className = 'w-4 h-4 text-red-400';
+      } else {
+        icon.className = 'w-4 h-4 text-emerald-400';
+      }
+      
+      toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+      }, 3000);
     }
 
     // AUTH LOGIC
@@ -353,26 +922,24 @@
       location.reload();
     }
 
-    // TABS
+    // TABS MANAGEMENT
     function switchTab(tab) {
-      const viewHoje = document.getElementById('viewHoje');
-      const viewHist = document.getElementById('viewHistorico');
-      const btnHoje = document.getElementById('tabBtn_hoje');
-      const btnHist = document.getElementById('tabBtn_historico');
+      const tabs = ['hoje', 'historico', 'cardapio', 'config'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
+        const btn = document.getElementById('tabBtn_' + t);
+        if (t === tab) {
+          if (view) view.classList.remove('hidden');
+          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap';
+        } else {
+          if (view) view.classList.add('hidden');
+          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap';
+        }
+      });
 
       if (tab === 'hoje') {
-        viewHoje.classList.remove('hidden');
-        viewHist.classList.add('hidden');
-        btnHoje.className = 'px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition';
-        btnHist.className = 'px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition';
         loadOrders();
-      } else {
-        viewHoje.classList.add('hidden');
-        viewHist.classList.remove('hidden');
-        btnHist.className = 'px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition';
-        btnHoje.className = 'px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition';
-        
-        // Set yesterday as default historical date if empty
+      } else if (tab === 'historico') {
         const dateInput = document.getElementById('historyDateInput');
         if (!dateInput.value) {
           const d = new Date();
@@ -380,17 +947,30 @@
           dateInput.value = d.toISOString().split('T')[0];
         }
         loadHistoricalOrders();
+      } else if (tab === 'cardapio') {
+        loadCardapio();
+      } else if (tab === 'config') {
+        populateConfigUI();
       }
+      lucide.createIcons();
+    }
+
+    function handleRefresh() {
+      loadOrders();
+      loadCardapio();
+      loadStoreConfig();
+      showToast('Dados atualizados com sucesso');
     }
 
     // INITIALIZE DASHBOARD
     function initDashboard() {
       updateDateDisplay();
+      loadStoreConfig();
+      loadCardapio();
       loadOrders();
       setupRealtime();
-      
-      // Auto polling every 10 seconds as safety net
       setInterval(loadOrders, 10000);
+      setInterval(updateStoreStatusBadge, 30000);
     }
 
     function updateDateDisplay() {
@@ -400,9 +980,14 @@
       document.getElementById('currentDateDisplay').innerText = formatted.charAt(0).toUpperCase() + formatted.slice(1);
     }
 
-    // LOAD ORDERS FOR TODAY
+    // ==========================================
+    // 1. ORDERS LOGIC (HOJE & HISTORICO)
+    // ==========================================
     async function loadOrders() {
-      if (!supabaseClient) return;
+      if (!supabaseClient) {
+        renderTodayDashboard(allOrders);
+        return;
+      }
 
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
@@ -419,7 +1004,6 @@
           return;
         }
 
-        // Check for new incoming orders to play beep
         let hasNew = false;
         if (data) {
           data.forEach(order => {
@@ -430,7 +1014,7 @@
           });
         }
 
-        if (hasNew && knownOrderIds.size > data.length) {
+        if (hasNew && knownOrderIds.size > (data ? data.length : 0)) {
           playOrderBeep();
         }
 
@@ -442,7 +1026,6 @@
       }
     }
 
-    // REALTIME SUBSCRIPTION
     function setupRealtime() {
       if (!supabaseClient) return;
       
@@ -451,18 +1034,31 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
           if (payload.eventType === 'INSERT') {
             playOrderBeep();
+            showToast(`Novo pedido de ${payload.new.cliente_nome || 'Cliente'}!`);
           }
           loadOrders();
         })
         .subscribe();
+
+      supabaseClient
+        .channel('cardapio_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'cardapio' }, () => {
+          loadCardapio(false);
+        })
+        .subscribe();
+
+      supabaseClient
+        .channel('loja_config_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'loja_config' }, () => {
+          loadStoreConfig(false);
+        })
+        .subscribe();
     }
 
-    // RENDER TODAY'S CARDS
     function renderTodayDashboard(orders) {
       const andamento = orders.filter(o => o.status !== 'finalizado' && o.status !== 'cancelado');
       const finalizados = orders.filter(o => o.status === 'finalizado');
 
-      // Update Metrics
       const totalRevenue = finalizados.reduce((acc, o) => acc + (parseFloat(o.total) || 0), 0);
       document.getElementById('statFaturamento').innerText = `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`;
       document.getElementById('statTotalPedidos').innerText = orders.length;
@@ -472,7 +1068,6 @@
       document.getElementById('badgePendingCount').innerText = `${andamento.length} em preparo`;
       document.getElementById('badgeDoneCount').innerText = `${finalizados.length} concluídos`;
 
-      // Render Andamento
       const containerAnd = document.getElementById('containerAndamento');
       containerAnd.innerHTML = '';
       if (andamento.length === 0) {
@@ -488,7 +1083,6 @@
         });
       }
 
-      // Render Finalizados
       const containerFin = document.getElementById('containerFinalizados');
       containerFin.innerHTML = '';
       if (finalizados.length === 0) {
@@ -506,7 +1100,6 @@
       lucide.createIcons();
     }
 
-    // CREATE ORDER CARD ELEMENT
     function createOrderCard(order, orderNum, isDone) {
       const card = document.createElement('div');
       const timeStr = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -534,8 +1127,6 @@
       card.className = `bg-white rounded-2xl p-4 border-2 ${borderClass} flex flex-col justify-between transition`;
       card.innerHTML = `
         <div class="space-y-3">
-          
-          <!-- Card Header -->
           <div class="flex items-center justify-between pb-2 border-b border-gray-100">
             <div class="flex items-center space-x-2">
               <span class="font-mono text-xs font-black bg-gray-100 text-gray-800 px-2 py-0.5 rounded-lg">#${orderNum}</span>
@@ -544,7 +1135,6 @@
             ${statusBadge}
           </div>
 
-          <!-- Customer Info -->
           <div>
             <div class="flex items-center justify-between">
               <h3 class="font-extrabold text-sm text-gray-900">${order.cliente_nome}</h3>
@@ -558,7 +1148,6 @@
             <p class="text-xs text-gray-500 mt-0.5">${order.cliente_telefone || ''}</p>
           </div>
 
-          <!-- Delivery Type & Address -->
           <div class="bg-gray-50 p-2.5 rounded-xl text-xs space-y-1">
             <div class="flex items-center space-x-1.5 font-bold ${order.tipo_entrega === 'delivery' ? 'text-brand-700' : 'text-emerald-700'}">
               <i data-lucide="${order.tipo_entrega === 'delivery' ? 'bike' : 'store'}" class="w-3.5 h-3.5"></i>
@@ -570,7 +1159,6 @@
             ` : ''}
           </div>
 
-          <!-- Items List -->
           <div class="space-y-1.5 pt-1">
             <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Itens do Pedido:</p>
             <div class="space-y-1">
@@ -583,7 +1171,6 @@
             </div>
           </div>
 
-          <!-- Payment Info -->
           <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
             <div>
               <span class="text-gray-500">Pagamento: </span>
@@ -595,10 +1182,8 @@
               <span class="text-base font-black text-brand-700">R$ ${(parseFloat(order.total) || 0).toFixed(2).replace('.', ',')}</span>
             </div>
           </div>
-
         </div>
 
-        <!-- Action Buttons -->
         ${!isDone ? `
           <div class="pt-3 mt-3 border-t border-gray-100 grid grid-cols-2 gap-1.5">
             ${order.status === 'pendente' ? `
@@ -637,7 +1222,6 @@
       return card;
     }
 
-    // UPDATE ORDER STATUS
     async function updateOrderStatus(orderId, newStatus) {
       if (!supabaseClient) return;
       try {
@@ -650,13 +1234,13 @@
           alert('Erro ao atualizar pedido: ' + error.message);
         } else {
           loadOrders();
+          showToast('Status do pedido atualizado');
         }
       } catch(err) {
         console.error(err);
       }
     }
 
-    // LOAD HISTORICAL ORDERS
     async function loadHistoricalOrders() {
       if (!supabaseClient) return;
 
@@ -687,7 +1271,6 @@
         document.getElementById('histFaturamento').innerText = `R$ ${faturamento.toFixed(2).replace('.', ',')}`;
         document.getElementById('histTotal').innerText = orders.length;
 
-        // Payment breakdown
         const pixCount = orders.filter(o => o.forma_pagamento === 'Pix').length;
         const cardCount = orders.filter(o => o.forma_pagamento === 'Cartão').length;
         const cashCount = orders.filter(o => o.forma_pagamento === 'Dinheiro').length;
@@ -712,7 +1295,489 @@
       }
     }
 
-    // CHECK AUTH ON LOAD
+    // ==========================================
+    // 2. CARDÁPIO MANAGEMENT LOGIC
+    // ==========================================
+    async function loadCardapio(showToastFeedback = false) {
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('cardapio')
+            .select('*')
+            .order('ordem', { ascending: true });
+
+          if (!error && data && data.length > 0) {
+            cardapioItems = data;
+            localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+          } else if (error) {
+            console.warn('Cardápio table not populated yet or error:', error.message);
+          }
+        } catch(e) {
+          console.warn('Supabase fetch error for cardapio:', e);
+        }
+      }
+
+      renderCardapioGrid();
+      if (showToastFeedback) showToast('Cardápio sincronizado');
+    }
+
+    function filterCardapioCategory(cat) {
+      currentCardapioCategory = cat;
+      document.querySelectorAll('.cardapio-filter-btn').forEach(btn => {
+        btn.className = 'cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition';
+      });
+      const activeBtn = document.getElementById('btnFilter_' + cat);
+      if (activeBtn) {
+        activeBtn.className = 'cardapio-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-brand-700 text-white shadow-sm transition';
+      }
+      renderCardapioGrid();
+    }
+
+    function renderCardapioGrid() {
+      const container = document.getElementById('cardapioItemsContainer');
+      container.innerHTML = '';
+
+      let filtered = cardapioItems;
+      if (currentCardapioCategory !== 'all') {
+        filtered = cardapioItems.filter(i => i.categoria === currentCardapioCategory);
+      }
+
+      document.getElementById('totalMenuItemsCount').innerText = `${cardapioItems.length} itens cadastrados`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full bg-white rounded-2xl p-8 text-center border border-dashed border-gray-300">
+            <p class="text-gray-400 font-bold text-sm">Nenhum produto nesta categoria.</p>
+            <button onclick="openItemModal(null, '${currentCardapioCategory}')" class="mt-3 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-4 py-2 rounded-xl text-xs border border-brand-200">
+              + Cadastrar Produto Aqui
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        const isDisponivel = item.disponivel !== false;
+
+        let priceText = '';
+        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length >= 2) {
+          const p = item.sizes.find(s => s.id === 'P') || item.sizes[0];
+          const m = item.sizes.find(s => s.id === 'M') || item.sizes[1];
+          priceText = `P: R$ ${p.price.toFixed(2).replace('.', ',')} | M: R$ ${m.price.toFixed(2).replace('.', ',')}`;
+        } else {
+          priceText = `R$ ${(parseFloat(item.preco) || 0).toFixed(2).replace('.', ',')}`;
+        }
+
+        const catNames = {
+          marmitas: '🍛 Marmita Tradicional',
+          marmita10: '💰 Marmita R$ 10',
+          feijoada: '🥘 Feijoada',
+          adicionais: '🍗 Adicional',
+          bebidas: '🥤 Bebida'
+        };
+        const catBadge = catNames[item.categoria] || item.categoria;
+
+        card.className = `bg-white rounded-2xl p-4 border-2 ${isDisponivel ? 'border-gray-200' : 'border-red-200 bg-red-50/20'} shadow-sm flex flex-col justify-between transition hover:shadow-md`;
+        
+        card.innerHTML = `
+          <div class="space-y-3">
+            
+            <!-- Top Image & Badges -->
+            <div class="relative">
+              <img src="${item.image || 'img/marmita_milanesa.jpg'}" alt="${item.nome}" onerror="this.src='watermarked_img_14074362198608020855.jpg'" class="w-full h-36 object-cover rounded-xl border border-gray-100">
+              
+              <span class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                ${catBadge}
+              </span>
+
+              <span class="absolute top-2 right-2 ${isDisponivel ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow">
+                ${isDisponivel ? '🟢 Disponível' : '🔴 Esgotado / Pausado'}
+              </span>
+            </div>
+
+            <!-- Details -->
+            <div>
+              <h3 class="font-extrabold text-sm text-gray-900 leading-snug">${item.nome}</h3>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">${item.descricao || 'Sem descrição'}</p>
+            </div>
+
+            <!-- Price -->
+            <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+              <span class="text-[11px] font-bold text-gray-400 uppercase">Preço</span>
+              <span class="text-xs font-black text-brand-700">${priceText}</span>
+            </div>
+
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-3 mt-3 border-t border-gray-100 flex items-center justify-between gap-1.5">
+            
+            <!-- Quick Toggle Status -->
+            <button onclick="toggleItemDisponibilidade('${item.id}')" class="flex-1 ${isDisponivel ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-200'} border font-bold py-2 px-2 rounded-xl text-[11px] flex items-center justify-center space-x-1 transition active:scale-95">
+              <i data-lucide="${isDisponivel ? 'pause-circle' : 'play-circle'}" class="w-3.5 h-3.5"></i>
+              <span>${isDisponivel ? 'Pausar (Esgotou)' : 'Ativar Item'}</span>
+            </button>
+
+            <!-- Edit Button -->
+            <button onclick="openItemModal('${item.id}')" class="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition" title="Editar Item">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Delete Button -->
+            <button onclick="deleteItem('${item.id}')" class="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition" title="Excluir Item">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // TOGGLE AVAILABILITY
+    async function toggleItemDisponibilidade(itemId) {
+      const idx = cardapioItems.findIndex(i => i.id === itemId);
+      if (idx === -1) return;
+
+      const newDisponivel = !cardapioItems[idx].disponivel;
+      cardapioItems[idx].disponivel = newDisponivel;
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      renderCardapioGrid();
+
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('cardapio')
+            .update({ disponivel: newDisponivel })
+            .eq('id', itemId);
+
+          if (error) {
+            console.warn('Supabase toggle error:', error.message);
+          }
+        } catch(e) {
+          console.warn('Supabase toggle catch:', e);
+        }
+      }
+
+      showToast(newDisponivel ? 'Item ativado no cardápio' : 'Item pausado / esgotado');
+    }
+
+    // OPEN ADD / EDIT MODAL
+    function openItemModal(itemId = null, defaultCat = null) {
+      const form = document.getElementById('itemEditModal');
+      const header = document.getElementById('modalItemHeaderTitle');
+      
+      if (itemId) {
+        const item = cardapioItems.find(i => i.id === itemId);
+        if (!item) return;
+
+        header.innerText = 'Editar Item: ' + item.nome;
+        document.getElementById('editItemId').value = item.id;
+        document.getElementById('editItemCategory').value = item.categoria;
+        document.getElementById('editItemName').value = item.nome;
+        document.getElementById('editItemDesc').value = item.descricao || '';
+        document.getElementById('editItemImage').value = item.image || '';
+        document.getElementById('editItemDisponivel').checked = item.disponivel !== false;
+
+        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length >= 2) {
+          const p = item.sizes.find(s => s.id === 'P') || item.sizes[0];
+          const m = item.sizes.find(s => s.id === 'M') || item.sizes[1];
+          document.getElementById('editPriceP').value = p.price;
+          document.getElementById('editPriceM').value = m.price;
+        } else {
+          document.getElementById('editPriceSingle').value = item.preco || 10.00;
+        }
+      } else {
+        header.innerText = 'Adicionar Novo Item ao Cardápio';
+        document.getElementById('editItemId').value = '';
+        document.getElementById('editItemCategory').value = defaultCat && defaultCat !== 'all' ? defaultCat : 'marmitas';
+        document.getElementById('editItemName').value = '';
+        document.getElementById('editItemDesc').value = '';
+        document.getElementById('editItemImage').value = 'img/marmita_milanesa.jpg';
+        document.getElementById('editItemDisponivel').checked = true;
+        document.getElementById('editPriceP').value = '15.00';
+        document.getElementById('editPriceM').value = '22.90';
+        document.getElementById('editPriceSingle').value = '10.00';
+      }
+
+      handleCategoryTypeChange();
+      form.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeItemModal() {
+      document.getElementById('itemEditModal').classList.add('hidden');
+    }
+
+    function handleCategoryTypeChange() {
+      const cat = document.getElementById('editItemCategory').value;
+      const secSizes = document.getElementById('sectionPriceSizes');
+      const secSingle = document.getElementById('sectionPriceSingle');
+
+      if (cat === 'marmitas' || cat === 'feijoada') {
+        secSizes.classList.remove('hidden');
+        secSingle.classList.add('hidden');
+      } else {
+        secSizes.classList.add('hidden');
+        secSingle.classList.remove('hidden');
+      }
+    }
+
+    // SAVE ITEM
+    async function handleSaveItem(e) {
+      e.preventDefault();
+      const id = document.getElementById('editItemId').value || ('item_' + Date.now());
+      const cat = document.getElementById('editItemCategory').value;
+      const nome = document.getElementById('editItemName').value.trim();
+      const desc = document.getElementById('editItemDesc').value.trim();
+      const image = document.getElementById('editItemImage').value.trim();
+      const disponivel = document.getElementById('editItemDisponivel').checked;
+
+      let type = 'direct';
+      let sizes = null;
+      let preco = 0;
+      let misturas = [];
+
+      if (cat === 'marmitas' || cat === 'feijoada') {
+        type = 'marmita_sizes';
+        const priceP = parseFloat(document.getElementById('editPriceP').value) || 15.00;
+        const priceM = parseFloat(document.getElementById('editPriceM').value) || 22.90;
+        sizes = [
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: priceP },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: priceM, popular: true }
+        ];
+        preco = priceP;
+      } else if (cat === 'marmita10') {
+        type = 'marmita_10';
+        preco = parseFloat(document.getElementById('editPriceSingle').value) || 10.00;
+        misturas = ['Bistequinha', 'Calabresa', 'Omelete', 'Linguiça Toscana'];
+      } else {
+        type = 'direct';
+        preco = parseFloat(document.getElementById('editPriceSingle').value) || 0;
+      }
+
+      const itemData = {
+        id: id,
+        categoria: cat,
+        nome: nome,
+        descricao: desc,
+        type: type,
+        sizes: sizes,
+        misturas: misturas,
+        preco: preco,
+        image: image,
+        disponivel: disponivel,
+        ordem: cardapioItems.length + 1
+      };
+
+      const existingIdx = cardapioItems.findIndex(i => i.id === id);
+      if (existingIdx >= 0) {
+        cardapioItems[existingIdx] = { ...cardapioItems[existingIdx], ...itemData };
+      } else {
+        cardapioItems.push(itemData);
+      }
+
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      renderCardapioGrid();
+      closeItemModal();
+
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('cardapio')
+            .upsert(itemData);
+
+          if (error) {
+            console.warn('Supabase upsert error:', error.message);
+          }
+        } catch(err) {
+          console.warn('Supabase upsert exception:', err);
+        }
+      }
+
+      showToast('Item salvo com sucesso!');
+    }
+
+    // DELETE ITEM
+    async function deleteItem(itemId) {
+      const item = cardapioItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (!confirm(`Deseja realmente excluir "${item.nome}" do cardápio?`)) return;
+
+      cardapioItems = cardapioItems.filter(i => i.id !== itemId);
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      renderCardapioGrid();
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient
+            .from('cardapio')
+            .delete()
+            .eq('id', itemId);
+        } catch(e) {
+          console.warn('Supabase delete error:', e);
+        }
+      }
+
+      showToast('Item removido do cardápio');
+    }
+
+    // ==========================================
+    // 3. STORE SETTINGS & HOURS LOGIC
+    // ==========================================
+    async function loadStoreConfig(syncUI = true) {
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('loja_config')
+            .select('*')
+            .eq('id', 'config_geral')
+            .single();
+
+          if (!error && data) {
+            storeConfig = { ...DEFAULT_CONFIG, ...data };
+            localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
+          }
+        } catch(e) {
+          console.warn('Supabase config fetch error:', e);
+        }
+      }
+
+      if (syncUI) {
+        populateConfigUI();
+      }
+      updateStoreStatusBadge();
+    }
+
+    function populateConfigUI() {
+      const mode = storeConfig.status_modo || 'auto';
+      handleModeChange(mode);
+
+      document.getElementById('cfgOpenTime').value = storeConfig.horario_abertura || '11:00';
+      document.getElementById('cfgCloseTime').value = storeConfig.horario_fechamento || '14:30';
+      document.getElementById('cfgWhatsapp').value = storeConfig.whatsapp || '5541985294063';
+      document.getElementById('cfgPixKey').value = storeConfig.pix_key || storeConfig.pixKey || '41985294063';
+      document.getElementById('cfgDeliveryFee').value = storeConfig.taxa_entrega || storeConfig.deliveryFee || 5.00;
+      document.getElementById('cfgClosedMessage').value = storeConfig.mensagem_fechado || DEFAULT_CONFIG.mensagem_fechado;
+
+      const dias = storeConfig.dias_funcionamento || [1, 2, 3, 4, 5, 6];
+      const dayMap = { 0: 'dom', 1: 'seg', 2: 'ter', 3: 'qua', 4: 'qui', 5: 'sex', 6: 'sab' };
+      for (let i = 0; i <= 6; i++) {
+        const el = document.getElementById('day_' + dayMap[i]);
+        if (el) {
+          el.checked = dias.includes(i) || dias.includes(String(i));
+        }
+      }
+    }
+
+    function handleModeChange(mode) {
+      const modes = ['auto', 'aberta', 'fechada'];
+      modes.forEach(m => {
+        const label = document.getElementById(m === 'auto' ? 'labelModeAuto' : m === 'aberta' ? 'labelModeOpen' : 'labelModeClosed');
+        const input = document.querySelector(`input[name="storeStatusMode"][value="${m}"]`);
+        if (input) input.checked = (m === mode);
+        
+        if (label) {
+          if (m === mode) {
+            label.className = 'relative flex flex-col p-3.5 border-2 rounded-2xl cursor-pointer transition border-brand-700 bg-brand-50/50 shadow-sm';
+          } else {
+            label.className = 'relative flex flex-col p-3.5 border-2 rounded-2xl cursor-pointer transition border-gray-200 hover:bg-gray-50';
+          }
+        }
+      });
+    }
+
+    async function saveStoreConfig() {
+      const mode = document.querySelector('input[name="storeStatusMode"]:checked')?.value || 'auto';
+      const openTime = document.getElementById('cfgOpenTime').value || '11:00';
+      const closeTime = document.getElementById('cfgCloseTime').value || '14:30';
+      const whatsapp = document.getElementById('cfgWhatsapp').value.trim() || '5541985294063';
+      const pixKey = document.getElementById('cfgPixKey').value.trim() || '41985294063';
+      const fee = parseFloat(document.getElementById('cfgDeliveryFee').value) || 5.00;
+      const closedMsg = document.getElementById('cfgClosedMessage').value.trim();
+
+      const dayMap = { 0: 'dom', 1: 'seg', 2: 'ter', 3: 'qua', 4: 'qui', 5: 'sex', 6: 'sab' };
+      const dias = [];
+      for (let i = 0; i <= 6; i++) {
+        const el = document.getElementById('day_' + dayMap[i]);
+        if (el && el.checked) dias.push(i);
+      }
+
+      storeConfig = {
+        id: 'config_geral',
+        status_modo: mode,
+        horario_abertura: openTime,
+        horario_fechamento: closeTime,
+        dias_funcionamento: dias,
+        whatsapp: whatsapp,
+        pix_key: pixKey,
+        taxa_entrega: fee,
+        mensagem_fechado: closedMsg,
+        updated_at: new Date().toISOString()
+      };
+
+      // Compatibility properties for index.html
+      storeConfig.pixKey = pixKey;
+      storeConfig.deliveryFee = fee;
+
+      localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
+
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('loja_config')
+            .upsert(storeConfig);
+
+          if (error) {
+            console.warn('Supabase loja_config error:', error.message);
+          }
+        } catch(e) {
+          console.warn('Supabase loja_config exception:', e);
+        }
+      }
+
+      updateStoreStatusBadge();
+      showToast('Configurações e horários salvos com sucesso!');
+    }
+
+    function updateStoreStatusBadge() {
+      const pill = document.getElementById('storeStatusPill');
+      if (!pill) return;
+
+      const mode = storeConfig.status_modo || 'auto';
+      if (mode === 'aberta') {
+        pill.className = 'bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center';
+        pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> FORÇADA ABERTA';
+      } else if (mode === 'fechada') {
+        pill.className = 'bg-red-100 text-red-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center';
+        pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1"></span> FECHADA';
+      } else {
+        // Auto mode check
+        const now = new Date();
+        const curDay = now.getDay();
+        const dias = storeConfig.dias_funcionamento || [1, 2, 3, 4, 5, 6];
+        const isDayValid = dias.includes(curDay) || dias.includes(String(curDay));
+
+        const curTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        const openT = storeConfig.horario_abertura || '11:00';
+        const closeT = storeConfig.horario_fechamento || '14:30';
+
+        const isOpen = isDayValid && (curTime >= openT && curTime <= closeT);
+        if (isOpen) {
+          pill.className = 'bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center';
+          pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> ABERTA (AUTO)';
+        } else {
+          pill.className = 'bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center';
+          pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1"></span> FECHADA (HORÁRIO)';
+        }
+      }
+    }
+
+    // CHECK AUTH ON INITIAL LOAD
     checkAuth();
   </script>
 </body>
