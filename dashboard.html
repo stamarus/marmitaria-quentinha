@@ -478,6 +478,62 @@
             <textarea id="cfgClosedMessage" rows="2" class="w-full p-3 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50" placeholder="Ex: Estamos fechados no momento. Nosso atendimento é de Seg a Sáb, das 11h às 14h30."></textarea>
           </div>
 
+          <!-- Evolution API WhatsApp Automation Section -->
+          <div class="pt-6 border-t border-gray-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-extrabold text-sm text-gray-900 flex items-center space-x-2">
+                  <i data-lucide="bot" class="w-4 h-4 text-emerald-600"></i>
+                  <span>Disparo Automático de WhatsApp (Evolution API)</span>
+                </h3>
+                <p class="text-[11px] text-gray-500 mt-0.5">Envia mensagens de status direto em segundo plano para o cliente sem abrir telas.</p>
+              </div>
+              <div id="evolutionStatusBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600 border border-gray-200 flex items-center space-x-1">
+                <span class="w-2 h-2 rounded-full bg-gray-400" id="evolutionStatusDot"></span>
+                <span id="evolutionStatusText">Não Configurado</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">URL da Evolution API</label>
+                <input type="text" id="cfgEvolutionUrl" placeholder="Ex: https://api.seudominio.com" class="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-mono focus:ring-2 focus:ring-brand-500 bg-gray-50">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">API Key (Global/Instância)</label>
+                <input type="password" id="cfgEvolutionKey" placeholder="Chave da API" class="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-mono focus:ring-2 focus:ring-brand-500 bg-gray-50">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Nome da Instância</label>
+                <input type="text" id="cfgEvolutionInstance" value="marmitaria" placeholder="Ex: marmitaria" class="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-mono focus:ring-2 focus:ring-brand-500 bg-gray-50">
+              </div>
+            </div>
+
+            <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h4 class="font-bold text-xs text-emerald-950 flex items-center space-x-1.5">
+                  <i data-lucide="smartphone" class="w-4 h-4 text-emerald-700"></i>
+                  <span>Conectar Aparelho do Negão (Sem QR Code)</span>
+                </h4>
+                <p class="text-[11px] text-emerald-800 mt-0.5">Gera o código de 8 dígitos para digitar no WhatsApp em <b>Aparelhos Conectados > Conectar com número de telefone</b>.</p>
+              </div>
+              <div class="flex items-center space-x-2 w-full sm:w-auto">
+                <button type="button" onclick="openPairingModal()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center space-x-1.5 active:scale-95">
+                  <i data-lucide="key" class="w-4 h-4"></i>
+                  <span>Gerar Código de 8 Dígitos</span>
+                </button>
+                <button type="button" onclick="checkEvolutionConnectionStatus(true)" class="p-2.5 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-800 transition" title="Verificar Status da Conexão">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2 pt-1">
+              <input type="checkbox" id="cfgEvolutionAutoSend" class="rounded text-brand-600 focus:ring-brand-500" checked>
+              <label for="cfgEvolutionAutoSend" class="text-xs font-bold text-gray-700 cursor-pointer">Disparar WhatsApp automaticamente em segundo plano ao avançar status do pedido</label>
+            </div>
+          </div>
+
           <!-- Save Button -->
           <div class="pt-4 border-t border-gray-100 flex justify-end">
             <button onclick="saveStoreConfig()" class="w-full sm:w-auto bg-brand-700 hover:bg-brand-800 text-white font-bold px-8 py-3.5 rounded-2xl text-xs transition shadow-lg flex items-center justify-center space-x-2 active:scale-95">
@@ -580,6 +636,57 @@
         </div>
 
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PAIRING CODE (CÓDIGO DE 8 DÍGITOS PARA CONEXÃO SEM QR CODE) -->
+  <div id="pairingCodeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 animate-slide-up text-center border border-gray-100">
+      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-100">
+        <i data-lucide="smartphone" class="w-6 h-6"></i>
+      </div>
+      
+      <div>
+        <h3 class="font-extrabold text-lg text-gray-900">Conectar WhatsApp do Negão</h3>
+        <p class="text-xs text-gray-500 mt-1">Conexão rápida por código (sem usar a câmera)</p>
+      </div>
+
+      <!-- Step 1: Input Phone -->
+      <div id="pairingStepPhone" class="space-y-3 text-left">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Número do WhatsApp (com DDD)</label>
+          <input type="tel" id="pairingPhoneInput" placeholder="Ex: 5541985294063" value="5541985294063" class="w-full p-3 rounded-xl border border-gray-300 font-mono text-sm font-bold bg-gray-50 focus:ring-2 focus:ring-brand-500 text-center">
+        </div>
+        <button onclick="requestPairingCode()" id="btnGenerateCode" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center space-x-2 active:scale-95">
+          <i data-lucide="key" class="w-4 h-4"></i>
+          <span>Obter Código de 8 Dígitos</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Display Code -->
+      <div id="pairingStepCode" class="hidden space-y-3">
+        <div class="bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-2xl p-4">
+          <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Código de Pareamento:</p>
+          <p id="displayPairingCode" class="text-3xl sm:text-4xl font-black font-mono text-emerald-700 tracking-widest my-2 select-all">----</p>
+          <p class="text-[10px] text-emerald-600">Este código expira em 2 minutos</p>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-3 text-left text-xs text-gray-600 space-y-1.5 leading-tight border border-gray-100">
+          <p class="font-bold text-gray-800">👉 No WhatsApp do celular do Negão:</p>
+          <p>1. Abra o WhatsApp > Menu <b>(3 pontinhos)</b> > <b>Aparelhos conectados</b></p>
+          <p>2. Toque em <b>Conectar um aparelho</b></p>
+          <p>3. Toque na opção <b>Conectar com número de telefone</b> (embaixo)</p>
+          <p>4. Digite o código de 8 dígitos mostrado acima.</p>
+        </div>
+
+        <button onclick="checkEvolutionConnectionStatus(true); closePairingModal();" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition">
+          Já digitei no celular (Fechar)
+        </button>
+      </div>
+
+      <button onclick="closePairingModal()" class="text-xs text-gray-400 hover:text-gray-600 font-bold block mx-auto mt-2">
+        Cancelar
+      </button>
     </div>
   </div>
 
@@ -854,7 +961,11 @@
       whatsapp: '5541985294063',
       pix_key: '41985294063',
       taxa_entrega: 5.00,
-      mensagem_fechado: 'Estamos fechados no momento. Nosso horário de atendimento é de Segunda a Sábado, das 11h às 14h30.'
+      mensagem_fechado: 'Estamos fechados no momento. Nosso horário de atendimento é de Segunda a Sábado, das 11h às 14h30.',
+      evolution_api_url: '',
+      evolution_api_key: '',
+      evolution_instance_name: 'marmitaria',
+      evolution_auto_send: true
     };
 
     let storeConfig = JSON.parse(localStorage.getItem('marmitaria_config')) || DEFAULT_CONFIG;
@@ -1272,21 +1383,23 @@
       return card;
     }
 
-    // CUSTOMER WHATSAPP NOTIFICATION
-    function notifyCustomerWhatsApp(orderId, statusOverride = null) {
+    // ==========================================
+    // WHATSAPP AUTOMATION & EVOLUTION API
+    // ==========================================
+    async function notifyCustomerWhatsApp(orderId, statusOverride = null, forceFallbackWindow = false) {
       let order = allOrders.find(o => String(o.id) === String(orderId));
       if (!order && window.lastHistoricalOrders) {
         order = window.lastHistoricalOrders.find(o => String(o.id) === String(orderId));
       }
       if (!order) {
         showToast('Pedido não encontrado.', true);
-        return;
+        return false;
       }
 
       const cleanPhone = (order.cliente_telefone || '').replace(/\D/g, '');
       if (!cleanPhone) {
         alert('Telefone do cliente não encontrado neste pedido.');
-        return;
+        return false;
       }
 
       const status = statusOverride || order.status;
@@ -1305,8 +1418,61 @@
         msg = `🍲 Olá, *${firstName}*! Estamos acompanhando o seu pedido *#${order.id}* na *Marmitaria Família*. Qualquer dúvida estamos à disposição!`;
       }
 
+      // Se a Evolution API estiver configurada e não foi forçado abrir janela manual, tenta envio 100% automático em segundo plano
+      const evolutionConfigured = storeConfig.evolution_api_url && storeConfig.evolution_api_key;
+      if (evolutionConfigured && !forceFallbackWindow) {
+        const sent = await sendEvolutionWhatsAppMessage(cleanPhone, msg);
+        if (sent) return true;
+      }
+
+      // Fallback: Abre WhatsApp Web / App
       const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
+      return true;
+    }
+
+    async function sendEvolutionWhatsAppMessage(phone, message) {
+      const url = (storeConfig.evolution_api_url || '').trim().replace(/\/+$/, '');
+      const key = (storeConfig.evolution_api_key || '').trim();
+      const instance = (storeConfig.evolution_instance_name || 'marmitaria').trim();
+
+      if (!url || !key) return false;
+
+      let cleanPhone = phone.replace(/\D/g, '');
+      if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) {
+        cleanPhone = '55' + cleanPhone;
+      }
+
+      try {
+        const res = await fetch(`${url}/message/sendText/${instance}`, {
+          method: 'POST',
+          headers: {
+            'apikey': key,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            number: cleanPhone,
+            text: message,
+            options: {
+              delay: 800,
+              presence: 'composing'
+            }
+          })
+        });
+
+        if (res.ok) {
+          showToast('✅ WhatsApp enviado automaticamente em 2º plano!');
+          return true;
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          console.warn('Evolution API response error:', errData);
+          showToast('Erro no envio automático. Abrindo WhatsApp...', true);
+          return false;
+        }
+      } catch(err) {
+        console.warn('Evolution API fetch exception:', err);
+        return false;
+      }
     }
 
     async function updateOrderStatus(orderId, newStatus, promptNotification = true) {
@@ -1323,23 +1489,180 @@
           loadOrders();
           showToast('Status atualizado: ' + newStatus);
 
-          if (promptNotification && (newStatus === 'em_preparo' || newStatus === 'saiu_entrega' || newStatus === 'finalizado')) {
-            const statusLabels = {
-              'em_preparo': 'Preparo Iniciado',
-              'saiu_entrega': 'Saiu para Entrega',
-              'finalizado': 'Pedido Entregue'
-            };
-            const label = statusLabels[newStatus] || newStatus;
-            setTimeout(() => {
-              const sendMsg = confirm(`Status alterado para "${label}"! Deseja enviar mensagem no WhatsApp do cliente agora?`);
-              if (sendMsg) {
-                notifyCustomerWhatsApp(orderId, newStatus);
-              }
-            }, 300);
+          const isEligibleStatus = (newStatus === 'em_preparo' || newStatus === 'saiu_entrega' || newStatus === 'finalizado');
+          if (promptNotification && isEligibleStatus) {
+            const hasEvolution = storeConfig.evolution_api_url && storeConfig.evolution_api_key;
+            const autoSend = storeConfig.evolution_auto_send !== false;
+
+            if (hasEvolution && autoSend) {
+              // Disparo invisível 100% automático em segundo plano sem popups
+              notifyCustomerWhatsApp(orderId, newStatus, false);
+            } else {
+              // Pergunta amigável para abrir WhatsApp caso a Evolution API ainda não esteja conectada
+              const statusLabels = {
+                'em_preparo': 'Preparo Iniciado',
+                'saiu_entrega': 'Saiu para Entrega',
+                'finalizado': 'Pedido Entregue'
+              };
+              const label = statusLabels[newStatus] || newStatus;
+              setTimeout(() => {
+                const sendMsg = confirm(`Status alterado para "${label}"!\nDeseja avisar o cliente no WhatsApp agora?`);
+                if (sendMsg) {
+                  notifyCustomerWhatsApp(orderId, newStatus, true);
+                }
+              }, 250);
+            }
           }
         }
       } catch(err) {
         console.error(err);
+      }
+    }
+
+    // ==========================================
+    // PAIRING CODE (CONEXÃO POR CÓDIGO DE 8 DÍGITOS)
+    // ==========================================
+    function openPairingModal() {
+      const modal = document.getElementById('pairingCodeModal');
+      const url = (document.getElementById('cfgEvolutionUrl')?.value || storeConfig.evolution_api_url || '').trim();
+      const key = (document.getElementById('cfgEvolutionKey')?.value || storeConfig.evolution_api_key || '').trim();
+
+      if (!url || !key) {
+        alert('Por favor, preencha a URL da Evolution API e a API Key nos campos acima e clique em Salvar primeiro.');
+        return;
+      }
+
+      document.getElementById('pairingStepPhone').classList.remove('hidden');
+      document.getElementById('pairingStepCode').classList.add('hidden');
+      document.getElementById('pairingPhoneInput').value = (storeConfig.whatsapp || '5541985294063').replace(/\D/g, '');
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closePairingModal() {
+      document.getElementById('pairingCodeModal').classList.add('hidden');
+    }
+
+    async function requestPairingCode() {
+      const url = (document.getElementById('cfgEvolutionUrl')?.value || storeConfig.evolution_api_url || '').trim().replace(/\/+$/, '');
+      const key = (document.getElementById('cfgEvolutionKey')?.value || storeConfig.evolution_api_key || '').trim();
+      const instance = (document.getElementById('cfgEvolutionInstance')?.value || storeConfig.evolution_instance_name || 'marmitaria').trim();
+      let phone = document.getElementById('pairingPhoneInput').value.trim().replace(/\D/g, '');
+
+      if (!phone) {
+        alert('Digite o número de telefone completo com DDD (ex: 5541985294063).');
+        return;
+      }
+      if (!phone.startsWith('55') && phone.length <= 11) {
+        phone = '55' + phone;
+      }
+
+      const btn = document.getElementById('btnGenerateCode');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Gerando Código...</span>';
+      lucide.createIcons();
+
+      try {
+        // Tenta conectar direto solicitando o pairingCode
+        let connectRes = await fetch(`${url}/instance/connect/${instance}?number=${phone}`, {
+          method: 'GET',
+          headers: {
+            'apikey': key,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (connectRes.status === 404) {
+          // Cria a instância se ainda não existir
+          await fetch(`${url}/instance/create`, {
+            method: 'POST',
+            headers: {
+              'apikey': key,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              instanceName: instance,
+              qrcode: false,
+              number: phone,
+              integration: 'WHATSAPP-BAILEYS'
+            })
+          });
+
+          // Tenta conectar novamente
+          connectRes = await fetch(`${url}/instance/connect/${instance}?number=${phone}`, {
+            method: 'GET',
+            headers: {
+              'apikey': key,
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+
+        const data = await connectRes.json();
+        const pairingCode = data.pairingCode || data.code || data.pairing_code || (data.instance && data.instance.pairingCode);
+
+        if (pairingCode) {
+          document.getElementById('displayPairingCode').innerText = pairingCode;
+          document.getElementById('pairingStepPhone').classList.add('hidden');
+          document.getElementById('pairingStepCode').classList.remove('hidden');
+          showToast('Código gerado! Digite no celular do Negão.');
+        } else {
+          if (data.state === 'open' || (data.instance && data.instance.state === 'open')) {
+            alert('WhatsApp já está 100% CONECTADO nesta instância!');
+            closePairingModal();
+            checkEvolutionConnectionStatus(true);
+          } else {
+            alert('Resposta da API: ' + JSON.stringify(data));
+          }
+        }
+      } catch(err) {
+        console.error('Pairing error:', err);
+        alert('Erro ao conectar com Evolution API: ' + err.message + '\nVerifique se a URL e a chave da API estão acessíveis.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="key" class="w-4 h-4"></i><span>Obter Código de 8 Dígitos</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function checkEvolutionConnectionStatus(showToastFeedback = false) {
+      const url = (document.getElementById('cfgEvolutionUrl')?.value || storeConfig.evolution_api_url || '').trim().replace(/\/+$/, '');
+      const key = (document.getElementById('cfgEvolutionKey')?.value || storeConfig.evolution_api_key || '').trim();
+      const instance = (document.getElementById('cfgEvolutionInstance')?.value || storeConfig.evolution_instance_name || 'marmitaria').trim();
+
+      const dot = document.getElementById('evolutionStatusDot');
+      const text = document.getElementById('evolutionStatusText');
+      if (!dot || !text) return;
+
+      if (!url || !key) {
+        dot.className = 'w-2 h-2 rounded-full bg-gray-400';
+        text.innerText = 'Não Configurado';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${url}/instance/connectionState/${instance}`, {
+          headers: { 'apikey': key }
+        });
+        const data = await res.json();
+        const state = data.instance?.state || data.state;
+
+        if (state === 'open') {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+          text.innerText = '🟢 Conectado';
+          if (showToastFeedback) showToast('WhatsApp conectado com sucesso!');
+        } else if (state === 'connecting') {
+          dot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+          text.innerText = '🟡 Conectando...';
+          if (showToastFeedback) showToast('WhatsApp conectando...');
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-red-500';
+          text.innerText = '🔴 Desconectado';
+          if (showToastFeedback) showToast('WhatsApp desconectado', true);
+        }
+      } catch(e) {
+        dot.className = 'w-2 h-2 rounded-full bg-red-400';
+        text.innerText = 'Sem Comunicação';
       }
     }
 
@@ -1870,6 +2193,13 @@
       document.getElementById('cfgDeliveryFee').value = storeConfig.taxa_entrega || storeConfig.deliveryFee || 5.00;
       document.getElementById('cfgClosedMessage').value = storeConfig.mensagem_fechado || DEFAULT_CONFIG.mensagem_fechado;
 
+      // Evolution API Fields
+      document.getElementById('cfgEvolutionUrl').value = storeConfig.evolution_api_url || '';
+      document.getElementById('cfgEvolutionKey').value = storeConfig.evolution_api_key || '';
+      document.getElementById('cfgEvolutionInstance').value = storeConfig.evolution_instance_name || 'marmitaria';
+      document.getElementById('cfgEvolutionAutoSend').checked = storeConfig.evolution_auto_send !== false;
+      checkEvolutionConnectionStatus(false);
+
       const dias = storeConfig.dias_funcionamento || [1, 2, 3, 4, 5, 6];
       const dayMap = { 0: 'dom', 1: 'seg', 2: 'ter', 3: 'qua', 4: 'qui', 5: 'sex', 6: 'sab' };
       for (let i = 0; i <= 6; i++) {
@@ -1906,6 +2236,12 @@
       const fee = parseFloat(document.getElementById('cfgDeliveryFee').value) || 5.00;
       const closedMsg = document.getElementById('cfgClosedMessage').value.trim();
 
+      // Evolution API properties
+      const evolutionUrl = document.getElementById('cfgEvolutionUrl').value.trim();
+      const evolutionKey = document.getElementById('cfgEvolutionKey').value.trim();
+      const evolutionInstance = document.getElementById('cfgEvolutionInstance').value.trim() || 'marmitaria';
+      const evolutionAutoSend = document.getElementById('cfgEvolutionAutoSend').checked;
+
       const dayMap = { 0: 'dom', 1: 'seg', 2: 'ter', 3: 'qua', 4: 'qui', 5: 'sex', 6: 'sab' };
       const dias = [];
       for (let i = 0; i <= 6; i++) {
@@ -1923,6 +2259,10 @@
         pix_key: pixKey,
         taxa_entrega: fee,
         mensagem_fechado: closedMsg,
+        evolution_api_url: evolutionUrl,
+        evolution_api_key: evolutionKey,
+        evolution_instance_name: evolutionInstance,
+        evolution_auto_send: evolutionAutoSend,
         updated_at: new Date().toISOString()
       };
 
@@ -1947,6 +2287,7 @@
       }
 
       updateStoreStatusBadge();
+      checkEvolutionConnectionStatus(false);
       showToast('Configurações e horários salvos com sucesso!');
     }
 
