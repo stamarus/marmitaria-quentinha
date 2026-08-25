@@ -56,6 +56,34 @@
     }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ESTILO PARA IMPRESSÃO TÉRMICA */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #thermalReceiptPrintArea, #thermalReceiptPrintArea * {
+        visibility: visible !important;
+      }
+      #thermalReceiptPrintArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 80mm;
+        margin: 0;
+        padding: 5px;
+        color: #000;
+        background: #fff;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        line-height: 1.25;
+      }
+      @page {
+        margin: 0;
+        size: auto;
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
@@ -1139,7 +1167,13 @@
               <span class="font-mono text-xs font-black bg-gray-100 text-gray-800 px-2 py-0.5 rounded-lg">#${orderNum}</span>
               <span class="text-xs font-bold text-gray-500">${timeStr}</span>
             </div>
-            ${statusBadge}
+            <div class="flex items-center space-x-1.5">
+              <button onclick="printOrderReceipt('${order.id}')" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-[11px] font-bold flex items-center space-x-1 transition shadow-sm" title="Imprimir Comanda Térmica">
+                <i data-lucide="printer" class="w-3.5 h-3.5 text-gray-700"></i>
+                <span>Imprimir</span>
+              </button>
+              ${statusBadge}
+            </div>
           </div>
 
           <div>
@@ -1271,6 +1305,7 @@
         }
 
         const orders = data || [];
+        window.lastHistoricalOrders = orders;
         const container = document.getElementById('containerHistorico');
         container.innerHTML = '';
 
@@ -1300,6 +1335,109 @@
       } catch(err) {
         console.error(err);
       }
+    }
+
+    // ==========================================
+    // IMPRESSÃO DE COMANDA TÉRMICA (58mm / 80mm)
+    // ==========================================
+    function printOrderReceipt(orderId) {
+      let order = allOrders.find(o => String(o.id) === String(orderId));
+      if (!order && window.lastHistoricalOrders) {
+        order = window.lastHistoricalOrders.find(o => String(o.id) === String(orderId));
+      }
+      if (!order) {
+        alert('Pedido não encontrado para impressão.');
+        return;
+      }
+
+      const dateStr = new Date(order.created_at || Date.now()).toLocaleDateString('pt-BR');
+      const timeStr = new Date(order.created_at || Date.now()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const itens = Array.isArray(order.itens) ? order.itens : [];
+      const taxa = parseFloat(order.taxa_entrega) || 0;
+      const total = parseFloat(order.total) || 0;
+      const subtotal = parseFloat(order.subtotal) || (total - taxa) || 0;
+
+      let itensHtml = '';
+      itens.forEach(it => {
+        itensHtml += `
+          <div style="margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px;">
+              <span>${it.qty}x ${it.name}</span>
+              <span>R$ ${((parseFloat(it.price) || 0) * it.qty).toFixed(2).replace('.', ',')}</span>
+            </div>
+            ${it.details ? `<div style="font-size: 10px; color: #222; margin-left: 6px; line-height: 1.2;">${it.details}</div>` : ''}
+          </div>
+        `;
+      });
+
+      const receiptHtml = `
+        <div style="text-align: center; margin-bottom: 8px;">
+          <h2 style="font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase;">MARMITARIA FAMÍLIA</h2>
+          <p style="font-size: 11px; margin: 2px 0; font-weight: bold;">Sabor Caseiro no Capricho - Xaxim</p>
+          <p style="font-size: 11px; margin: 2px 0;">WhatsApp: (41) 98529-4063</p>
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
+        <div style="font-size: 12px; margin-bottom: 4px;">
+          <div style="display: flex; justify-content: space-between; font-weight: bold;">
+            <span style="font-size: 14px;">PEDIDO #${order.id}</span>
+            <span>${timeStr} - ${dateStr}</span>
+          </div>
+          <div style="font-weight: 900; margin-top: 4px; font-size: 13px; text-transform: uppercase; background: #eee; padding: 2px 4px; text-align: center;">
+            ${order.tipo_entrega === 'delivery' ? '🛵 ENTREGA EM DOMICÍLIO' : '🏬 RETIRADA NO BALCÃO'}
+          </div>
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
+        <div style="font-size: 12px; margin-bottom: 4px;">
+          <div><strong>Cliente:</strong> ${order.cliente_nome}</div>
+          <div><strong>Telefone:</strong> ${order.cliente_telefone || 'Não informado'}</div>
+          ${order.tipo_entrega === 'delivery' && order.endereco ? `
+            <div style="margin-top: 4px;"><strong>Endereço:</strong> ${order.endereco}</div>
+            ${order.complemento ? `<div><strong>Ref/Compl:</strong> ${order.complemento}</div>` : ''}
+          ` : ''}
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
+        <div style="margin-bottom: 6px;">
+          <div style="font-weight: 900; font-size: 11px; margin-bottom: 4px; text-transform: uppercase;">ITENS DO PEDIDO:</div>
+          ${itensHtml}
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
+        <div style="font-size: 12px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Subtotal:</span>
+            <span>R$ ${subtotal.toFixed(2).replace('.', ',')}</span>
+          </div>
+          ${order.tipo_entrega === 'delivery' ? `
+            <div style="display: flex; justify-content: space-between;">
+              <span>Taxa de Entrega:</span>
+              <span>R$ ${taxa.toFixed(2).replace('.', ',')}</span>
+            </div>
+          ` : ''}
+          <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; margin-top: 4px; border-top: 1px solid #000; padding-top: 4px;">
+            <span>TOTAL:</span>
+            <span>R$ ${total.toFixed(2).replace('.', ',')}</span>
+          </div>
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 6px 0;"></div>
+        <div style="font-size: 11px;">
+          <div><strong>Forma de Pagamento:</strong> ${order.forma_pagamento}</div>
+          ${order.troco_para ? `<div style="font-weight: bold; margin-top: 2px;">Troco para: ${order.troco_para}</div>` : ''}
+        </div>
+        <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+        <div style="text-align: center; font-size: 11px; margin-top: 8px;">
+          <p style="margin: 2px 0; font-weight: bold;">Obrigado pela preferência!</p>
+          <p style="margin: 2px 0;">Bom apetite! 🍲</p>
+        </div>
+      `;
+
+      let printArea = document.getElementById('thermalReceiptPrintArea');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'thermalReceiptPrintArea';
+        document.body.appendChild(printArea);
+      }
+
+      printArea.innerHTML = receiptHtml;
+      window.print();
     }
 
     // ==========================================
