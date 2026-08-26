@@ -531,8 +531,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual econômica', price: 15.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta e reforçada', price: 22.90, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual econômica', price: 15.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta e reforçada', price: 22.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 26.90, available: true }
           ]
         },
         {
@@ -543,8 +544,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 18.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta com bastante queijo', price: 25.90, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 18.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta com bastante queijo', price: 25.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande reforçada', price: 29.90, available: true }
           ]
         },
         {
@@ -555,8 +557,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 16.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 23.90, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 16.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 23.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 27.90, available: true }
           ]
         },
         {
@@ -567,8 +570,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 26.90, available: true }
           ]
         },
         {
@@ -579,8 +583,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 26.90, available: true }
           ]
         }
       ],
@@ -610,8 +615,9 @@
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 20.00 },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 25.00, popular: true }
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 20.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 25.00, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 30.00, available: true }
           ]
         },
         {
@@ -820,9 +826,17 @@
         card.className = 'bg-white rounded-2xl p-3.5 shadow-sm border border-warm-100 flex space-x-3 items-start hover:shadow-md transition';
         
         let priceFormatted = '';
+        let isCompletelyUnavailable = false;
+
         if (item.type === 'marmita_sizes' && item.sizes && item.sizes.length > 0) {
-          const minPrice = Math.min(...item.sizes.map(s => s.price));
-          priceFormatted = `A partir de R$ ${minPrice.toFixed(2).replace('.', ',')}`;
+          const availSizes = item.sizes.filter(s => s.available !== false);
+          if (availSizes.length === 0) {
+            isCompletelyUnavailable = true;
+            priceFormatted = '<span class="text-rose-600 text-xs font-bold">🔴 Esgotado</span>';
+          } else {
+            const minPrice = Math.min(...availSizes.map(s => s.price));
+            priceFormatted = `A partir de R$ ${minPrice.toFixed(2).replace('.', ',')}`;
+          }
         } else {
           priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
         }
@@ -836,10 +850,16 @@
             </div>
             <div class="flex items-center justify-between mt-3 pt-1">
               <span class="font-extrabold text-brand-700 text-sm">${priceFormatted}</span>
-              <button onclick="handleItemClick('${item.id}', '${currentCategory}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 border border-brand-200/60 transition active:scale-95">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>${item.type !== 'direct' ? 'Montar' : 'Pedir'}</span>
-              </button>
+              ${isCompletelyUnavailable ? `
+                <span class="bg-gray-100 text-gray-400 font-bold px-3 py-1.5 rounded-xl text-xs">
+                  Esgotado
+                </span>
+              ` : `
+                <button onclick="handleItemClick('${item.id}', '${currentCategory}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 border border-brand-200/60 transition active:scale-95">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>${item.type !== 'direct' ? 'Montar' : 'Pedir'}</span>
+                </button>
+              `}
             </div>
           </div>
         `;
@@ -899,21 +919,45 @@
         document.getElementById('modalBadge').innerText = 'Escolha o Tamanho & Acompanhamentos';
         stepAcompNum.innerText = '2';
 
-        selectedSize = (item.sizes && item.sizes[1]) || (item.sizes && item.sizes[0]) || { id: 'M', name: 'Marmita M', price: 22.90 };
+        const availSizes = (item.sizes || []).filter(s => s.available !== false);
+        if (availSizes.length === 0) {
+          alert('Desculpe, todos os tamanhos deste prato estão esgotados no momento.');
+          return;
+        }
+
+        // Default to M if available, else first available
+        selectedSize = availSizes.find(s => s.id === 'M') || availSizes[0];
         selectedSides = [...DEFAULT_MARMITA_SIDES];
 
-        // Render Sizes
+        // Render Sizes (P, M, G)
         const sizeContainer = document.getElementById('sizeOptions');
-        sizeContainer.innerHTML = (item.sizes || []).map(s => `
-          <button type="button" onclick="selectSize('${s.id}')" id="sizeBtn_${s.id}" class="p-3 rounded-xl border-2 text-left transition ${selectedSize.id === s.id ? 'border-brand-700 bg-brand-50 text-brand-900 font-bold' : 'border-gray-200 bg-white text-gray-700'}">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold">${s.name}</span>
-              ${s.popular ? '<span class="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded font-bold uppercase">Mais Pedida</span>' : ''}
-            </div>
-            <p class="text-[10px] text-gray-500 mt-0.5">${s.desc || ''}</p>
-            <p class="text-xs font-extrabold text-brand-700 mt-1.5">R$ ${(s.price || 0).toFixed(2).replace('.', ',')}</p>
-          </button>
-        `).join('');
+        sizeContainer.innerHTML = (item.sizes || []).map(s => {
+          const isAvail = s.available !== false;
+          if (!isAvail) {
+            return `
+              <div class="p-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-gray-400 opacity-60 cursor-not-allowed">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold line-through">${s.name}</span>
+                  <span class="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold uppercase">Esgotado</span>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-0.5">${s.desc || ''}</p>
+                <p class="text-xs font-bold text-gray-400 mt-1.5">R$ ${(s.price || 0).toFixed(2).replace('.', ',')}</p>
+              </div>
+            `;
+          }
+
+          const isSelected = selectedSize && selectedSize.id === s.id;
+          return `
+            <button type="button" onclick="selectSize('${s.id}')" id="sizeBtn_${s.id}" class="p-3 rounded-xl border-2 text-left transition ${isSelected ? 'border-brand-700 bg-brand-50 text-brand-900 font-bold shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold">${s.name}</span>
+                ${s.popular ? '<span class="text-[9px] bg-brand-600 text-white px-1.5 py-0.5 rounded font-bold uppercase">Mais Pedida</span>' : ''}
+              </div>
+              <p class="text-[10px] text-gray-500 mt-0.5">${s.desc || ''}</p>
+              <p class="text-xs font-extrabold text-brand-700 mt-1.5">R$ ${(s.price || 0).toFixed(2).replace('.', ',')}</p>
+            </button>
+          `;
+        }).join('');
 
         // Render Marmita Sides
         sideContainer.innerHTML = DEFAULT_MARMITA_SIDES.map(side => `
@@ -959,14 +1003,17 @@
     }
 
     function selectSize(sizeId) {
-      selectedSize = currentModalItem.sizes.find(s => s.id === sizeId);
+      const target = (currentModalItem.sizes || []).find(s => s.id === sizeId);
+      if (!target || target.available === false) return;
+
+      selectedSize = target;
       currentModalItem.sizes.forEach(s => {
         const btn = document.getElementById('sizeBtn_' + s.id);
         if (btn) {
           if (s.id === sizeId) {
-            btn.className = 'p-3 rounded-xl border-2 text-left transition border-brand-700 bg-brand-50 text-brand-900 font-bold';
+            btn.className = 'p-3 rounded-xl border-2 text-left transition border-brand-700 bg-brand-50 text-brand-900 font-bold shadow-sm';
           } else {
-            btn.className = 'p-3 rounded-xl border-2 text-left transition border-gray-200 bg-white text-gray-700';
+            btn.className = 'p-3 rounded-xl border-2 text-left transition border-gray-200 bg-white text-gray-700 hover:border-gray-300';
           }
         }
       });

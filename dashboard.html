@@ -577,9 +577,9 @@
         <div>
           <label class="block font-bold text-gray-700 mb-1">Categoria do Produto</label>
           <select id="editItemCategory" onchange="handleCategoryTypeChange()" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white focus:ring-2 focus:ring-brand-500">
-            <option value="marmitas">🍛 Marmitas Tradicionais (P e M)</option>
+            <option value="marmitas">🍛 Marmitas Tradicionais (Tamanhos P, M e G)</option>
             <option value="marmita10">💰 Marmita R$ 10 (Econômica)</option>
-            <option value="feijoada">🥘 Feijoada & Kits</option>
+            <option value="feijoada">🥘 Feijoada & Especiais</option>
             <option value="adicionais">🍗 Adicionais & Porções</option>
             <option value="bebidas">🥤 Bebidas</option>
           </select>
@@ -595,38 +595,94 @@
           <textarea id="editItemDesc" rows="2" placeholder="Ex: Acompanha arroz, feijão, purê, farofa..." class="w-full p-2.5 rounded-xl border border-gray-300 font-normal focus:ring-2 focus:ring-brand-500"></textarea>
         </div>
 
-        <!-- Price Configuration based on Category / Type -->
-        <div id="sectionPriceSizes" class="space-y-2 p-3 bg-brand-50/60 rounded-2xl border border-brand-100">
-          <p class="font-extrabold text-brand-900">Preços por Tamanho (P e M)</p>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-gray-700 mb-1">Preço Marmita P (R$)</label>
-              <input type="number" step="0.10" id="editPriceP" value="15.00" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+        <!-- Price Configuration: P, M and G for Meals -->
+        <div id="sectionPriceSizes" class="space-y-3 p-3.5 bg-brand-50/70 rounded-2xl border border-brand-200">
+          <div class="flex items-center justify-between">
+            <p class="font-extrabold text-brand-900 text-xs flex items-center gap-1.5">
+              <i data-lucide="layers" class="w-4 h-4 text-brand-700"></i>
+              <span>Preços e Disponibilidade por Tamanho (P, M, G)</span>
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-2.5">
+            <!-- Tamanho P -->
+            <div class="p-2.5 bg-white rounded-xl border border-brand-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-gray-800 text-xs">Pequena (P)</span>
+                <input type="checkbox" id="editSizeAvailableP" checked title="Ativar/Desativar Tamanho P" class="w-4 h-4 rounded text-brand-600">
+              </div>
+              <div class="relative">
+                <span class="absolute left-2 top-2 text-[10px] text-gray-400 font-bold">R$</span>
+                <input type="number" step="0.10" id="editPriceP" value="15.00" class="w-full pl-6 pr-2 py-1.5 rounded-lg border border-gray-300 font-bold text-xs">
+              </div>
             </div>
-            <div>
-              <label class="block font-bold text-gray-700 mb-1">Preço Marmita M (R$)</label>
-              <input type="number" step="0.10" id="editPriceM" value="22.90" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+
+            <!-- Tamanho M -->
+            <div class="p-2.5 bg-white rounded-xl border border-brand-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-gray-800 text-xs">Média (M)</span>
+                <input type="checkbox" id="editSizeAvailableM" checked title="Ativar/Desativar Tamanho M" class="w-4 h-4 rounded text-brand-600">
+              </div>
+              <div class="relative">
+                <span class="absolute left-2 top-2 text-[10px] text-gray-400 font-bold">R$</span>
+                <input type="number" step="0.10" id="editPriceM" value="22.90" class="w-full pl-6 pr-2 py-1.5 rounded-lg border border-gray-300 font-bold text-xs">
+              </div>
             </div>
+
+            <!-- Tamanho G -->
+            <div class="p-2.5 bg-white rounded-xl border border-brand-200 shadow-sm space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-gray-800 text-xs">Grande (G)</span>
+                <input type="checkbox" id="editSizeAvailableG" checked title="Ativar/Desativar Tamanho G" class="w-4 h-4 rounded text-brand-600">
+              </div>
+              <div class="relative">
+                <span class="absolute left-2 top-2 text-[10px] text-gray-400 font-bold">R$</span>
+                <input type="number" step="0.10" id="editPriceG" value="26.90" class="w-full pl-6 pr-2 py-1.5 rounded-lg border border-gray-300 font-bold text-xs">
+              </div>
+            </div>
+          </div>
+          <p class="text-[10px] text-gray-500 italic">Desmarque a caixinha de um tamanho se faltar embalagem ou ingrediente para aquele tamanho específico.</p>
+        </div>
+
+        <!-- Single Price for Direct / Bebidas / Porções -->
+        <div id="sectionPriceSingle" class="hidden space-y-1 p-3 bg-gray-50 rounded-2xl border border-gray-200">
+          <label class="block font-bold text-gray-700 mb-1">Preço Unitário (R$)</label>
+          <div class="relative max-w-xs">
+            <span class="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">R$</span>
+            <input type="number" step="0.10" id="editPriceSingle" value="10.00" class="w-full pl-8 pr-3 py-2 rounded-xl border border-gray-300 font-bold text-sm bg-white">
           </div>
         </div>
 
-        <div id="sectionPriceSingle" class="hidden space-y-1">
-          <label class="block font-bold text-gray-700 mb-1">Preço Unitário (R$)</label>
-          <input type="number" step="0.10" id="editPriceSingle" value="10.00" class="w-full p-2.5 rounded-xl border border-gray-300 font-bold bg-white">
+        <!-- Foto do Produto: Upload Direto & Preview -->
+        <div class="space-y-2 p-3 bg-gray-50 rounded-2xl border border-gray-200">
+          <label class="block font-bold text-gray-800 text-xs">Foto do Prato (Upload Direto de Qualquer Aparelho)</label>
+          
+          <div class="flex items-center gap-3">
+            <img id="editImagePreview" src="watermarked_img_14074362198608020855.jpg" alt="Preview" class="w-16 h-16 rounded-xl object-cover border-2 border-brand-500 shadow-sm flex-shrink-0 bg-white">
+            
+            <div class="flex-1 space-y-1.5">
+              <input type="file" id="editImageFileInput" accept="image/*" class="hidden" onchange="handleImageFileUpload(event)">
+              
+              <button type="button" onclick="document.getElementById('editImageFileInput').click()" class="w-full bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold py-2 px-3 rounded-xl border border-brand-300 flex items-center justify-center space-x-1.5 transition active:scale-95 text-xs shadow-sm">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <span>Tirar Foto ou Escolher da Galeria</span>
+              </button>
+              
+              <p class="text-[10px] text-gray-500 leading-tight" id="imageUploadStatus">Otimização automática para carregar super rápido no celular.</p>
+            </div>
+          </div>
+
+          <div class="pt-1.5 border-t border-gray-200">
+            <input type="text" id="editItemImage" placeholder="Ou cole um link direto da imagem (URL)" class="w-full p-2 rounded-lg border border-gray-300 font-mono text-[11px] bg-white" oninput="document.getElementById('editImagePreview').src = this.value || 'watermarked_img_14074362198608020855.jpg'">
+          </div>
         </div>
 
-        <div>
-          <label class="block font-bold text-gray-700 mb-1">Caminho ou Link da Imagem</label>
-          <input type="text" id="editItemImage" placeholder="Ex: img/marmita_milanesa.jpg ou https://..." class="w-full p-2.5 rounded-xl border border-gray-300 font-mono text-xs focus:ring-2 focus:ring-brand-500">
-          <p class="text-[10px] text-gray-400 mt-1">Exemplos: img/marmita_parmegiana.jpg, img/cini200ml.jfif, img/marmita_feijoada.jpg</p>
-        </div>
-
-        <div class="pt-2">
-          <label class="flex items-center space-x-2.5 p-3 rounded-2xl border border-gray-200 bg-gray-50 cursor-pointer">
+        <div class="pt-1">
+          <label class="flex items-center space-x-2.5 p-3 rounded-2xl border border-gray-200 bg-white shadow-sm cursor-pointer hover:bg-gray-50">
             <input type="checkbox" id="editItemDisponivel" checked class="w-4 h-4 rounded text-brand-600">
             <div>
-              <span class="font-bold text-gray-900">Item Disponível para Venda</span>
-              <p class="text-[11px] text-gray-500">Desmarque para pausar ou marcar como esgotado temporariamente.</p>
+              <span class="font-bold text-gray-900">Item Ativo no Cardápio Geral</span>
+              <p class="text-[11px] text-gray-500">Desmarque para pausar o prato inteiro de uma só vez (fica marcado como Esgotado).</p>
             </div>
           </label>
         </div>
@@ -635,8 +691,9 @@
           <button type="button" onclick="closeItemModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
             Cancelar
           </button>
-          <button type="submit" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 rounded-xl transition shadow-md">
-            Salvar Item
+          <button type="submit" id="btnSaveItemModal" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center space-x-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Salvar no Cardápio</span>
           </button>
         </div>
 
@@ -1901,39 +1958,65 @@
         const card = document.createElement('div');
         const isDisponivel = item.disponivel !== false;
 
-        let priceText = '';
-        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length >= 2) {
-          const p = item.sizes.find(s => s.id === 'P') || item.sizes[0];
-          const m = item.sizes.find(s => s.id === 'M') || item.sizes[1];
-          priceText = `P: R$ ${p.price.toFixed(2).replace('.', ',')} | M: R$ ${m.price.toFixed(2).replace('.', ',')}`;
-        } else {
-          priceText = `R$ ${(parseFloat(item.preco) || 0).toFixed(2).replace('.', ',')}`;
-        }
-
         const catNames = {
           marmitas: '🍛 Marmita Tradicional',
           marmita10: '💰 Marmita R$ 10',
-          feijoada: '🥘 Feijoada',
-          adicionais: '🍗 Adicional',
+          feijoada: '🥘 Feijoada & Especiais',
+          adicionais: '🍗 Adicional / Porção',
           bebidas: '🥤 Bebida'
         };
         const catBadge = catNames[item.categoria] || item.categoria;
 
-        card.className = `bg-white rounded-2xl p-4 border-2 ${isDisponivel ? 'border-gray-200' : 'border-red-200 bg-red-50/20'} shadow-sm flex flex-col justify-between transition hover:shadow-md`;
+        // Size pills with granular 1-click toggles
+        let sizesSectionHtml = '';
+        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+          sizesSectionHtml = `
+            <div class="pt-2 border-t border-gray-100 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase">
+                <span>Tamanhos & Preços</span>
+                <span class="text-[10px] text-gray-400 font-normal lowercase">(clique p/ pausar tamanho)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5">
+                ${item.sizes.map(s => {
+                  const sAvail = s.available !== false;
+                  return `
+                    <button type="button" onclick="toggleSizeDisponibilidade('${item.id}', '${s.id}')" title="${sAvail ? 'Clique para pausar tamanho ' + s.id : 'Clique para ativar tamanho ' + s.id}" class="p-1.5 rounded-lg text-left border transition ${sAvail ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-red-50/80 border-red-200 text-red-800 opacity-60'}">
+                      <div class="flex items-center justify-between text-[10px] font-black leading-tight">
+                        <span>${s.id}</span>
+                        <span class="w-1.5 h-1.5 rounded-full ${sAvail ? 'bg-emerald-500' : 'bg-red-500'}"></span>
+                      </div>
+                      <div class="text-[11px] font-extrabold mt-0.5">R$ ${(s.price || 0).toFixed(2).replace('.', ',')}</div>
+                      <div class="text-[9px] ${sAvail ? 'text-emerald-700 font-bold' : 'text-red-600 font-extrabold'}">${sAvail ? 'Ativo' : 'Esgotou'}</div>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        } else {
+          sizesSectionHtml = `
+            <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+              <span class="text-[11px] font-bold text-gray-400 uppercase">Preço</span>
+              <span class="text-sm font-black text-brand-700">R$ ${(parseFloat(item.preco) || 0).toFixed(2).replace('.', ',')}</span>
+            </div>
+          `;
+        }
+
+        card.className = `bg-white rounded-2xl p-4 border-2 ${isDisponivel ? 'border-gray-200' : 'border-red-300 bg-red-50/20'} shadow-sm flex flex-col justify-between transition hover:shadow-md`;
         
         card.innerHTML = `
           <div class="space-y-3">
             
             <!-- Top Image & Badges -->
             <div class="relative">
-              <img src="${item.image || 'img/marmita_milanesa.jpg'}" alt="${item.nome}" onerror="this.src='watermarked_img_14074362198608020855.jpg'" class="w-full h-36 object-cover rounded-xl border border-gray-100">
+              <img src="${item.image || 'img/marmita_milanesa.jpg'}" alt="${item.nome}" onerror="this.src='watermarked_img_14074362198608020855.jpg'" class="w-full h-36 object-cover rounded-xl border border-gray-100 bg-gray-50">
               
               <span class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
                 ${catBadge}
               </span>
 
               <span class="absolute top-2 right-2 ${isDisponivel ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow">
-                ${isDisponivel ? '🟢 Disponível' : '🔴 Esgotado / Pausado'}
+                ${isDisponivel ? '🟢 Prato Ativo' : '🔴 Prato Esgotado'}
               </span>
             </div>
 
@@ -1943,21 +2026,18 @@
               <p class="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">${item.descricao || 'Sem descrição'}</p>
             </div>
 
-            <!-- Price -->
-            <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
-              <span class="text-[11px] font-bold text-gray-400 uppercase">Preço</span>
-              <span class="text-xs font-black text-brand-700">${priceText}</span>
-            </div>
+            <!-- Price & Sizes -->
+            ${sizesSectionHtml}
 
           </div>
 
           <!-- Actions -->
           <div class="pt-3 mt-3 border-t border-gray-100 flex items-center justify-between gap-1.5">
             
-            <!-- Quick Toggle Status -->
+            <!-- Quick Toggle Entire Dish Status -->
             <button onclick="toggleItemDisponibilidade('${item.id}')" class="flex-1 ${isDisponivel ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-200' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-200'} border font-bold py-2 px-2 rounded-xl text-[11px] flex items-center justify-center space-x-1 transition active:scale-95">
               <i data-lucide="${isDisponivel ? 'pause-circle' : 'play-circle'}" class="w-3.5 h-3.5"></i>
-              <span>${isDisponivel ? 'Pausar (Esgotou)' : 'Ativar Item'}</span>
+              <span>${isDisponivel ? 'Pausar Prato Todo' : 'Ativar Prato'}</span>
             </button>
 
             <!-- Edit Button -->
@@ -1978,7 +2058,38 @@
       lucide.createIcons();
     }
 
-    // TOGGLE AVAILABILITY
+    // TOGGLE GRANULAR SIZE AVAILABILITY
+    async function toggleSizeDisponibilidade(itemId, sizeId) {
+      const idx = cardapioItems.findIndex(i => i.id === itemId);
+      if (idx === -1) return;
+
+      const item = cardapioItems[idx];
+      if (!Array.isArray(item.sizes)) return;
+
+      const sizeObj = item.sizes.find(s => s.id === sizeId);
+      if (!sizeObj) return;
+
+      const newAvail = sizeObj.available === false ? true : false;
+      sizeObj.available = newAvail;
+
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      renderCardapioGrid();
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient
+            .from('cardapio')
+            .update({ sizes: item.sizes })
+            .eq('id', itemId);
+        } catch(e) {
+          console.warn('Erro ao atualizar tamanho no Supabase:', e);
+        }
+      }
+
+      showToast(`Tamanho ${sizeId} ${newAvail ? 'ativado' : 'pausado / esgotado'}`);
+    }
+
+    // TOGGLE OVERALL ITEM AVAILABILITY
     async function toggleItemDisponibilidade(itemId) {
       const idx = cardapioItems.findIndex(i => i.id === itemId);
       if (idx === -1) return;
@@ -2003,13 +2114,57 @@
         }
       }
 
-      showToast(newDisponivel ? 'Item ativado no cardápio' : 'Item pausado / esgotado');
+      showToast(newDisponivel ? 'Prato ativado no cardápio' : 'Prato pausado / esgotado');
+    }
+
+    // IMAGE UPLOAD & CANVAS COMPRESSOR (ANY DEVICE)
+    function handleImageFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('imageUploadStatus');
+      statusEl.innerText = 'Processando e otimizando imagem...';
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to lightweight JPEG / WebP data URL
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          document.getElementById('editItemImage').value = compressedDataUrl;
+          document.getElementById('editImagePreview').src = compressedDataUrl;
+          statusEl.innerText = `✅ Foto carregada com sucesso (${Math.round(compressedDataUrl.length / 1024)} KB)`;
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     // OPEN ADD / EDIT MODAL
     function openItemModal(itemId = null, defaultCat = null) {
       const form = document.getElementById('itemEditModal');
       const header = document.getElementById('modalItemHeaderTitle');
+      const statusEl = document.getElementById('imageUploadStatus');
+      if (statusEl) statusEl.innerText = 'Otimização automática para carregar super rápido no celular.';
       
       if (itemId) {
         const item = cardapioItems.find(i => i.id === itemId);
@@ -2021,15 +2176,29 @@
         document.getElementById('editItemName').value = item.nome;
         document.getElementById('editItemDesc').value = item.descricao || '';
         document.getElementById('editItemImage').value = item.image || '';
+        document.getElementById('editImagePreview').src = item.image || 'watermarked_img_14074362198608020855.jpg';
         document.getElementById('editItemDisponivel').checked = item.disponivel !== false;
 
-        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length >= 2) {
-          const p = item.sizes.find(s => s.id === 'P') || item.sizes[0];
-          const m = item.sizes.find(s => s.id === 'M') || item.sizes[1];
-          document.getElementById('editPriceP').value = p.price;
-          document.getElementById('editPriceM').value = m.price;
+        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes)) {
+          const p = item.sizes.find(s => s.id === 'P') || { price: 15.00, available: true };
+          const m = item.sizes.find(s => s.id === 'M') || { price: 22.90, available: true };
+          const g = item.sizes.find(s => s.id === 'G') || { price: 26.90, available: true };
+
+          document.getElementById('editPriceP').value = p.price || 15.00;
+          document.getElementById('editPriceM').value = m.price || 22.90;
+          document.getElementById('editPriceG').value = g.price || 26.90;
+
+          document.getElementById('editSizeAvailableP').checked = p.available !== false;
+          document.getElementById('editSizeAvailableM').checked = m.available !== false;
+          document.getElementById('editSizeAvailableG').checked = g.available !== false;
         } else {
           document.getElementById('editPriceSingle').value = item.preco || 10.00;
+          document.getElementById('editPriceP').value = '15.00';
+          document.getElementById('editPriceM').value = '22.90';
+          document.getElementById('editPriceG').value = '26.90';
+          document.getElementById('editSizeAvailableP').checked = true;
+          document.getElementById('editSizeAvailableM').checked = true;
+          document.getElementById('editSizeAvailableG').checked = true;
         }
       } else {
         header.innerText = 'Adicionar Novo Item ao Cardápio';
@@ -2038,9 +2207,16 @@
         document.getElementById('editItemName').value = '';
         document.getElementById('editItemDesc').value = '';
         document.getElementById('editItemImage').value = 'img/marmita_milanesa.jpg';
+        document.getElementById('editImagePreview').src = 'img/marmita_milanesa.jpg';
         document.getElementById('editItemDisponivel').checked = true;
+
         document.getElementById('editPriceP').value = '15.00';
         document.getElementById('editPriceM').value = '22.90';
+        document.getElementById('editPriceG').value = '26.90';
+        document.getElementById('editSizeAvailableP').checked = true;
+        document.getElementById('editSizeAvailableM').checked = true;
+        document.getElementById('editSizeAvailableG').checked = true;
+
         document.getElementById('editPriceSingle').value = '10.00';
       }
 
@@ -2074,7 +2250,7 @@
       const cat = document.getElementById('editItemCategory').value;
       const nome = document.getElementById('editItemName').value.trim();
       const desc = document.getElementById('editItemDesc').value.trim();
-      const image = document.getElementById('editItemImage').value.trim();
+      const image = document.getElementById('editItemImage').value.trim() || 'watermarked_img_14074362198608020855.jpg';
       const disponivel = document.getElementById('editItemDisponivel').checked;
 
       let type = 'direct';
@@ -2086,9 +2262,16 @@
         type = 'marmita_sizes';
         const priceP = parseFloat(document.getElementById('editPriceP').value) || 15.00;
         const priceM = parseFloat(document.getElementById('editPriceM').value) || 22.90;
+        const priceG = parseFloat(document.getElementById('editPriceG').value) || 26.90;
+
+        const isP = document.getElementById('editSizeAvailableP').checked;
+        const isM = document.getElementById('editSizeAvailableM').checked;
+        const isG = document.getElementById('editSizeAvailableG').checked;
+
         sizes = [
-          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: priceP },
-          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: priceM, popular: true }
+          { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: priceP, available: isP },
+          { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: priceM, available: isM, popular: true },
+          { id: 'G', name: 'Marmita G', desc: 'Porção família', price: priceG, available: isG }
         ];
         preco = priceP;
       } else if (cat === 'marmita10') {
