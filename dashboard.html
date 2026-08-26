@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard do Negão - Marmitaria Família</title>
+  <title>Dashboard do Negão - Marmitaria Quentinha Caseira</title>
   <meta name="theme-color" content="#C0392B">
   
   <!-- Tailwind CSS CDN -->
@@ -135,7 +135,7 @@
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h1 class="font-extrabold text-base text-gray-900 leading-none">Marmitaria Família</h1>
+              <h1 class="font-extrabold text-base text-gray-900 leading-none">Marmitaria Quentinha Caseira</h1>
               <span id="storeStatusPill" class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span> AO VIVO
               </span>
@@ -1407,15 +1407,15 @@
       let msg = '';
 
       if (status === 'em_preparo') {
-        msg = `🍲 Olá, *${firstName}*! Passando para avisar que o seu pedido *#${order.id}* na *Marmitaria Família* foi confirmado e já está sendo preparado com todo o capricho! Em breve te avisamos quando sair para entrega. ✨`;
+        msg = `🍲 Olá, *${firstName}*! Passando para avisar que o seu pedido *#${order.id}* na *Marmitaria Quentinha Caseira* foi confirmado e já está sendo preparado com todo o capricho! Em breve te avisamos quando sair para entrega. ✨`;
       } else if (status === 'saiu_entrega') {
-        msg = `🛵 Oba, *${firstName}*! Seu pedido *#${order.id}* da *Marmitaria Família* acabou de sair para entrega com o nosso motoboy! Fique atento(a) ao seu endereço/interfone. Bom almoço! 🍲`;
+        msg = `🛵 Oba, *${firstName}*! Seu pedido *#${order.id}* da *Marmitaria Quentinha Caseira* acabou de sair para entrega com o nosso motoboy! Fique atento(a) ao seu endereço/interfone. Bom almoço! 🍲`;
       } else if (status === 'finalizado') {
-        msg = `✅ Olá, *${firstName}*! Seu pedido *#${order.id}* foi concluído/entregue! Esperamos que aproveite a sua refeição feita no capricho. Se puder, nos conte o que achou! A *Marmitaria Família* agradece sua preferência. 🍲❤️`;
+        msg = `✅ Olá, *${firstName}*! Seu pedido *#${order.id}* foi concluído/entregue! Esperamos que aproveite a sua refeição feita no capricho. Se puder, nos conte o que achou! A *Marmitaria Quentinha Caseira* agradece sua preferência. 🍲❤️`;
       } else if (status === 'cancelado') {
-        msg = `⚠️ Olá, *${firstName}*! O seu pedido *#${order.id}* na *Marmitaria Família* foi cancelado. Qualquer dúvida estamos à disposição!`;
+        msg = `⚠️ Olá, *${firstName}*! O seu pedido *#${order.id}* na *Marmitaria Quentinha Caseira* foi cancelado. Qualquer dúvida estamos à disposição!`;
       } else {
-        msg = `🍲 Olá, *${firstName}*! Estamos acompanhando o seu pedido *#${order.id}* na *Marmitaria Família*. Qualquer dúvida estamos à disposição!`;
+        msg = `🍲 Olá, *${firstName}*! Estamos acompanhando o seu pedido *#${order.id}* na *Marmitaria Quentinha Caseira*. Qualquer dúvida estamos à disposição!`;
       }
 
       // Se a Evolution API estiver configurada e não foi forçado abrir janela manual, tenta envio 100% automático em segundo plano
@@ -1763,7 +1763,7 @@
 
       const receiptHtml = `
         <div style="text-align: center; margin-bottom: 8px;">
-          <h2 style="font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase;">MARMITARIA FAMÍLIA</h2>
+          <h2 style="font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase;">MARMITARIA QUENTINHA CASEIRA</h2>
           <p style="font-size: 11px; margin: 2px 0; font-weight: bold;">Sabor Caseiro no Capricho - Xaxim</p>
           <p style="font-size: 11px; margin: 2px 0;">WhatsApp: (41) 98529-4063</p>
         </div>
