@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script>
+    if (window.location.hostname.endsWith('github.io')) {
+      window.location.replace('https://marmitaria-quentinha-caseira.netlify.app' + window.location.pathname.replace(/^\/[^\/]+/, '') + window.location.search);
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard do Negão - Marmitaria Quentinha Caseira</title>
