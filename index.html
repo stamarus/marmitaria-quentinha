@@ -73,6 +73,12 @@
     .animate-slide-up {
       animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    [data-netlify-badge], .netlify-badge, #netlify-badge, [id^="netlify-drawer"], [class*="netlify-drawer"], iframe[src*="netlify"] {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body class="bg-warm-50 text-gray-800 min-h-screen pb-28">
@@ -518,6 +524,16 @@
       'Salada Fresca'
     ];
 
+    // DEFAULT SIDES FOR FEIJOADA
+    const DEFAULT_FEIJOADA_SIDES = [
+      'Arroz',
+      'Feijoada Completa',
+      'Couve Refogada',
+      'Farofa da Casa',
+      'Vinagrete Especial',
+      'Torresmo Crocante'
+    ];
+
     // DEFAULT SIDES FOR MARMITA R$ 10
     const DEFAULT_MARMITA10_SIDES = [
       'Arroz',
@@ -607,7 +623,8 @@
             'Bistequinha',
             'Calabresa',
             'Omelete',
-            'Linguiça Toscana'
+            'Linguiça Toscana',
+            'Frango a Passarinho'
           ]
         }
       ],
@@ -932,7 +949,10 @@
 
         // Default to M if available, else first available
         selectedSize = availSizes.find(s => s.id === 'M') || availSizes[0];
-        selectedSides = [...DEFAULT_MARMITA_SIDES];
+        
+        const isFeijoada = (item.id && item.id.includes('feijoada')) || currentCategory === 'feijoada';
+        const sidesToUse = isFeijoada ? DEFAULT_FEIJOADA_SIDES : DEFAULT_MARMITA_SIDES;
+        selectedSides = [...sidesToUse];
 
         // Render Sizes (P, M, G)
         const sizeContainer = document.getElementById('sizeOptions');
@@ -965,7 +985,7 @@
         }).join('');
 
         // Render Marmita Sides
-        sideContainer.innerHTML = DEFAULT_MARMITA_SIDES.map(side => `
+        sideContainer.innerHTML = sidesToUse.map(side => `
           <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
             <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
             <span class="text-gray-700 font-medium">${side}</span>
