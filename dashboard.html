@@ -1051,15 +1051,21 @@
     // DEFAULT STORE CONFIG
     const DEFAULT_CONFIG = {
       status_modo: 'auto', // 'auto', 'aberta', 'fechada'
+      hora_abertura: '11:00',
+      hora_fechamento: '14:30',
       horario_abertura: '11:00',
       horario_fechamento: '14:30',
       dias_funcionamento: [1, 2, 3, 4, 5, 6], // Seg a Sáb
       whatsapp: '5541985294063',
       pix_key: '41985294063',
+      pixKey: '41985294063',
+      delivery_fee: 5.00,
       taxa_entrega: 5.00,
-      mensagem_fechado: 'Estamos fechados no momento. Nosso horário de atendimento é de Segunda a Sábado, das 11h às 14h30.',
+      deliveryFee: 5.00,
+      mensagem_fechado: 'Estamos fechados no momento. Almoço de Seg a Sáb das 11h às 14h30!',
       evolution_api_url: '',
       evolution_api_key: '',
+      evolution_instance: 'marmitaria',
       evolution_instance_name: 'marmitaria',
       evolution_auto_send: true
     };
@@ -2443,7 +2449,21 @@
             .single();
 
           if (!error && data) {
-            storeConfig = { ...DEFAULT_CONFIG, ...data };
+            storeConfig = {
+              ...DEFAULT_CONFIG,
+              ...data,
+              hora_abertura: data.hora_abertura || data.horario_abertura || DEFAULT_CONFIG.hora_abertura,
+              hora_fechamento: data.hora_fechamento || data.horario_fechamento || DEFAULT_CONFIG.hora_fechamento,
+              horario_abertura: data.hora_abertura || data.horario_abertura || DEFAULT_CONFIG.horario_abertura,
+              horario_fechamento: data.hora_fechamento || data.horario_fechamento || DEFAULT_CONFIG.horario_fechamento,
+              pix_key: data.pix_key || storeConfig.pix_key,
+              pixKey: data.pix_key || storeConfig.pix_key,
+              delivery_fee: parseFloat(data.delivery_fee) || storeConfig.delivery_fee,
+              deliveryFee: parseFloat(data.delivery_fee) || storeConfig.delivery_fee,
+              taxa_entrega: parseFloat(data.delivery_fee) || storeConfig.delivery_fee,
+              evolution_instance: data.evolution_instance || data.evolution_instance_name || 'marmitaria',
+              evolution_instance_name: data.evolution_instance || data.evolution_instance_name || 'marmitaria'
+            };
             localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
           }
         } catch(e) {
@@ -2461,17 +2481,17 @@
       const mode = storeConfig.status_modo || 'auto';
       handleModeChange(mode);
 
-      document.getElementById('cfgOpenTime').value = storeConfig.horario_abertura || '11:00';
-      document.getElementById('cfgCloseTime').value = storeConfig.horario_fechamento || '14:30';
+      document.getElementById('cfgOpenTime').value = storeConfig.hora_abertura || storeConfig.horario_abertura || '11:00';
+      document.getElementById('cfgCloseTime').value = storeConfig.hora_fechamento || storeConfig.horario_fechamento || '14:30';
       document.getElementById('cfgWhatsapp').value = storeConfig.whatsapp || '5541985294063';
       document.getElementById('cfgPixKey').value = storeConfig.pix_key || storeConfig.pixKey || '41985294063';
-      document.getElementById('cfgDeliveryFee').value = storeConfig.taxa_entrega || storeConfig.deliveryFee || 5.00;
+      document.getElementById('cfgDeliveryFee').value = storeConfig.delivery_fee || storeConfig.taxa_entrega || storeConfig.deliveryFee || 5.00;
       document.getElementById('cfgClosedMessage').value = storeConfig.mensagem_fechado || DEFAULT_CONFIG.mensagem_fechado;
 
       // Evolution API Fields
       document.getElementById('cfgEvolutionUrl').value = storeConfig.evolution_api_url || '';
       document.getElementById('cfgEvolutionKey').value = storeConfig.evolution_api_key || '';
-      document.getElementById('cfgEvolutionInstance').value = storeConfig.evolution_instance_name || 'marmitaria';
+      document.getElementById('cfgEvolutionInstance').value = storeConfig.evolution_instance || storeConfig.evolution_instance_name || 'marmitaria';
       document.getElementById('cfgEvolutionAutoSend').checked = storeConfig.evolution_auto_send !== false;
       checkEvolutionConnectionStatus(false);
 
@@ -2480,7 +2500,7 @@
       for (let i = 0; i <= 6; i++) {
         const el = document.getElementById('day_' + dayMap[i]);
         if (el) {
-          el.checked = dias.includes(i) || dias.includes(String(i));
+          el.checked = dias.includes(i) || dias.includes(String(i)) || (Array.isArray(dias) && dias.includes(dayMap[i]));
         }
       }
     }
@@ -2524,26 +2544,33 @@
         if (el && el.checked) dias.push(i);
       }
 
-      storeConfig = {
+      // Payload strictly conforming to Supabase loja_config schema
+      const payloadSupabase = {
         id: 'config_geral',
         status_modo: mode,
-        horario_abertura: openTime,
-        horario_fechamento: closeTime,
+        hora_abertura: openTime,
+        hora_fechamento: closeTime,
         dias_funcionamento: dias,
         whatsapp: whatsapp,
         pix_key: pixKey,
-        taxa_entrega: fee,
+        delivery_fee: fee,
         mensagem_fechado: closedMsg,
         evolution_api_url: evolutionUrl,
         evolution_api_key: evolutionKey,
-        evolution_instance_name: evolutionInstance,
-        evolution_auto_send: evolutionAutoSend,
+        evolution_instance: evolutionInstance,
         updated_at: new Date().toISOString()
       };
 
-      // Compatibility properties for index.html
-      storeConfig.pixKey = pixKey;
-      storeConfig.deliveryFee = fee;
+      storeConfig = {
+        ...payloadSupabase,
+        horario_abertura: openTime,
+        horario_fechamento: closeTime,
+        pixKey: pixKey,
+        taxa_entrega: fee,
+        deliveryFee: fee,
+        evolution_instance_name: evolutionInstance,
+        evolution_auto_send: evolutionAutoSend
+      };
 
       localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
 
@@ -2551,7 +2578,7 @@
         try {
           const { error } = await supabaseClient
             .from('loja_config')
-            .upsert(storeConfig);
+            .upsert([payloadSupabase]);
 
           if (error) {
             console.warn('Supabase loja_config error:', error.message);

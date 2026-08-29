@@ -758,8 +758,8 @@
             whatsapp: data.whatsapp || storeConfig.whatsapp,
             pixKey: data.pix_key || storeConfig.pixKey,
             deliveryFee: parseFloat(data.delivery_fee) || storeConfig.deliveryFee,
-            hora_abertura: data.hora_abertura || storeConfig.hora_abertura,
-            hora_fechamento: data.hora_fechamento || storeConfig.hora_fechamento,
+            hora_abertura: data.hora_abertura || data.horario_abertura || storeConfig.hora_abertura,
+            hora_fechamento: data.hora_fechamento || data.horario_fechamento || storeConfig.hora_fechamento,
             dias_funcionamento: Array.isArray(data.dias_funcionamento) ? data.dias_funcionamento : storeConfig.dias_funcionamento,
             status_modo: data.status_modo || storeConfig.status_modo,
             mensagem_fechado: data.mensagem_fechado || storeConfig.mensagem_fechado
