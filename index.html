@@ -201,6 +201,18 @@
     <!-- Items dynamically loaded by JavaScript -->
   </main>
 
+  <!-- FOOTER -->
+  <footer class="max-w-xl mx-auto px-4 pt-8 pb-4 text-center">
+    <p class="text-xs text-gray-500 font-medium flex items-center justify-center gap-1">
+      <span>Desenvolvido por</span>
+      <button type="button" onclick="openDevModal()" class="text-brand-700 font-bold hover:underline inline-flex items-center gap-0.5 transition cursor-pointer">
+        <span>Stamarus</span>
+        <i data-lucide="info" class="w-3.5 h-3.5 inline text-brand-600"></i>
+      </button>
+    </p>
+    <p class="text-[10px] text-gray-400 mt-1">© 2026 Marmitaria Quentinha Caseira</p>
+  </footer>
+
   <!-- FLOATING CART BAR -->
   <div id="floatingCart" class="fixed bottom-4 left-4 right-4 max-w-xl mx-auto z-40 hidden transition-all duration-300 transform translate-y-0">
     <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white p-3.5 rounded-2xl shadow-xl flex items-center justify-between border border-emerald-400/30 transition active:scale-[0.98]">
@@ -538,6 +550,65 @@
       <div class="p-4 border-t border-gray-100 bg-gray-50 flex space-x-2">
         <button onclick="saveAdminSettings()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-2.5 rounded-xl text-xs transition">
           Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER INFO MODAL (STAMARUS) -->
+  <div id="devModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 animate-slide-up text-center border border-gray-100">
+      <div class="w-16 h-16 bg-gradient-to-tr from-brand-700 to-amber-600 text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
+        <i data-lucide="code-2" class="w-8 h-8"></i>
+      </div>
+      
+      <div>
+        <span class="text-[10px] font-extrabold uppercase tracking-widest text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full">Desenvolvedor & Tecnologia</span>
+        <h3 class="font-black text-lg text-gray-900 mt-2">Stamarus Solutions</h3>
+      </div>
+
+      <div class="bg-gray-50 rounded-2xl p-4 text-left text-xs space-y-3 border border-gray-100">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-gray-500 shadow-sm border border-gray-100 flex-shrink-0">
+            <i data-lucide="user" class="w-4 h-4 text-brand-700"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-gray-400 font-bold uppercase">Nome</p>
+            <p class="font-bold text-gray-800 text-sm">Rafael Tamaributi</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-gray-500 shadow-sm border border-gray-100 flex-shrink-0">
+            <i data-lucide="mail" class="w-4 h-4 text-brand-700"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-[10px] text-gray-400 font-bold uppercase">E-mail</p>
+            <a href="mailto:rafael.tamaributi@gmail.com" class="font-bold text-brand-700 hover:underline break-all">rafael.tamaributi@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-gray-500 shadow-sm border border-gray-100 flex-shrink-0">
+            <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-gray-400 font-bold uppercase">WhatsApp</p>
+            <a href="https://wa.me/5511994934475" target="_blank" class="font-bold text-emerald-700 hover:underline flex items-center gap-1">
+              <span>+55 11 99493 4475</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex space-x-2 pt-1">
+        <a href="https://wa.me/5511994934475" target="_blank" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center space-x-1.5">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>Chamar no WhatsApp</span>
+        </a>
+        <button type="button" onclick="closeDevModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-3 rounded-xl text-xs transition">
+          Fechar
         </button>
       </div>
     </div>
@@ -1490,6 +1561,16 @@
 
     function closeAdminModal() {
       document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    // DEVELOPER INFO MODAL LOGIC
+    function openDevModal() {
+      document.getElementById('devModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDevModal() {
+      document.getElementById('devModal').classList.add('hidden');
     }
 
     // DIRECT WHATSAPP GREETING CONTACT
