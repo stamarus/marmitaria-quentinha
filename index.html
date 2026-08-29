@@ -420,13 +420,39 @@
     </div>
   </div>
 
-  <!-- ADMIN CONFIG MODAL (PARA O IGOR) -->
+  <!-- ADMIN AUTH MODAL (PARA A ENGRENAGEM DE CONFIG) -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 animate-slide-up text-center border border-gray-100">
+      <div class="w-14 h-14 bg-brand-50 text-brand-700 rounded-2xl flex items-center justify-center mx-auto border border-brand-100 shadow-inner">
+        <i data-lucide="lock" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-base text-gray-900">Configurações da Loja</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Digite a senha de administrador</p>
+      </div>
+
+      <form onsubmit="handleAdminAuth(event)" class="space-y-3">
+        <input type="password" id="adminAuthPassInput" name="password" autocomplete="current-password" placeholder="Senha de acesso" required class="w-full p-3.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-center font-bold tracking-widest text-sm bg-gray-50">
+        <p id="adminAuthError" class="text-red-600 text-xs font-bold hidden">Senha incorreta. Tente novamente.</p>
+        <div class="flex space-x-2 pt-1">
+          <button type="button" onclick="closeAdminAuthModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl text-xs transition">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
+            Entrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN CONFIG MODAL -->
   <div id="adminModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="p-4 bg-brand-700 text-white flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <i data-lucide="shield-check" class="w-5 h-5"></i>
-          <h3 class="font-bold text-base">Painel do Dono (Igor)</h3>
+          <i data-lucide="settings" class="w-5 h-5"></i>
+          <h3 class="font-bold text-base">Configurações Rápidas da Loja</h3>
         </div>
         <button onclick="closeAdminModal()" class="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-brand-800">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -1350,13 +1376,38 @@
       window.open(url, '_blank');
     }
 
-    // ADMIN MODAL LOGIC
+    // ADMIN AUTH & CONFIG LOGIC
+    const ADMIN_PASSWORD = 'M4rm1t4r14';
+
     function openAdminModal() {
-      const pin = prompt('Digite a senha de administrador:', '');
-      if (pin !== 'M4rm1t4r14') {
-        alert('Senha incorreta.');
-        return;
+      if (sessionStorage.getItem('marmitaria_admin_auth') === 'true') {
+        showAdminConfigModal();
+      } else {
+        document.getElementById('adminAuthPassInput').value = '';
+        document.getElementById('adminAuthError').classList.add('hidden');
+        document.getElementById('adminAuthModal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('adminAuthPassInput').focus(), 150);
+        lucide.createIcons();
       }
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    }
+
+    function handleAdminAuth(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminAuthPassInput').value.trim();
+      if (pass === ADMIN_PASSWORD) {
+        sessionStorage.setItem('marmitaria_admin_auth', 'true');
+        closeAdminAuthModal();
+        showAdminConfigModal();
+      } else {
+        document.getElementById('adminAuthError').classList.remove('hidden');
+      }
+    }
+
+    function showAdminConfigModal() {
       document.getElementById('adminStatusModo').value = storeConfig.status_modo || 'auto';
       document.getElementById('adminHoraAbertura').value = storeConfig.hora_abertura || '11:00';
       document.getElementById('adminHoraFechamento').value = storeConfig.hora_fechamento || '14:30';
