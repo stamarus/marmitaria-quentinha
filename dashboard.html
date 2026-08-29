@@ -8,7 +8,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard do Negão - Marmitaria Quentinha Caseira</title>
+  <title>Painel Administrativo - Marmitaria Quentinha Caseira</title>
   <meta name="theme-color" content="#C0392B">
   
   <!-- Tailwind CSS CDN -->
@@ -131,7 +131,7 @@
       <div class="w-16 h-16 bg-brand-50 text-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-brand-100 shadow-inner">
         <i data-lucide="lock" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-xl font-bold text-gray-900">Painel do Negão</h2>
+      <h2 class="text-xl font-bold text-gray-900">Painel Administrativo</h2>
       <p class="text-xs text-gray-500 mt-1 mb-5">Digite a senha de administrador para acessar o painel</p>
       
       <form onsubmit="handleAuth(event)" class="space-y-4">
@@ -542,7 +542,7 @@
               <div>
                 <h4 class="font-bold text-xs text-emerald-950 flex items-center space-x-1.5">
                   <i data-lucide="smartphone" class="w-4 h-4 text-emerald-700"></i>
-                  <span>Conectar Aparelho do Negão (Sem QR Code)</span>
+                  <span>Conectar Aparelho / WhatsApp (Sem QR Code)</span>
                 </h4>
                 <p class="text-[11px] text-emerald-800 mt-0.5">Gera o código de 8 dígitos para digitar no WhatsApp em <b>Aparelhos Conectados > Conectar com número de telefone</b>.</p>
               </div>
@@ -743,7 +743,7 @@
       </div>
       
       <div>
-        <h3 class="font-extrabold text-lg text-gray-900">Conectar WhatsApp do Negão</h3>
+        <h3 class="font-extrabold text-lg text-gray-900">Conectar WhatsApp da Loja</h3>
         <p class="text-xs text-gray-500 mt-1">Conexão rápida por código (sem usar a câmera)</p>
       </div>
 
@@ -768,7 +768,7 @@
         </div>
 
         <div class="bg-gray-50 rounded-xl p-3 text-left text-xs text-gray-600 space-y-1.5 leading-tight border border-gray-100">
-          <p class="font-bold text-gray-800">👉 No WhatsApp do celular do Negão:</p>
+          <p class="font-bold text-gray-800">👉 No WhatsApp do celular da loja:</p>
           <p>1. Abra o WhatsApp > Menu <b>(3 pontinhos)</b> > <b>Aparelhos conectados</b></p>
           <p>2. Toque em <b>Conectar um aparelho</b></p>
           <p>3. Toque na opção <b>Conectar com número de telefone</b> (embaixo)</p>
@@ -1734,7 +1734,7 @@
           document.getElementById('displayPairingCode').innerText = pairingCode;
           document.getElementById('pairingStepPhone').classList.add('hidden');
           document.getElementById('pairingStepCode').classList.remove('hidden');
-          showToast('Código gerado! Digite no celular do Negão.');
+          showToast('Código gerado! Digite no celular da loja.');
         } else {
           if (data.state === 'open' || (data.instance && data.instance.state === 'open')) {
             alert('WhatsApp já está 100% CONECTADO nesta instância!');
