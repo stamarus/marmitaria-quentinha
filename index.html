@@ -558,8 +558,8 @@
   <!-- SCRIPT LOGIC -->
   <script>
     // SUPABASE CLIENT FOR REALTIME ORDERS
-    const SUPABASE_URL = 'https://pwrtnhgsgvcqoyttkmmq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cnRuaGdzZ3ZjcW95dHRrbW1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MjQ3MDksImV4cCI6MjEwMzIwMDcwOX0.FaCRpqL2AEJIi5S4g3sswPFBASAkjrKKCWYwCyBZwJ0';
+    const SUPABASE_URL = 'https://drecypzvptgyfltjlebh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZWN5cHp2cHRneWZsdGpsZWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MzIwMTAsImV4cCI6MjEwMzUwODAxMH0.eVsHivVn8vvRmHU6e8qL74kFchrGB0NOohkoje6Hytc';
     let supabaseClient = null;
     try {
       if (window.supabase) {
@@ -578,7 +578,19 @@
       hora_fechamento: '14:30',
       dias_funcionamento: ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'],
       status_modo: 'auto', // 'auto', 'force_open', 'force_closed'
-      mensagem_fechado: 'Estamos fechados no momento. Almoço de Seg a Sáb das 11h às 14h30!'
+      mensagem_fechado: 'Estamos fechados no momento. Almoço de Seg a Sáb das 11h às 14h30!',
+      guarnicoes_status: {
+        'Arroz': true,
+        'Feijão Caseiro': true,
+        'Purê de Batata Cremoso': true,
+        'Farofa da Casa': true,
+        'Macarrão Especial': true,
+        'Salada Fresca': true,
+        'Feijoada Completa': true,
+        'Couve Refogada': true,
+        'Vinagrete Especial': true,
+        'Torresmo Crocante': true
+      }
     };
 
     // LOAD STORE CONFIG
@@ -820,7 +832,7 @@
         const { data, error } = await supabaseClient
           .from('loja_config')
           .select('*')
-          .eq('id', 'config_geral')
+          .eq('loja_id', 'marmitaria')
           .maybeSingle();
 
         if (!error && data) {
@@ -832,7 +844,8 @@
             hora_fechamento: data.hora_fechamento || data.horario_fechamento || storeConfig.hora_fechamento,
             dias_funcionamento: Array.isArray(data.dias_funcionamento) ? data.dias_funcionamento : storeConfig.dias_funcionamento,
             status_modo: data.status_modo || storeConfig.status_modo,
-            mensagem_fechado: data.mensagem_fechado || storeConfig.mensagem_fechado
+            mensagem_fechado: data.mensagem_fechado || storeConfig.mensagem_fechado,
+            guarnicoes_status: data.guarnicoes_status || storeConfig.guarnicoes_status || {}
           };
           localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
           updateStoreStatusUI();
@@ -849,6 +862,7 @@
         const { data, error } = await supabaseClient
           .from('cardapio')
           .select('*')
+          .eq('loja_id', 'marmitaria')
           .order('ordem', { ascending: true });
 
         if (!error && data && data.length > 0) {
@@ -1054,13 +1068,28 @@
           `;
         }).join('');
 
-        // Render Marmita Sides
-        sideContainer.innerHTML = sidesToUse.map(side => `
-          <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
-            <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
-            <span class="text-gray-700 font-medium">${side}</span>
-          </label>
-        `).join('');
+        // Filter out paused sides from preselection
+        const gStatus = storeConfig.guarnicoes_status || {};
+        selectedSides = sidesToUse.filter(side => gStatus[side] !== false);
+
+        // Render Marmita Sides with Esgotado / Paused support
+        sideContainer.innerHTML = sidesToUse.map(side => {
+          const isAvail = gStatus[side] !== false;
+          if (!isAvail) {
+            return `
+              <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
+                <span class="line-through font-medium">${side}</span>
+                <span class="text-[9px] font-black uppercase bg-red-100 px-1.5 py-0.5 rounded">Esgotado</span>
+              </div>
+            `;
+          }
+          return `
+            <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
+              <span class="text-gray-700 font-medium">${side}</span>
+            </label>
+          `;
+        }).join('');
 
       } else if (item.type === 'marmita_10') {
         sizeSection.classList.add('hidden');
