@@ -916,7 +916,9 @@
     function renderMenu() {
       const container = document.getElementById('menuContainer');
       container.innerHTML = '';
-      const items = (MENU_ITEMS[currentCategory] || []).filter(i => i.disponivel !== false);
+      // Show all items in category, handling disponivel status gracefully
+      const allCategoryItems = MENU_ITEMS[currentCategory] || [];
+      const items = allCategoryItems;
 
       if (items.length === 0) {
         container.innerHTML = `
@@ -934,7 +936,12 @@
         let priceFormatted = '';
         let isCompletelyUnavailable = false;
 
-        if (item.type === 'marmita_sizes' && item.sizes && item.sizes.length > 0) {
+        const itemIsGlobalUnavailable = item.disponivel === false;
+
+        if (itemIsGlobalUnavailable) {
+          isCompletelyUnavailable = true;
+          priceFormatted = '<span class="text-rose-600 text-xs font-bold">🔴 Esgotado Hoje</span>';
+        } else if (item.type === 'marmita_sizes' && item.sizes && item.sizes.length > 0) {
           const availSizes = item.sizes.filter(s => s.available !== false);
           if (availSizes.length === 0) {
             isCompletelyUnavailable = true;
@@ -992,6 +999,11 @@
     function handleItemClick(itemId, category) {
       const item = (MENU_ITEMS[category] || []).find(i => i.id === itemId);
       if (!item) return;
+
+      if (item.disponivel === false) {
+        alert('Este prato está pausado / esgotado no momento.');
+        return;
+      }
 
       if (item.type === 'marmita_sizes' || item.type === 'marmita_10') {
         openCustomModal(item);
@@ -1557,6 +1569,8 @@
 
     // Live clock check every minute
     setInterval(updateStoreStatusUI, 60000);
+    setInterval(fetchCardapioFromSupabase, 8000);
+    setInterval(fetchStoreConfigFromSupabase, 15000);
   
     // DEVELOPER INFO MODAL LOGIC (STAMARUS)
     function openDevModal() {
