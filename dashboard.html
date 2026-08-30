@@ -84,6 +84,25 @@
       top: -9999px !important;
       z-index: -99999 !important;
     }
+  
+    /* ESTILO PARA IMPRESSÃO A4 (LISTA DE COMPRAS DE MERCADO) */
+    @media print {
+      body.printing-grocery > *:not(#groceryPrintArea) {
+        display: none !important;
+      }
+      body.printing-grocery #groceryPrintArea {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: 210mm !important;
+        margin: 0 auto !important;
+        padding: 10mm !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
+
   </style>
   <script>
     (function() {
@@ -1205,8 +1224,137 @@
     }
 
     // TABS MANAGEMENT
+    
+    // ==========================================
+    // LISTA DO MERCADO & COMPRAS (A4 PRINT)
+    // ==========================================
+    let groceryList = JSON.parse(localStorage.getItem('marmitaria_grocery_list')) || [
+      { id: 'g1', name: 'Arroz Tipo 1 (Sacos 5kg)', qty: '4 sacos (20kg)', cat: 'Grãos & Secos', checked: false },
+      { id: 'g2', name: 'Feijão Carioca', qty: '10 kg', cat: 'Grãos & Secos', checked: false },
+      { id: 'g3', name: 'Óleo de Soja', qty: '6 garrafas', cat: 'Óleos & Condimentos', checked: false },
+      { id: 'g4', name: 'Embalagens Marmitex c/ Tampa', qty: '200 un', cat: 'Descartáveis', checked: false },
+      { id: 'g5', name: 'Bisteca de Porco / Linguiça Toscana', qty: '15 kg', cat: 'Açougue', checked: false },
+      { id: 'g6', name: 'Frango a Passarinho / Peito', qty: '15 kg', cat: 'Açougue', checked: false },
+      { id: 'g7', name: 'Batata / Alface / Tomate / Cebola', qty: '12 kg', cat: 'Hortifruti', checked: false }
+    ];
+
+    function renderGroceryTable() {
+      document.getElementById('groceryPrintDate').innerText = 'Data: ' + new Date().toLocaleDateString('pt-BR');
+      document.getElementById('groceryTotalItemsCount').innerText = groceryList.length;
+
+      const tbody = document.getElementById('groceryTableBody');
+      if (groceryList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-gray-400">Nenhum item na lista. Clique em "Calcular por Pedidos" ou adicione acima.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = groceryList.map(item => `
+        <tr class="hover:bg-gray-50/60 transition ${item.checked ? 'bg-gray-50 text-gray-400 line-through' : ''}">
+          <td class="py-2.5 px-2 text-center">
+            <input type="checkbox" onchange="toggleGroceryItem('${item.id}')" ${item.checked ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+          </td>
+          <td class="py-2.5 px-3 font-bold text-gray-900 ${item.checked ? 'line-through text-gray-400' : ''}">
+            ${item.name}
+          </td>
+          <td class="py-2.5 px-3 font-mono font-bold text-brand-700">
+            ${item.qty}
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 text-gray-700">${item.cat || 'Geral'}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right text-gray-400 text-[11px]">
+            [ R$ _________ ]
+          </td>
+          <td class="py-2.5 px-2 text-center no-print">
+            <button onclick="removeGroceryItem('${item.id}')" class="text-rose-500 hover:text-rose-700 p-1 rounded-lg hover:bg-rose-50 transition" title="Remover">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function toggleGroceryItem(id) {
+      const item = groceryList.find(i => i.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        saveGroceryList();
+      }
+    }
+
+    function addCustomGroceryItem(e) {
+      e.preventDefault();
+      const name = document.getElementById('newGroceryName').value.trim();
+      const qty = document.getElementById('newGroceryQty').value.trim();
+      if (!name || !qty) return;
+
+      groceryList.push({
+        id: 'g_' + Date.now(),
+        name: name,
+        qty: qty,
+        cat: 'Personalizado',
+        checked: false
+      });
+
+      document.getElementById('newGroceryName').value = '';
+      document.getElementById('newGroceryQty').value = '';
+      saveGroceryList();
+      showToast('Item adicionado à lista de compras!');
+    }
+
+    function removeGroceryItem(id) {
+      groceryList = groceryList.filter(i => i.id !== id);
+      saveGroceryList();
+    }
+
+    function saveGroceryList() {
+      localStorage.setItem('marmitaria_grocery_list', JSON.stringify(groceryList));
+      renderGroceryTable();
+    }
+
+    function autoGenerateGroceryList() {
+      const all = allOrdersList || [];
+      const prodMap = {};
+      all.forEach(o => {
+        if (o.status !== 'cancelado') {
+          const itens = Array.isArray(o.itens) ? o.itens : [];
+          itens.forEach(i => {
+            const n = i.name || i.nome || 'Marmita';
+            const q = i.qty || i.quantidade || 1;
+            prodMap[n] = (prodMap[n] || 0) + q;
+          });
+        }
+      });
+
+      const generated = Object.entries(prodMap).map(([pName, count], idx) => ({
+        id: 'gen_' + idx + '_' + Date.now(),
+        name: `Insumos p/ ${pName}`,
+        qty: `Demanda de ${count} refeições`,
+        cat: 'Demanda dos Pedidos',
+        checked: false
+      }));
+
+      if (generated.length > 0) {
+        groceryList = [...generated, ...groceryList];
+        saveGroceryList();
+        showToast('Lista calculada com base nos pedidos!');
+      } else {
+        showToast('Nenhum pedido recente. Insumos padrão carregados!');
+      }
+    }
+
+    function printGroceryListA4() {
+      document.body.classList.add('printing-grocery');
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-grocery');
+      }, 1000);
+    }
+
     function switchTab(tab) {
-      const tabs = ['hoje', 'historico', 'cardapio', 'config'];
+      const tabs = ['hoje', 'historico', 'mercado', 'cardapio', 'config'];
       tabs.forEach(t => {
         const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
         const btn = document.getElementById('tabBtn_' + t);
