@@ -2170,30 +2170,30 @@
     // GUARNIÇÕES & ACOMPANHAMENTOS QUICK TOGGLE
     // ==========================================
     const DEFAULT_GUARDA_SIDES = [
-      { id: 'Macarrão Especial', icon: '🍝', label: 'Macarrão' },
-      { id: 'Purê de Batata Cremoso', icon: '🥔', label: 'Purê de Batata' },
-      { id: 'Farofa da Casa', icon: '🌾', label: 'Farofa' },
-      { id: 'Salada Fresca', icon: '🥗', label: 'Salada' },
-      { id: 'Feijão Caseiro', icon: '🫘', label: 'Feijão' },
-      { id: 'Arroz', icon: '🍚', label: 'Arroz' }
+      { id: 'guarnicao_macarrao', name: 'Macarrão Especial', icon: '🍝', label: 'Macarrão' },
+      { id: 'guarnicao_pure', name: 'Purê de Batata Cremoso', icon: '🥔', label: 'Purê de Batata' },
+      { id: 'guarnicao_farofa', name: 'Farofa da Casa', icon: '🌾', label: 'Farofa' },
+      { id: 'guarnicao_salada', name: 'Salada Fresca', icon: '🥗', label: 'Salada' },
+      { id: 'guarnicao_feijao', name: 'Feijão Caseiro', icon: '🫘', label: 'Feijão' },
+      { id: 'guarnicao_arroz', name: 'Arroz', icon: '🍚', label: 'Arroz' }
     ];
 
     function renderGuarnicoesGrid() {
       const container = document.getElementById('guarnicoesGrid');
       if (!container) return;
 
-      const gStatus = storeConfig.guarnicoes_status || {};
-
       container.innerHTML = DEFAULT_GUARDA_SIDES.map(g => {
-        const isAvail = gStatus[g.id] !== false;
+        const item = cardapioItems.find(i => i.id === g.id);
+        const isAvail = item ? item.disponivel !== false : true;
+
         return `
-          <button type="button" onclick="toggleGuarnicao('${g.id}')" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between ${isAvail ? 'bg-white border-emerald-300 text-emerald-950 hover:bg-emerald-50/50 shadow-sm' : 'bg-red-50/80 border-red-300 text-red-900 opacity-80'}">
+          <button type="button" onclick="toggleGuarnicao('${g.id}', '${g.name}')" class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between ${isAvail ? 'bg-white border-emerald-300 text-emerald-950 hover:bg-emerald-50/50 shadow-sm' : 'bg-red-50/80 border-red-300 text-red-900 opacity-80'}">
             <div class="flex items-center justify-between text-xs font-black">
               <span>${g.icon} ${g.label}</span>
               <span class="w-2 h-2 rounded-full ${isAvail ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}"></span>
             </div>
             <div class="text-[10px] font-extrabold mt-2 flex items-center justify-between">
-              <span class="${isAvail ? 'text-emerald-700' : 'text-red-700'}">${isAvail ? '🟢 Ativo' : '🔴 Esgotou'}</span>
+              <span class="${isAvail ? 'text-emerald-700' : 'text-red-700 font-black'}">${isAvail ? '🟢 Ativo' : '🔴 Esgotou'}</span>
               <span class="text-[9px] text-gray-400 font-normal underline">clique</span>
             </div>
           </button>
@@ -2201,27 +2201,48 @@
       }).join('');
     }
 
-    async function toggleGuarnicao(sideName) {
-      if (!storeConfig.guarnicoes_status) storeConfig.guarnicoes_status = {};
-      const cur = storeConfig.guarnicoes_status[sideName] !== false;
-      const next = !cur;
-      storeConfig.guarnicoes_status[sideName] = next;
+    async function toggleGuarnicao(guarnicaoId, sideName) {
+      let item = cardapioItems.find(i => i.id === guarnicaoId);
+      const newDisponivel = item ? (item.disponivel === false ? true : false) : false;
 
-      localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
+      if (item) {
+        item.disponivel = newDisponivel;
+      } else {
+        cardapioItems.push({
+          id: guarnicaoId,
+          loja_id: 'marmitaria',
+          categoria: 'guarnicoes',
+          nome: sideName,
+          disponivel: newDisponivel,
+          tipo: 'side',
+          preco: 0
+        });
+      }
+
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
       renderGuarnicoesGrid();
 
       if (supabaseClient) {
         try {
-          await supabaseClient
-            .from('loja_config')
-            .update({ guarnicoes_status: storeConfig.guarnicoes_status })
-            .eq('loja_id', 'marmitaria');
+          const { error } = await supabaseClient
+            .from('cardapio')
+            .upsert({
+              id: guarnicaoId,
+              loja_id: 'marmitaria',
+              categoria: 'guarnicoes',
+              nome: sideName,
+              disponivel: newDisponivel,
+              tipo: 'side',
+              preco: 0
+            });
+
+          if (error) console.warn('Erro ao atualizar guarnicao no Supabase:', error.message);
         } catch(e) {
-          console.warn('Erro ao salvar status de guarnição no Supabase:', e);
+          console.warn('Erro toggleGuarnicao:', e);
         }
       }
 
-      showToast(`${sideName} ${next ? 'ativado' : 'pausado / esgotado'}`);
+      showToast(`${sideName} ${newDisponivel ? 'ativado' : 'pausado / esgotado'}`);
     }
 
     async function loadCardapio(showToastFeedback = false) {
@@ -2266,7 +2287,7 @@
       const container = document.getElementById('cardapioItemsContainer');
       container.innerHTML = '';
 
-      let filtered = cardapioItems;
+      let filtered = cardapioItems.filter(i => i.categoria !== 'guarnicoes');
       if (currentCardapioCategory !== 'all') {
         filtered = cardapioItems.filter(i => i.categoria === currentCardapioCategory);
       }

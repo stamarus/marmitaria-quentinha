@@ -866,7 +866,7 @@
           .order('ordem', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [] };
+          const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
           data.forEach(item => {
             const cat = item.categoria || 'marmitas';
             if (!categorized[cat]) categorized[cat] = [];
@@ -1080,13 +1080,21 @@
           `;
         }).join('');
 
-        // Filter out paused sides from preselection
-        const gStatus = storeConfig.guarnicoes_status || {};
-        selectedSides = sidesToUse.filter(side => gStatus[side] !== false);
+        // Check availability from both MENU_ITEMS.guarnicoes and storeConfig
+        const guarnicoesDb = MENU_ITEMS.guarnicoes || [];
+        const isSideAvailable = (sideName) => {
+          const found = guarnicoesDb.find(g => g.nome.toLowerCase() === sideName.toLowerCase() || sideName.toLowerCase().includes(g.nome.toLowerCase()));
+          if (found && found.disponivel === false) return false;
+          const gStatus = storeConfig.guarnicoes_status || {};
+          if (gStatus[sideName] === false) return false;
+          return true;
+        };
+
+        selectedSides = sidesToUse.filter(side => isSideAvailable(side));
 
         // Render Marmita Sides with Esgotado / Paused support
         sideContainer.innerHTML = sidesToUse.map(side => {
-          const isAvail = gStatus[side] !== false;
+          const isAvail = isSideAvailable(side);
           if (!isAvail) {
             return `
               <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
