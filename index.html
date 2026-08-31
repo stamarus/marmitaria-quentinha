@@ -1114,7 +1114,7 @@
         // Check availability from both MENU_ITEMS.guarnicoes and storeConfig
         const guarnicoesDb = MENU_ITEMS.guarnicoes || [];
         const isSideAvailable = (sideName) => {
-          const found = guarnicoesDb.find(g => g.nome.toLowerCase() === sideName.toLowerCase() || sideName.toLowerCase().includes(g.nome.toLowerCase()));
+          const found = guarnicoesDb.find(g => g.name.toLowerCase() === sideName.toLowerCase() || sideName.toLowerCase().includes(g.name.toLowerCase()));
           if (found && found.disponivel === false) return false;
           const gStatus = storeConfig.guarnicoes_status || {};
           if (gStatus[sideName] === false) return false;
