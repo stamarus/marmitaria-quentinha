@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-
   <script>
-    
+    if (window.location.hostname.endsWith('github.io')) {
+      window.location.replace('https://marmitaria-quentinha-caseira.netlify.app' + window.location.pathname.replace(/^\/[^\/]+/, '') + window.location.search);
+    }
   </script>
   <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=84bc34c4-726e-4ac9-954d-3df528f9bea7
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=84bc34c4-726e-4ac9-954d-3df528f9bea7">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Marmitaria Quentinha Caseira - Cardápio Digital (Xaxim)</title>
   <meta name="description" content="Comida caseira de verdade no Xaxim! Feijoada completa, marmitex fartos, parmegiana e marmita econômica de 10 reais com entrega rápida.">
@@ -130,13 +132,13 @@
               <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Aberto hoje
             </span>
             <span>•</span>
-            <span class="text-gray-600 font-medium">📍 Xaxim e região, Curitiba</span>
+            <span class="text-gray-600 font-medium">📍 Xaxim, Curitiba</span>
           </div>
         </div>
       </div>
 
       <div class="flex items-center space-x-1">
-        <a href="dashboard.html" class="p-2 text-gray-500 hover:text-brand-700 rounded-lg hover:bg-gray-100 transition flex items-center space-x-1 text-xs font-bold" title="Painel de Pedidos">
+        <a class='p-2 text-gray-500 hover:text-brand-700 rounded-lg hover:bg-gray-100 transition flex items-center space-x-1 text-xs font-bold' href='/dashboard' title='Painel de Pedidos'>
           <i data-lucide="layout-dashboard" class="w-5 h-5 text-brand-700"></i>
         </a>
         <button onclick="openAdminModal()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition" title="Configurações">
@@ -168,11 +170,8 @@
   </div>
 
   <!-- CATEGORY NAVIGATION -->
-  <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2 relative">
-    <button onclick="scrollCategoryTabs(-150)" class="absolute left-1 top-1/2 -translate-y-1/2 z-30 p-1.5 bg-white border border-gray-200 rounded-full shadow-md text-gray-500 hover:text-brand-600 flex items-center justify-center">
-      <i data-lucide="chevron-left" class="w-5 h-5"></i>
-    </button>
-    <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 px-4 scroll-smooth" id="categoryTabs">
+  <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2">
+    <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1" id="categoryTabs">
       <button onclick="selectCategory('marmitas')" id="tab_marmitas" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
         🍛 Marmitas (P & M)
       </button>
@@ -294,7 +293,7 @@
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-bold text-gray-900 flex items-center">
               <span class="w-5 h-5 rounded-full bg-brand-700 text-white text-xs flex items-center justify-center mr-1.5 font-bold" id="stepAcompNum">2</span>
-              Escolha os Acompanhamentos Desejados (Marque os que quiser)
+              Acompanhamentos Inclusos
             </h4>
             <span class="text-[11px] text-gray-500 font-medium">Desmarque se não quiser algum</span>
           </div>
@@ -564,8 +563,8 @@
   <!-- SCRIPT LOGIC -->
   <script>
     // SUPABASE CLIENT FOR REALTIME ORDERS
-    const SUPABASE_URL = 'https://drecypzvptgyfltjlebh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZWN5cHp2cHRneWZsdGpsZWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MzIwMTAsImV4cCI6MjEwMzUwODAxMH0.eVsHivVn8vvRmHU6e8qL74kFchrGB0NOohkoje6Hytc';
+    const SUPABASE_URL = 'https://pwrtnhgsgvcqoyttkmmq.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3cnRuaGdzZ3ZjcW95dHRrbW1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MjQ3MDksImV4cCI6MjEwMzIwMDcwOX0.FaCRpqL2AEJIi5S4g3sswPFBASAkjrKKCWYwCyBZwJ0';
     let supabaseClient = null;
     try {
       if (window.supabase) {
@@ -584,19 +583,7 @@
       hora_fechamento: '14:30',
       dias_funcionamento: ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'],
       status_modo: 'auto', // 'auto', 'force_open', 'force_closed'
-      mensagem_fechado: 'Estamos fechados no momento. Almoço de Seg a Sáb das 11h às 14h30!',
-      guarnicoes_status: {
-        'Arroz': true,
-        'Feijão Caseiro': true,
-        'Purê de Batata Cremoso': true,
-        'Farofa da Casa': true,
-        'Macarrão Especial': true,
-        'Salada Fresca': true,
-        'Feijoada Completa': true,
-        'Couve Refogada': true,
-        'Vinagrete Especial': true,
-        'Torresmo Crocante': true
-      }
+      mensagem_fechado: 'Estamos fechados no momento. Almoço de Seg a Sáb das 11h às 14h30!'
     };
 
     // LOAD STORE CONFIG
@@ -838,7 +825,7 @@
         const { data, error } = await supabaseClient
           .from('loja_config')
           .select('*')
-          .eq('loja_id', 'marmitaria')
+          .eq('id', 'config_geral')
           .maybeSingle();
 
         if (!error && data) {
@@ -850,8 +837,7 @@
             hora_fechamento: data.hora_fechamento || data.horario_fechamento || storeConfig.hora_fechamento,
             dias_funcionamento: Array.isArray(data.dias_funcionamento) ? data.dias_funcionamento : storeConfig.dias_funcionamento,
             status_modo: data.status_modo || storeConfig.status_modo,
-            mensagem_fechado: data.mensagem_fechado || storeConfig.mensagem_fechado,
-            guarnicoes_status: data.guarnicoes_status || storeConfig.guarnicoes_status || {}
+            mensagem_fechado: data.mensagem_fechado || storeConfig.mensagem_fechado
           };
           localStorage.setItem('marmitaria_config', JSON.stringify(storeConfig));
           updateStoreStatusUI();
@@ -868,11 +854,10 @@
         const { data, error } = await supabaseClient
           .from('cardapio')
           .select('*')
-          .eq('loja_id', 'marmitaria')
           .order('ordem', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+          const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [] };
           data.forEach(item => {
             const cat = item.categoria || 'marmitas';
             if (!categorized[cat]) categorized[cat] = [];
@@ -922,9 +907,7 @@
     function renderMenu() {
       const container = document.getElementById('menuContainer');
       container.innerHTML = '';
-      // Filtrar apenas itens que NÃO são guarnições e NÃO estão completamente excluídos
-      const allCategoryItems = (MENU_ITEMS[currentCategory] || []).filter(i => i.categoria !== 'guarnicoes');
-      const items = allCategoryItems;
+      const items = (MENU_ITEMS[currentCategory] || []).filter(i => i.disponivel !== false);
 
       if (items.length === 0) {
         container.innerHTML = `
@@ -942,12 +925,7 @@
         let priceFormatted = '';
         let isCompletelyUnavailable = false;
 
-        const itemIsGlobalUnavailable = item.disponivel === false;
-
-        if (itemIsGlobalUnavailable) {
-          isCompletelyUnavailable = true;
-          priceFormatted = '<span class="text-rose-600 text-xs font-bold">🔴 Esgotado Hoje</span>';
-        } else if (item.type === 'marmita_sizes' && item.sizes && item.sizes.length > 0) {
+        if (item.type === 'marmita_sizes' && item.sizes && item.sizes.length > 0) {
           const availSizes = item.sizes.filter(s => s.available !== false);
           if (availSizes.length === 0) {
             isCompletelyUnavailable = true;
@@ -960,35 +938,19 @@
           priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
         }
 
-        card.className = `bg-white rounded-2xl p-3.5 shadow-sm border ${isCompletelyUnavailable ? 'border-red-200 bg-red-50/10 opacity-50 pointer-events-none select-none' : 'border-warm-100'} flex space-x-3 items-start hover:shadow-md transition relative overflow-hidden`;
-
         card.innerHTML = `
-          <!-- Imagem com Tarja Vermelha de Esgotado se indisponível -->
-          <div class="relative flex-shrink-0 w-24 h-24 mt-0.5">
-            <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 ${isCompletelyUnavailable ? 'grayscale contrast-125' : ''}" onerror="this.src='watermarked_img_14074362198608020855.jpg'">
-            ${isCompletelyUnavailable ? `
-              <div class="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
-                <div class="bg-red-600 text-white font-black text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow-lg transform -rotate-12 border border-white/40">
-                  ESGOTADO
-                </div>
-              </div>
-            ` : ''}
-          </div>
-
+          <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 flex-shrink-0 mt-0.5" onerror="this.src='watermarked_img_14074362198608020855.jpg'">
           <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[6rem]">
             <div>
-              <div class="flex items-center justify-between gap-1">
-                <h3 class="font-bold text-gray-900 text-sm leading-snug ${isCompletelyUnavailable ? 'line-through text-gray-500' : ''}">${item.name}</h3>
-                ${isCompletelyUnavailable ? '<span class="bg-red-100 text-red-700 text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex-shrink-0">Esgotado</span>' : ''}
-              </div>
-              <p class="text-gray-500 text-xs mt-1 leading-relaxed line-clamp-2">${item.description}</p>
+              <h3 class="font-bold text-gray-900 text-sm leading-snug">${item.name}</h3>
+              <p class="text-gray-500 text-xs mt-1 leading-relaxed">${item.description}</p>
             </div>
             <div class="flex items-center justify-between mt-3 pt-1">
               <span class="font-extrabold text-brand-700 text-sm">${priceFormatted}</span>
               ${isCompletelyUnavailable ? `
-                <button disabled class="bg-red-600 text-white font-black px-3 py-1.5 rounded-xl text-xs cursor-not-allowed opacity-90 shadow-sm">
-                  ESGOTADO
-                </button>
+                <span class="bg-gray-100 text-gray-400 font-bold px-3 py-1.5 rounded-xl text-xs">
+                  Esgotado
+                </span>
               ` : `
                 <button onclick="handleItemClick('${item.id}', '${currentCategory}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 border border-brand-200/60 transition active:scale-95">
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -1005,13 +967,6 @@
     }
 
     // CATEGORY SELECTION
-    function scrollCategoryTabs(amount) {
-      const container = document.getElementById('categoryTabs');
-      if (container) {
-        container.scrollBy({ left: amount, behavior: 'smooth' });
-      }
-    }
-
     function selectCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -1028,11 +983,6 @@
     function handleItemClick(itemId, category) {
       const item = (MENU_ITEMS[category] || []).find(i => i.id === itemId);
       if (!item) return;
-
-      if (item.disponivel === false) {
-        alert('Este prato está pausado / esgotado no momento.');
-        return;
-      }
 
       if (item.type === 'marmita_sizes' || item.type === 'marmita_10') {
         openCustomModal(item);
@@ -1077,7 +1027,7 @@
         
         const isFeijoada = (item.id && item.id.includes('feijoada')) || currentCategory === 'feijoada';
         const sidesToUse = isFeijoada ? DEFAULT_FEIJOADA_SIDES : DEFAULT_MARMITA_SIDES;
-        selectedSides = [];
+        selectedSides = [...sidesToUse];
 
         // Render Sizes (P, M, G)
         const sizeContainer = document.getElementById('sizeOptions');
@@ -1109,38 +1059,13 @@
           `;
         }).join('');
 
-        // Check availability from both MENU_ITEMS.guarnicoes and storeConfig
-        const guarnicoesDb = MENU_ITEMS.guarnicoes || [];
-        const isSideAvailable = (sideName) => {
-          const found = guarnicoesDb.find(g => g.nome.toLowerCase() === sideName.toLowerCase() || sideName.toLowerCase().includes(g.nome.toLowerCase()));
-          if (found && found.disponivel === false) return false;
-          const gStatus = storeConfig.guarnicoes_status || {};
-          if (gStatus[sideName] === false) return false;
-          return true;
-        };
-
-        // INICIAR DESMARCADO (VAZIO) CONFORME SOLICITADO PELO NEGÃO PARA O CLIENTE ESCOLHER
-        selectedSides = [];
-
-        // Render Marmita Sides with Esgotado / Paused support
-        sideContainer.innerHTML = sidesToUse.map(side => {
-          const isAvail = isSideAvailable(side);
-          if (!isAvail) {
-            return `
-              <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
-                <span class="line-through font-medium">${side}</span>
-                <span class="text-[9px] font-black uppercase bg-red-100 px-1.5 py-0.5 rounded">Esgotado</span>
-              </div>
-            `;
-          }
-          const isChecked = selectedSides.includes(side);
-          return `
-            <label class="flex items-center space-x-2 p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}">
-              <input type="checkbox" value="${side}" ${isChecked ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
-              <span class="text-xs">${side}</span>
-            </label>
-          `;
-        }).join('');
+        // Render Marmita Sides
+        sideContainer.innerHTML = sidesToUse.map(side => `
+          <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
+            <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
+            <span class="text-gray-700 font-medium">${side}</span>
+          </label>
+        `).join('');
 
       } else if (item.type === 'marmita_10') {
         sizeSection.classList.add('hidden');
@@ -1149,7 +1074,7 @@
         stepAcompNum.innerText = '2';
 
         selectedMistura = (item.misturas && item.misturas[0]) || 'Bistequinha';
-        selectedSides = [];
+        selectedSides = [...DEFAULT_MARMITA10_SIDES];
 
         // Render Misturas
         const misturaContainer = document.getElementById('misturaOptions');
@@ -1293,34 +1218,6 @@
     }
 
     // CHECKOUT MODAL
-    
-    // BUSCA AUTOMÁTICA DE CEP VIA VIACEP
-    async function handleCepInput(val) {
-      const cleanCep = val.replace(/\D/g, '');
-      if (cleanCep.length === 8) {
-        document.getElementById('cepStatusText').innerHTML = '<span class="text-brand-600 font-bold animate-pulse">Buscando endereço...</span>';
-        try {
-          const resp = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
-          const data = await resp.json();
-          if (!data.erro) {
-            document.getElementById('custStreet').value = data.logradouro || '';
-            document.getElementById('custNeighborhood').value = data.bairro || '';
-            document.getElementById('cepStatusText').innerHTML = '<span class="text-emerald-600 font-bold">✓ Endereço preenchido!</span>';
-            document.getElementById('custNumber').focus();
-          } else {
-            document.getElementById('cepStatusText').innerHTML = '<span class="text-rose-600 font-bold">CEP não localizado</span>';
-          }
-        } catch(e) {
-          document.getElementById('cepStatusText').innerText = 'Preencha manualmente';
-        }
-      }
-    }
-
-    function consultarCepManual() {
-      const cep = document.getElementById('custCep').value;
-      handleCepInput(cep);
-    }
-
     function openCheckoutModal() {
       renderCheckoutItems();
       document.getElementById('pixKeyDisplay').innerText = storeConfig.pixKey;
@@ -1636,8 +1533,6 @@
 
     // Live clock check every minute
     setInterval(updateStoreStatusUI, 60000);
-    setInterval(fetchCardapioFromSupabase, 8000);
-    setInterval(fetchStoreConfigFromSupabase, 15000);
   
     // DEVELOPER INFO MODAL LOGIC (STAMARUS)
     function openDevModal() {
@@ -1723,3 +1618,4 @@
 
 </body>
 </html>
+<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="84bc34c4-726e-4ac9-954d-3df528f9bea7" data-app-host="app.netlify.com"></script>
