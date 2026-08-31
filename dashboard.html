@@ -374,6 +374,32 @@
       </div>
 
       <!-- VIEW 3: GERENCIAR CARDÁPIO -->
+      
+      <!-- MARKET LIST VIEW -->
+      <div id="viewMercado" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Lista de Mercado</h2>
+            <p class="text-xs text-gray-500 mt-1">Anote os itens que precisam ser comprados.</p>
+          </div>
+          <button onclick="clearMarketList()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <span>Limpar Tudo</span>
+          </button>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div class="flex space-x-2 mb-4">
+            <input type="text" id="marketInput" placeholder="Ex: Arroz 5kg, Feijão, Óleo..." class="flex-1 p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-sm bg-gray-50" onkeypress="if(event.key === 'Enter') addMarketItem()">
+            <button onclick="addMarketItem()" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-3 rounded-xl font-bold transition">Adicionar</button>
+          </div>
+          
+          <ul id="marketList" class="space-y-2">
+            <!-- Items injected by JS -->
+          </ul>
+        </div>
+      </div>
+
       <div id="viewCardapio" class="hidden space-y-6">
         
         <!-- Header & Action Bar -->
@@ -3012,6 +3038,68 @@
 
     // CHECK AUTH ON INITIAL LOAD
     checkAuth();
+
+    // --- MARKET LIST LOGIC ---
+    let marketItems = JSON.parse(localStorage.getItem('marmitaria_market_list') || '[]');
+
+    function renderMarketList() {
+      const ul = document.getElementById('marketList');
+      if (!ul) return;
+      ul.innerHTML = marketItems.map((item, idx) => `
+        <li class="flex items-center justify-between p-3 rounded-xl border border-gray-100 ${item.done ? 'bg-gray-50 opacity-60' : 'bg-white hover:border-gray-200'} transition">
+          <label class="flex items-center space-x-3 cursor-pointer flex-1">
+            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleMarketItem(${idx})" class="w-5 h-5 text-brand-600 rounded focus:ring-brand-500">
+            <span class="text-sm font-bold ${item.done ? 'line-through text-gray-400' : 'text-gray-700'}">${item.name}</span>
+          </label>
+          <button onclick="removeMarketItem(${idx})" class="text-gray-400 hover:text-rose-500 transition p-1">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </li>
+      `).join('');
+      if(marketItems.length === 0) {
+        ul.innerHTML = '<p class="text-center text-sm text-gray-400 py-4">Nenhum item na lista.</p>';
+      }
+      lucide.createIcons();
+    }
+
+    function addMarketItem() {
+      const inp = document.getElementById('marketInput');
+      if(!inp) return;
+      const val = inp.value.trim();
+      if(val) {
+        marketItems.push({ name: val, done: false });
+        inp.value = '';
+        saveMarketList();
+      }
+    }
+
+    function toggleMarketItem(idx) {
+      marketItems[idx].done = !marketItems[idx].done;
+      saveMarketList();
+    }
+
+    function removeMarketItem(idx) {
+      marketItems.splice(idx, 1);
+      saveMarketList();
+    }
+
+    function clearMarketList() {
+      if(confirm('Tem certeza que deseja apagar toda a lista de mercado?')) {
+        marketItems = [];
+        saveMarketList();
+      }
+    }
+
+    function saveMarketList() {
+      localStorage.setItem('marmitaria_market_list', JSON.stringify(marketItems));
+      renderMarketList();
+    }
+    
+    // Call render once on load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMarketList();
+    });
+
   </script>
 </body>
 </html>
