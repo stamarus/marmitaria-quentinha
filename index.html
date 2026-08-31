@@ -6,9 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <script>
-    
-  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Marmitaria Quentinha Caseira - Cardápio Digital (Xaxim)</title>
@@ -76,45 +74,9 @@
     .animate-slide-up {
       animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    netlify-drawer,
-    #netlify-drawer-root,
-    [id*="netlify-drawer"],
-    [class*="netlify-drawer"],
-    [data-netlify-badge],
-    .netlify-badge,
-    #netlify-badge,
-    iframe[src*="netlify"],
-    iframe[title*="Netlify"],
-    div[data-netlify-deploy-id] {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      width: 0 !important;
-      height: 0 !important;
-      clip: rect(0, 0, 0, 0) !important;
-      position: absolute !important;
-      left: -9999px !important;
-      top: -9999px !important;
-      z-index: -99999 !important;
-    }
+
   </style>
-  <script>
-    (function() {
-      function killNetlify() {
-        const sel = 'netlify-drawer, #netlify-drawer-root, [id*="netlify-drawer"], [class*="netlify-drawer"], [data-netlify-badge], .netlify-badge, #netlify-badge, iframe[src*="netlify"], iframe[title*="Netlify"], div[data-netlify-deploy-id]';
-        document.querySelectorAll(sel).forEach(el => {
-          try { el.remove(); } catch(e) {}
-        });
-      }
-      if (window.MutationObserver) {
-        new MutationObserver(killNetlify).observe(document.documentElement, { childList: true, subtree: true });
-      }
-      window.addEventListener('DOMContentLoaded', killNetlify);
-      window.addEventListener('load', killNetlify);
-      setInterval(killNetlify, 500);
-    })();
-  </script>
+
 </head>
 <body class="bg-warm-50 text-gray-800 min-h-screen pb-28">
 
@@ -790,7 +752,7 @@
       const workingDays = config.dias_funcionamento || ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
 
       if (!workingDays.includes(currentDay)) {
-        return { isOpen: false, statusText: 'Fechado hoje', badgeClass: 'text-amber-700', dotClass: 'bg-amber-500' };
+        return { isOpen: false, statusText: `Fechado hoje (Abre às ${config.hora_abertura || '11:00'})`, badgeClass: 'text-amber-700', dotClass: 'bg-amber-500' };
       }
 
       const curH = now.getHours();
@@ -803,9 +765,9 @@
       const closeTotalMin = closeH * 60 + closeM;
 
       if (curTotalMin >= openTotalMin && curTotalMin <= closeTotalMin) {
-        return { isOpen: true, statusText: `Aberto até ${config.hora_fechamento || '14:30'}`, badgeClass: 'text-emerald-600', dotClass: 'bg-emerald-500 animate-pulse' };
+        return { isOpen: true, statusText: `Aberto (Fecha às ${config.hora_fechamento || '14:30'})`, badgeClass: 'text-emerald-600', dotClass: 'bg-emerald-500 animate-pulse' };
       } else {
-        return { isOpen: false, statusText: `Fechado (Abre às ${config.hora_abertura || '11:00'})`, badgeClass: 'text-rose-600', dotClass: 'bg-rose-500' };
+        return { isOpen: false, statusText: `Fechado hoje (Abre às ${config.hora_abertura || '11:00'})`, badgeClass: 'text-rose-600', dotClass: 'bg-rose-500' };
       }
     }
 
