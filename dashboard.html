@@ -2225,6 +2225,25 @@
       }
 
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
       renderGuarnicoesGrid();
 
       if (supabaseClient) {
@@ -2262,6 +2281,25 @@
           if (!error && data && data.length > 0) {
             cardapioItems = data;
             localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
           } else if (error) {
             console.warn('Cardápio table not populated yet or error:', error.message);
           }
@@ -2430,6 +2468,25 @@
       sizeObj.available = newAvail;
 
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
       renderCardapioGrid();
       renderGuarnicoesGrid();
 
@@ -2456,6 +2513,25 @@
       const newDisponivel = !cardapioItems[idx].disponivel;
       cardapioItems[idx].disponivel = newDisponivel;
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
       renderCardapioGrid();
       renderGuarnicoesGrid();
 
@@ -2684,6 +2760,25 @@
       }
 
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
       renderCardapioGrid();
       renderGuarnicoesGrid();
       closeItemModal();
@@ -2714,6 +2809,25 @@
 
       cardapioItems = cardapioItems.filter(i => i.id !== itemId);
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(item => {
+        const cat = item.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: item.id,
+          name: item.nome,
+          description: item.descricao || '',
+          price: parseFloat(item.preco) || 0,
+          type: item.tipo || 'direct',
+          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          image: item.image || 'img/marmita_milanesa.jpg',
+          disponivel: item.disponivel !== false,
+          ordem: item.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
       renderCardapioGrid();
       renderGuarnicoesGrid();
 
