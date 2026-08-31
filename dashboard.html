@@ -426,9 +426,13 @@
                             <button onclick="loadHistoricalOrders()" class="bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition">
                 Filtrar
               </button>
-              <button onclick="exportCustomerPhones()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1" title="Exportar Telefones para Disparo">
+                            <button onclick="exportCustomerPhones()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1" title="Exportar Telefones para Disparo">
                 <i data-lucide="download" class="w-4 h-4"></i>
                 <span class="hidden sm:inline">Contatos</span>
+              </button>
+              <button onclick="openBroadcastModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1" title="Disparo Automático no WhatsApp">
+                <i data-lucide="megaphone" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Disparo</span>
               </button>
             </div>
           </div>
@@ -2103,6 +2107,108 @@
     }
 
     
+    
+    // --- BROADCAST LOGIC ---
+    let broadcastContacts = [];
+    let isBroadcasting = false;
+
+    async function openBroadcastModal() {
+      if (!supabaseClient) return alert("Banco de dados desconectado!");
+      
+      const hasEvolution = storeConfig.evolution_api_url && storeConfig.evolution_api_key;
+      if (!hasEvolution) {
+        return alert('Configure a Evolution API na aba de Configurações antes de usar o Disparo!');
+      }
+
+      document.getElementById('broadcastModal').classList.remove('hidden');
+      document.getElementById('broadcastProgressContainer').classList.add('hidden');
+      document.getElementById('broadcastStartBtn').disabled = false;
+      document.getElementById('broadcastCancelBtn').disabled = false;
+      document.getElementById('broadcastCountBadge').innerText = 'Carregando contatos...';
+      
+      // Fetch all unique phones from ALL orders
+      try {
+        const { data, error } = await supabaseClient
+          .from('pedidos')
+          .select('cliente_telefone')
+          .not('cliente_telefone', 'is', null);
+          
+        if (error) throw error;
+        
+        const phones = new Set();
+        (data || []).forEach(row => {
+          if (row.cliente_telefone) {
+            const clean = row.cliente_telefone.replace(/\D/g, '');
+            if (clean) phones.add(clean);
+          }
+        });
+        
+        broadcastContacts = Array.from(phones);
+        document.getElementById('broadcastCountBadge').innerText = `Contatos válidos encontrados: ${broadcastContacts.length}`;
+        
+        if (broadcastContacts.length === 0) {
+          document.getElementById('broadcastStartBtn').disabled = true;
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('broadcastCountBadge').innerText = 'Erro ao carregar contatos.';
+      }
+      
+      lucide.createIcons();
+    }
+
+    function closeBroadcastModal() {
+      if (isBroadcasting) {
+        return alert("Disparo em andamento! Aguarde finalizar.");
+      }
+      document.getElementById('broadcastModal').classList.add('hidden');
+    }
+
+    async function startBroadcast() {
+      if (broadcastContacts.length === 0) return;
+      
+      const msg = document.getElementById('broadcastMessage').value.trim();
+      if (!msg) return alert('Digite uma mensagem para enviar!');
+
+      if (!confirm(`Deseja iniciar o disparo automático para ${broadcastContacts.length} contatos?`)) return;
+
+      isBroadcasting = true;
+      document.getElementById('broadcastStartBtn').disabled = true;
+      document.getElementById('broadcastCancelBtn').disabled = true;
+      document.getElementById('broadcastProgressContainer').classList.remove('hidden');
+      
+      let successCount = 0;
+      let errorCount = 0;
+      let total = broadcastContacts.length;
+
+      for (let i = 0; i < total; i++) {
+        const phone = broadcastContacts[i];
+        
+        document.getElementById('broadcastStatusText').innerText = `Enviando para ${phone}...`;
+        document.getElementById('broadcastProgressText').innerText = `${i} / ${total}`;
+        document.getElementById('broadcastProgressBar').style.width = `${(i / total) * 100}%`;
+        
+        try {
+          const sent = await sendEvolutionWhatsAppMessage(phone, msg);
+          if (sent) successCount++;
+          else errorCount++;
+        } catch(e) {
+          errorCount++;
+        }
+        
+        // Delay 2 seconds between messages to avoid rate limits
+        await new Promise(r => setTimeout(r, 2000));
+      }
+
+      document.getElementById('broadcastProgressText').innerText = `${total} / ${total}`;
+      document.getElementById('broadcastProgressBar').style.width = `100%`;
+      document.getElementById('broadcastStatusText').innerText = `Disparo Finalizado! Sucesso: ${successCount} | Erros: ${errorCount}`;
+      
+      isBroadcasting = false;
+      document.getElementById('broadcastCancelBtn').disabled = false;
+      document.getElementById('broadcastCancelBtn').innerText = 'Fechar';
+    }
+
     function exportCustomerPhones() {
       if (!window.lastHistoricalOrders || window.lastHistoricalOrders.length === 0) {
         return alert('Nenhum pedido no período filtrado para exportar contatos!');
