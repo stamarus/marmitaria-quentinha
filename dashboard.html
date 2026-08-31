@@ -85,7 +85,47 @@
       }
     }
 
+  
+    @media print {
+      body.printing-market * {
+        visibility: hidden;
+      }
+      body.printing-market #viewMercado,
+      body.printing-market #viewMercado * {
+        visibility: visible;
+      }
+      body.printing-market #viewMercado {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body.printing-market #viewMercado button,
+      body.printing-market #viewMercado input[type="text"],
+      body.printing-market #viewMercado p.text-xs {
+        display: none !important;
+      }
+      body.printing-market #viewMercado h2 {
+        font-size: 16pt;
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 1px dashed #000;
+        padding-bottom: 10px;
+      }
+      body.printing-market #viewMercado ul {
+        margin-top: 10px;
+      }
+      body.printing-market #viewMercado li {
+        border: none !important;
+        border-bottom: 1px dotted #ccc !important;
+        padding: 8px 0 !important;
+        margin: 0 !important;
+      }
+    }
   </style>
+
 
   <style>
 
@@ -133,7 +173,47 @@
         size: auto !important;
       }
     }
+  
+    @media print {
+      body.printing-market * {
+        visibility: hidden;
+      }
+      body.printing-market #viewMercado,
+      body.printing-market #viewMercado * {
+        visibility: visible;
+      }
+      body.printing-market #viewMercado {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body.printing-market #viewMercado button,
+      body.printing-market #viewMercado input[type="text"],
+      body.printing-market #viewMercado p.text-xs {
+        display: none !important;
+      }
+      body.printing-market #viewMercado h2 {
+        font-size: 16pt;
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 1px dashed #000;
+        padding-bottom: 10px;
+      }
+      body.printing-market #viewMercado ul {
+        margin-top: 10px;
+      }
+      body.printing-market #viewMercado li {
+        border: none !important;
+        border-bottom: 1px dotted #ccc !important;
+        padding: 8px 0 !important;
+        margin: 0 !important;
+      }
+    }
   </style>
+
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
 
@@ -382,10 +462,20 @@
             <h2 class="text-xl font-bold text-gray-800">Lista de Mercado</h2>
             <p class="text-xs text-gray-500 mt-1">Anote os itens que precisam ser comprados.</p>
           </div>
-          <button onclick="clearMarketList()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-            <span>Limpar Tudo</span>
-          </button>
+          <div class="flex items-center space-x-2 mt-2 sm:mt-0">
+            <button onclick="downloadMarketTxt()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1 sm:space-x-2" title="Baixar .txt">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">.txt</span>
+            </button>
+            <button onclick="printMarketList()" class="bg-brand-50 hover:bg-brand-100 text-brand-700 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1 sm:space-x-2" title="Imprimir">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Imprimir</span>
+            </button>
+            <button onclick="clearMarketList()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1 sm:space-x-2" title="Limpar Tudo">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Limpar</span>
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -3060,6 +3150,33 @@
         ul.innerHTML = '<p class="text-center text-sm text-gray-400 py-4">Nenhum item na lista.</p>';
       }
       lucide.createIcons();
+    }
+
+    
+    function downloadMarketTxt() {
+      if (marketItems.length === 0) return alert('A lista de mercado está vazia!');
+      let text = 'LISTA DE MERCADO - MARMITARIA\n============================\n\n';
+      marketItems.forEach(item => {
+        text += `[${item.done ? 'X' : ' '}] ${item.name}\n`;
+      });
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lista-de-mercado.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function printMarketList() {
+      if (marketItems.length === 0) return alert('A lista de mercado está vazia!');
+      document.body.classList.add('printing-market');
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-market');
+      }, 1000);
     }
 
     function addMarketItem() {
