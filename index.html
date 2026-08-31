@@ -754,12 +754,15 @@
       }
 
       // Auto mode: check day and hour
-      const now = new Date();
+            const now = new Date();
+      const currentDayNum = now.getDay();
       const dayMap = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-      const currentDay = dayMap[now.getDay()];
-      const workingDays = config.dias_funcionamento || ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+      const currentDayStr = dayMap[currentDayNum];
+      
+      const workingDays = config.dias_funcionamento || [1, 2, 3, 4, 5, 6];
+      const isWorkingDay = workingDays.includes(currentDayNum) || workingDays.includes(String(currentDayNum)) || workingDays.includes(currentDayStr);
 
-      if (!workingDays.includes(currentDay)) {
+      if (!isWorkingDay) { {
         return { isOpen: false, statusText: `Fechado hoje (Abre às ${config.hora_abertura || '11:00'})`, badgeClass: 'text-amber-700', dotClass: 'bg-amber-500' };
       }
 
@@ -1303,8 +1306,9 @@
       const closeH = config.hora_fechamento || '14:30';
 
       let html = '';
-      Object.keys(daysMap).forEach(key => {
-        const isOpen = workingDays.includes(key);
+            const daysKeys = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+      Object.keys(daysMap).forEach((key, index) => {
+        const isOpen = workingDays.includes(index) || workingDays.includes(String(index)) || workingDays.includes(key);
         html += `
           <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
             <span class="font-bold ${isOpen ? 'text-gray-700' : 'text-gray-400'}">${daysMap[key]}</span>
