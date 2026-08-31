@@ -113,5 +113,23 @@ ON CONFLICT (id) DO UPDATE SET
     misturas = EXCLUDED.misturas,
     image = EXCLUDED.image,
     disponivel = EXCLUDED.disponivel,
-    ordem = EXCLUDED.ordem,
     updated_at = NOW();
+
+-- =========================================================
+-- 4. TABELA DE REPORTES DE BUGS (KB & BUG TRACKER)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS public.bug_reports (
+    bug_id BIGSERIAL PRIMARY KEY,
+    loja_id TEXT DEFAULT 'marmitaria',
+    bug_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    bug_desc TEXT NOT NULL,
+    status TEXT DEFAULT 'new',          -- 'new', 'close'
+    resolvido TEXT DEFAULT 'NO',        -- 'YES', 'NO'
+    bug_fix_date TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.bug_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public full access bug_reports" ON public.bug_reports;
+CREATE POLICY "Public full access bug_reports" ON public.bug_reports FOR ALL USING (true) WITH CHECK (true);
+ALTER PUBLICATION supabase_realtime ADD TABLE public.bug_reports;

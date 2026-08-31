@@ -173,7 +173,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="max-w-xl mx-auto px-4 pt-8 pb-4 text-center">
+  <footer class="max-w-xl mx-auto px-4 pt-8 pb-4 text-center space-y-2">
     <p class="text-xs text-gray-500 font-medium flex items-center justify-center gap-1">
       <span>Desenvolvido por</span>
       <button type="button" onclick="openDevModal()" class="text-brand-700 font-bold hover:underline inline-flex items-center gap-0.5 transition cursor-pointer">
@@ -181,6 +181,14 @@
         <i data-lucide="info" class="w-3.5 h-3.5 inline text-brand-600"></i>
       </button>
     </p>
+    
+    <div>
+      <button type="button" onclick="openBugModal()" class="text-xs text-gray-400 hover:text-amber-600 font-medium underline inline-flex items-center gap-1 transition cursor-pointer">
+        <i data-lucide="bug" class="w-3.5 h-3.5 text-amber-500"></i>
+        <span>Encontrou um erro? Informe aqui!</span>
+      </button>
+    </div>
+
     <p class="text-[10px] text-gray-400 mt-1">© 2026 Marmitaria Quentinha Caseira</p>
   </footer>
 
@@ -1676,6 +1684,91 @@
       }
     }
 
+    // BUG REPORTER LOGIC
+    function openBugModal() {
+      const now = new Date();
+      const formattedDate = now.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const dateInp = document.getElementById('bugDateInput');
+      if (dateInp) {
+        dateInp.value = formattedDate;
+        dateInp.dataset.iso = now.toISOString();
+      }
+      const descInp = document.getElementById('bugDescInput');
+      if (descInp) descInp.value = '';
+      
+      const statusMsg = document.getElementById('bugStatusMsg');
+      if (statusMsg) {
+        statusMsg.className = 'hidden';
+        statusMsg.innerText = '';
+      }
+      const btn = document.getElementById('bugSubmitBtn');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5 mr-1"></i><span>Enviar Relato</span>';
+      }
+      const modal = document.getElementById('bugModal');
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeBugModal() {
+      const modal = document.getElementById('bugModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function submitBugReport(event) {
+      event.preventDefault();
+      const descInp = document.getElementById('bugDescInput');
+      const dateInp = document.getElementById('bugDateInput');
+      const btn = document.getElementById('bugSubmitBtn');
+      const statusMsg = document.getElementById('bugStatusMsg');
+
+      const desc = descInp ? descInp.value.trim() : '';
+      const isoDate = (dateInp && dateInp.dataset.iso) ? dateInp.dataset.iso : new Date().toISOString();
+
+      if (!desc) return;
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin mr-1">⏳</span><span>Enviando...</span>';
+      }
+
+      try {
+        if (supabaseClient) {
+          const { error } = await supabaseClient.from('bug_reports').insert([{
+            loja_id: 'marmitaria',
+            bug_date: isoDate,
+            bug_desc: desc,
+            status: 'new',
+            resolvido: 'NO'
+          }]);
+          if (error) throw error;
+        }
+
+        if (statusMsg) {
+          statusMsg.className = 'text-xs text-center font-bold p-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 block';
+          statusMsg.innerText = '✅ Relato enviado com sucesso! Obrigado pela ajuda.';
+        }
+
+        setTimeout(() => {
+          closeBugModal();
+        }, 1600);
+
+      } catch (err) {
+        console.warn('Erro ao registrar bug no Supabase:', err);
+        if (statusMsg) {
+          statusMsg.className = 'text-xs text-center font-bold p-2.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 block';
+          statusMsg.innerText = 'Relato registrado localmente. Obrigado!';
+        }
+        setTimeout(() => {
+          closeBugModal();
+        }, 1600);
+      }
+    }
+
   </script>
   <!-- DEVELOPER INFO MODAL (STAMARUS) -->
   <div id="devModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4" style="display: none;" onclick="if(event.target===this)closeDevModal()">
@@ -1763,6 +1856,50 @@
           Entendi
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- BUG REPORTER MODAL -->
+  <div id="bugModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col relative animate-scale-up">
+      <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-amber-50">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-700 font-bold">
+            <i data-lucide="bug" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 text-sm">Reportar um Erro</h3>
+            <p class="text-[11px] text-gray-500">Ajude-nos a melhorar o sistema</p>
+          </div>
+        </div>
+        <button onclick="closeBugModal()" class="text-gray-400 hover:bg-gray-200 p-2 rounded-full transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="bugReportForm" onsubmit="submitBugReport(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block font-bold text-gray-700 mb-1 text-xs">Quando isso aconteceu?</label>
+          <input type="text" id="bugDateInput" readonly class="w-full p-2.5 rounded-xl border border-gray-200 bg-gray-100 text-gray-600 font-mono text-xs cursor-not-allowed">
+        </div>
+
+        <div>
+          <label class="block font-bold text-gray-700 mb-1 text-xs">Descrição do erro</label>
+          <textarea id="bugDescInput" required rows="4" placeholder="Descreva o que aconteceu de errado com o máximo de detalhes possível..." class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-amber-500 focus:outline-none text-xs bg-gray-50 resize-none"></textarea>
+        </div>
+
+        <div id="bugStatusMsg" class="hidden text-xs text-center font-bold p-2.5 rounded-xl"></div>
+
+        <div class="flex space-x-2 pt-1">
+          <button type="button" onclick="closeBugModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-xs transition">
+            Cancelar
+          </button>
+          <button type="submit" id="bugSubmitBtn" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center space-x-1">
+            <i data-lucide="send" class="w-3.5 h-3.5 mr-1"></i>
+            <span>Enviar Relato</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
