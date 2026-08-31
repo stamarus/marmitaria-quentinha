@@ -423,8 +423,12 @@
               <input type="date" id="historyStartDate" class="p-2.5 rounded-xl border border-gray-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 bg-gray-50">
               <span class="text-gray-500 text-xs font-bold">até</span>
               <input type="date" id="historyEndDate" class="p-2.5 rounded-xl border border-gray-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 bg-gray-50">
-              <button onclick="loadHistoricalOrders()" class="bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition">
+                            <button onclick="loadHistoricalOrders()" class="bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition">
                 Filtrar
+              </button>
+              <button onclick="exportCustomerPhones()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1" title="Exportar Telefones para Disparo">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">Contatos</span>
               </button>
             </div>
           </div>
@@ -2096,6 +2100,39 @@
       document.getElementById('historyStartDate').value = startIso;
       
       loadHistoricalOrders();
+    }
+
+    
+    function exportCustomerPhones() {
+      if (!window.lastHistoricalOrders || window.lastHistoricalOrders.length === 0) {
+        return alert('Nenhum pedido no período filtrado para exportar contatos!');
+      }
+      
+      const phones = new Set();
+      window.lastHistoricalOrders.forEach(o => {
+        if (o.cliente_telefone) {
+          // Clean phone to numeric only
+          const cleanPhone = o.cliente_telefone.replace(/\D/g, '');
+          if (cleanPhone) phones.add(cleanPhone);
+        }
+      });
+      
+      if (phones.size === 0) {
+        return alert('Nenhum telefone encontrado nos pedidos filtrados!');
+      }
+
+      let text = 'TELEFONES PARA WHATSAPP\n=======================\n\n';
+      phones.forEach(p => text += `${p}\n`);
+      
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'contatos-clientes.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     async function loadHistoricalOrders() {
