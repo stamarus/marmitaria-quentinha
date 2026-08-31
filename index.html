@@ -1590,6 +1590,7 @@
         try {
           await supabaseClient.from('loja_config').upsert([{
             id: 'config_geral',
+            loja_id: 'marmitaria',
             whatsapp: storeConfig.whatsapp,
             pix_key: storeConfig.pixKey,
             delivery_fee: storeConfig.deliveryFee,
