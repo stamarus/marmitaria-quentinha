@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <script>
     if (window.location.hostname.endsWith('github.io')) {
       window.location.replace('https://marmitaria-quentinha-caseira.netlify.app' + window.location.pathname.replace(/^\/[^\/]+/, '') + window.location.search);
@@ -165,8 +170,11 @@
   </div>
 
   <!-- CATEGORY NAVIGATION -->
-  <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2">
-    <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1" id="categoryTabs">
+  <div class="max-w-xl mx-auto px-4 pt-4 sticky top-[65px] bg-warm-50/95 backdrop-blur-sm z-20 py-2 relative">
+    <button onclick="scrollCategoryTabs(-150)" class="absolute left-1 top-1/2 -translate-y-1/2 z-30 p-1.5 bg-white border border-gray-200 rounded-full shadow-md text-gray-500 hover:text-brand-600 flex items-center justify-center">
+      <i data-lucide="chevron-left" class="w-5 h-5"></i>
+    </button>
+    <div class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1 px-4 scroll-smooth" id="categoryTabs">
       <button onclick="selectCategory('marmitas')" id="tab_marmitas" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-brand-700 text-white shadow-sm transition">
         🍛 Marmitas (P & M)
       </button>
@@ -954,7 +962,7 @@
           priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
         }
 
-        card.className = `bg-white rounded-2xl p-3.5 shadow-sm border ${isCompletelyUnavailable ? 'border-red-200 bg-red-50/10 opacity-75' : 'border-warm-100'} flex space-x-3 items-start hover:shadow-md transition relative overflow-hidden`;
+        card.className = `bg-white rounded-2xl p-3.5 shadow-sm border ${isCompletelyUnavailable ? 'border-red-200 bg-red-50/10 opacity-50 pointer-events-none select-none' : 'border-warm-100'} flex space-x-3 items-start hover:shadow-md transition relative overflow-hidden`;
 
         card.innerHTML = `
           <!-- Imagem com Tarja Vermelha de Esgotado se indisponível -->
@@ -1000,7 +1008,7 @@
 
     // CATEGORY SELECTION
     function scrollCategoryTabs(amount) {
-      const container = document.getElementById('categoryTabsContainer');
+      const container = document.getElementById('categoryTabs');
       if (container) {
         container.scrollBy({ left: amount, behavior: 'smooth' });
       }
