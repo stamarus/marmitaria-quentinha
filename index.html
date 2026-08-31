@@ -868,7 +868,6 @@
         const { data, error } = await supabaseClient
           .from('cardapio')
           .select('*')
-          .eq('loja_id', 'marmitaria')
           .order('ordem', { ascending: true });
 
         if (!error && data && data.length > 0) {

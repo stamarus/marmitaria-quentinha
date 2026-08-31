@@ -2250,7 +2250,6 @@
             .from('cardapio')
             .upsert({
               id: guarnicaoId,
-              loja_id: 'marmitaria',
               categoria: 'guarnicoes',
               nome: sideName,
               disponivel: newDisponivel,
@@ -2538,8 +2537,7 @@
           const { error } = await supabaseClient
             .from('cardapio')
             .update({ disponivel: newDisponivel })
-            .eq('id', itemId)
-            .eq('loja_id', 'marmitaria');
+            .eq('id', itemId);
 
           if (error) {
             console.warn('Supabase toggle error:', error.message);
