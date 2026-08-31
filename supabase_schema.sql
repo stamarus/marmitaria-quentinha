@@ -125,8 +125,7 @@ CREATE TABLE IF NOT EXISTS public.bug_reports (
     bug_desc TEXT NOT NULL,
     status TEXT DEFAULT 'new',          -- 'new', 'close'
     resolvido TEXT DEFAULT 'NO',        -- 'YES', 'NO'
-    bug_fix_date TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    bug_fix_date TIMESTAMP WITH TIME ZONE
 );
 
 ALTER TABLE public.bug_reports ENABLE ROW LEVEL SECURITY;
