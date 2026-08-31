@@ -84,11 +84,11 @@
   <header class="bg-white shadow-sm border-b border-warm-200 sticky top-0 z-30">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <img src="watermarked_img_14074362198608020855.jpg" alt="Marmitaria Quentinha Caseira" class="w-12 h-12 rounded-full object-cover border-2 border-brand-500 shadow-sm">
+        <img src="watermarked_img_14074362198608020855.jpg" alt="Marmitaria Quentinha Caseira" class="w-12 h-12 rounded-full object-cover border-2 border-brand-500 shadow-sm cursor-pointer hover:opacity-90 transition" onclick="window.scrollTo({top:0, behavior:'smooth'}); setTimeout(() => window.location.reload(), 300)">
         <div>
-          <h1 class="font-bold text-gray-900 text-base leading-tight">Marmitaria Quentinha Caseira</h1>
+          <h1 class="font-bold text-gray-900 text-base leading-tight cursor-pointer hover:text-brand-700 transition" onclick="window.scrollTo({top:0, behavior:'smooth'}); setTimeout(() => window.location.reload(), 300)">Marmitaria Quentinha Caseira</h1>
           <div class="flex items-center space-x-2 text-xs text-gray-500">
-            <span id="storeStatusBadge" class="inline-flex items-center text-emerald-600 font-semibold">
+            <span id="storeStatusBadge" class="inline-flex items-center text-emerald-600 font-semibold cursor-pointer hover:opacity-80 transition" title="Ver horários" onclick="openHoursModal()">
               <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Aberto hoje
             </span>
             <span>•</span>
@@ -1291,6 +1291,35 @@
     function consultarCepManual() {
       const cep = document.getElementById('custCep').value;
       handleCepInput(cep);
+    }
+
+    
+    function openHoursModal() {
+      const content = document.getElementById('hoursModalContent');
+      const daysMap = { dom: 'Domingo', seg: 'Segunda-feira', ter: 'Terça-feira', qua: 'Quarta-feira', qui: 'Quinta-feira', sex: 'Sexta-feira', sab: 'Sábado' };
+      const config = storeConfig || {};
+      const workingDays = config.dias_funcionamento || ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+      const openH = config.hora_abertura || '11:00';
+      const closeH = config.hora_fechamento || '14:30';
+
+      let html = '';
+      Object.keys(daysMap).forEach(key => {
+        const isOpen = workingDays.includes(key);
+        html += `
+          <div class="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+            <span class="font-bold ${isOpen ? 'text-gray-700' : 'text-gray-400'}">${daysMap[key]}</span>
+            <span class="text-sm font-medium ${isOpen ? 'text-brand-600' : 'text-gray-400'}">
+              ${isOpen ? `${openH} às ${closeH}` : 'Fechado'}
+            </span>
+          </div>
+        `;
+      });
+      content.innerHTML = html;
+      document.getElementById('hoursModal').classList.remove('hidden');
+    }
+
+    function closeHoursModal() {
+      document.getElementById('hoursModal').classList.add('hidden');
     }
 
     function openCheckoutModal() {
