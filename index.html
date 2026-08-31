@@ -361,10 +361,18 @@
           </div>
 
           <div id="addressSection">
-            <label class="block font-bold text-gray-700 mb-1">Endereço de Entrega Completo *</label>
-            <input type="text" id="custAddress" placeholder="Rua, número e bairro (Xaxim e região)" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
-            <input type="text" id="custComp" placeholder="Complemento / Ponto de Referência (Apto, Bloco, etc.)" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50 mt-1.5">
-          </div>
+<label class="block font-bold text-gray-700 mb-1">Endereço de Entrega *</label>
+<div class="flex gap-2">
+  <input type="tel" id="custCep" placeholder="CEP" maxlength="9" onkeyup="if(this.value.length >= 8) consultarCepManual()" class="w-1/3 p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
+  <div id="cepStatusText" class="text-[10px] text-gray-500 flex items-center">Digite o CEP</div>
+</div>
+<div class="flex gap-2 mt-1.5">
+  <input type="text" id="custAddress" placeholder="Rua" class="w-3/4 p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
+  <input type="tel" id="custNumber" placeholder="Nº" class="w-1/4 p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50">
+</div>
+<input type="text" id="custNeighborhood" placeholder="Bairro" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50 mt-1.5">
+<input type="text" id="custComp" placeholder="Complemento / Referência" class="w-full p-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs bg-gray-50 mt-1.5">
+</div>
         </div>
 
         <!-- Payment Method -->
@@ -1404,8 +1412,24 @@
     function sendOrderToWhatsApp() {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-      const comp = document.getElementById('custComp').value.trim();
+      
+      let address = '';
+      let rawAddress = document.getElementById('custAddress').value.trim();
+      let comp = document.getElementById('custComp').value.trim();
+      
+      if (deliveryType === 'delivery') {
+          const cep = document.getElementById('custCep') ? document.getElementById('custCep').value.trim() : '';
+          const num = document.getElementById('custNumber') ? document.getElementById('custNumber').value.trim() : '';
+          const neighborhood = document.getElementById('custNeighborhood') ? document.getElementById('custNeighborhood').value.trim() : '';
+          
+          if (!rawAddress || !num || !neighborhood) {
+              alert('Por favor, informe a Rua, o Número e o Bairro para entrega.');
+              return;
+          }
+          address = `${rawAddress}, ${num} - ${neighborhood}`;
+          if (cep) address += ` [CEP: ${cep}]`;
+      }
+      
       const troco = document.getElementById('custTroco').value.trim();
 
       if (!name) {
@@ -1416,10 +1440,7 @@
         alert('Por favor, informe seu telefone / WhatsApp.');
         return;
       }
-      if (deliveryType === 'delivery' && !address) {
-        alert('Por favor, informe o endereço completo de entrega.');
-        return;
-      }
+
 
       const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
       const fee = deliveryType === 'delivery' ? storeConfig.deliveryFee : 0;

@@ -65,28 +65,7 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    netlify-drawer,
-    #netlify-drawer-root,
-    [id*="netlify-drawer"],
-    [class*="netlify-drawer"],
-    [data-netlify-badge],
-    .netlify-badge,
-    #netlify-badge,
-    iframe[src*="netlify"],
-    iframe[title*="Netlify"],
-    div[data-netlify-deploy-id] {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      width: 0 !important;
-      height: 0 !important;
-      clip: rect(0, 0, 0, 0) !important;
-      position: absolute !important;
-      left: -9999px !important;
-      top: -9999px !important;
-      z-index: -99999 !important;
-    }
+
   
     /* ESTILO PARA IMPRESSÃO A4 (LISTA DE COMPRAS DE MERCADO) */
     @media print {
@@ -107,22 +86,7 @@
     }
 
   </style>
-  <script>
-    (function() {
-      function killNetlify() {
-        const sel = 'netlify-drawer, #netlify-drawer-root, [id*="netlify-drawer"], [class*="netlify-drawer"], [data-netlify-badge], .netlify-badge, #netlify-badge, iframe[src*="netlify"], iframe[title*="Netlify"], div[data-netlify-deploy-id]';
-        document.querySelectorAll(sel).forEach(el => {
-          try { el.remove(); } catch(e) {}
-        });
-      }
-      if (window.MutationObserver) {
-        new MutationObserver(killNetlify).observe(document.documentElement, { childList: true, subtree: true });
-      }
-      window.addEventListener('DOMContentLoaded', killNetlify);
-      window.addEventListener('load', killNetlify);
-      setInterval(killNetlify, 500);
-    })();
-  </script>
+
   <style>
 
     /* ESTILO PARA IMPRESSÃO TÉRMICA DE ALTO CONTRASTE (58mm / 80mm) - COMPACTO SEM AVANÇO */
@@ -1146,34 +1110,17 @@
 
     let storeConfig = JSON.parse(localStorage.getItem('marmitaria_config')) || DEFAULT_CONFIG;
 
-    // WEB AUDIO SOUND BEEP
+        // WEB AUDIO SOUND BEEP
     function playOrderBeep() {
       if (!audioEnabled) return;
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, now); // D5
-        osc.frequency.setValueAtTime(880.00, now + 0.15); // A5
-        osc.frequency.setValueAtTime(1174.66, now + 0.30); // D6
-        
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(now);
-        osc.stop(now + 0.6);
+        const audio = new Audio('alerta.ogg');
+        audio.play().catch(e => console.warn('Audio play error:', e));
       } catch(e) {
         console.warn('Audio play error:', e);
       }
     }
+
 
     function toggleAudio() {
       audioEnabled = !audioEnabled;
