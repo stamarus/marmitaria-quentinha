@@ -2509,33 +2509,47 @@
           const { data, error } = await supabaseClient
             .from('cardapio')
             .select('*')
-            .eq('loja_id', 'marmitaria')
             .order('ordem', { ascending: true });
 
           if (!error && data && data.length > 0) {
-            cardapioItems = data;
+            cardapioItems = data.map(item => ({
+              id: item.id,
+              loja_id: item.loja_id || 'marmitaria',
+              categoria: item.categoria || 'marmitas',
+              nome: item.nome,
+              descricao: item.descricao || '',
+              tipo: item.tipo || item.type || 'direct',
+              type: item.tipo || item.type || 'direct',
+              preco: parseFloat(item.preco) || 0,
+              sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
+              misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+              image: item.image || 'img/marmita_milanesa.jpg',
+              disponivel: item.disponivel !== false,
+              ordem: item.ordem || 0
+            }));
             localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
-      // Force sync with client cache safely
-      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
-      cardapioItems.forEach(item => {
-        const cat = item.categoria || 'marmitas';
-        if (!categorized[cat]) categorized[cat] = [];
-        categorized[cat].push({
-          id: item.id,
-          name: item.nome,
-          description: item.descricao || '',
-          price: parseFloat(item.preco) || 0,
-          type: item.tipo || 'direct',
-          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
-          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
-          image: item.image || 'img/marmita_milanesa.jpg',
-          disponivel: item.disponivel !== false,
-          ordem: item.ordem || 0
-        });
-      });
-      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
+
+            // Sync with client cache safely
+            const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+            cardapioItems.forEach(item => {
+              const cat = item.categoria || 'marmitas';
+              if (!categorized[cat]) categorized[cat] = [];
+              categorized[cat].push({
+                id: item.id,
+                name: item.nome,
+                description: item.descricao || '',
+                price: parseFloat(item.preco) || 0,
+                type: item.tipo || item.type || 'direct',
+                sizes: item.sizes || [],
+                misturas: item.misturas || [],
+                image: item.image || 'img/marmita_milanesa.jpg',
+                disponivel: item.disponivel !== false,
+                ordem: item.ordem || 0
+              });
+            });
+            localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
           } else if (error) {
-            console.warn('Cardápio table not populated yet or error:', error.message);
+            console.warn('Cardápio table error:', error.message);
           }
         } catch(e) {
           console.warn('Supabase fetch error for cardapio:', e);
@@ -2598,7 +2612,7 @@
 
         // Size pills with granular 1-click toggles
         let sizesSectionHtml = '';
-        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+        if ((item.type === 'marmita_sizes' || item.tipo === 'marmita_sizes') && Array.isArray(item.sizes) && item.sizes.length > 0) {
           sizesSectionHtml = `
             <div class="pt-2 border-t border-gray-100 space-y-1.5">
               <div class="flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase">
@@ -2712,9 +2726,9 @@
           name: item.nome,
           description: item.descricao || '',
           price: parseFloat(item.preco) || 0,
-          type: item.tipo || 'direct',
-          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
-          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          type: item.tipo || item.type || 'direct',
+          sizes: item.sizes || [],
+          misturas: item.misturas || [],
           image: item.image || 'img/marmita_milanesa.jpg',
           disponivel: item.disponivel !== false,
           ordem: item.ordem || 0
@@ -2726,11 +2740,11 @@
 
       if (supabaseClient) {
         try {
-          await supabaseClient
+          const { error } = await supabaseClient
             .from('cardapio')
             .update({ sizes: item.sizes })
-            .eq('id', itemId)
-            .eq('loja_id', 'marmitaria');
+            .eq('id', itemId);
+          if (error) console.warn('Erro ao atualizar tamanho no Supabase:', error.message);
         } catch(e) {
           console.warn('Erro ao atualizar tamanho no Supabase:', e);
         }
@@ -2744,7 +2758,7 @@
       const idx = cardapioItems.findIndex(i => i.id === itemId);
       if (idx === -1) return;
 
-      const newDisponivel = !cardapioItems[idx].disponivel;
+      const newDisponivel = cardapioItems[idx].disponivel === false ? true : false;
       cardapioItems[idx].disponivel = newDisponivel;
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
       // Force sync with client cache safely
@@ -2757,9 +2771,9 @@
           name: item.nome,
           description: item.descricao || '',
           price: parseFloat(item.preco) || 0,
-          type: item.tipo || 'direct',
-          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
-          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          type: item.tipo || item.type || 'direct',
+          sizes: item.sizes || [],
+          misturas: item.misturas || [],
           image: item.image || 'img/marmita_milanesa.jpg',
           disponivel: item.disponivel !== false,
           ordem: item.ordem || 0
@@ -2855,7 +2869,7 @@
           document.getElementById('editItemMisturas').value = 'Bistequinha, Calabresa, Omelete, Linguiça Toscana, Frango a Passarinho';
         }
 
-        if (item.type === 'marmita_sizes' && Array.isArray(item.sizes)) {
+        if ((item.type === 'marmita_sizes' || item.tipo === 'marmita_sizes') && Array.isArray(item.sizes) && item.sizes.length > 0) {
           const p = item.sizes.find(s => s.id === 'P') || { price: 15.00, available: true };
           const m = item.sizes.find(s => s.id === 'M') || { price: 22.90, available: true };
           const g = item.sizes.find(s => s.id === 'G') || { price: 26.90, available: true };
@@ -2940,7 +2954,7 @@
       const disponivel = document.getElementById('editItemDisponivel').checked;
 
       let type = 'direct';
-      let sizes = null;
+      let sizes = [];
       let preco = 0;
       let misturas = [];
 
@@ -2970,22 +2984,25 @@
         preco = parseFloat(document.getElementById('editPriceSingle').value) || 0;
       }
 
+      const existingIdx = cardapioItems.findIndex(i => i.id === id);
+      const ordem = existingIdx >= 0 && cardapioItems[existingIdx].ordem ? cardapioItems[existingIdx].ordem : (cardapioItems.length + 1);
+
       const itemData = {
         id: id,
         loja_id: 'marmitaria',
         categoria: cat,
         nome: nome,
         descricao: desc,
+        tipo: type,
         type: type,
         sizes: sizes,
         misturas: misturas,
         preco: preco,
         image: image,
         disponivel: disponivel,
-        ordem: cardapioItems.length + 1
+        ordem: ordem
       };
 
-      const existingIdx = cardapioItems.findIndex(i => i.id === id);
       if (existingIdx >= 0) {
         cardapioItems[existingIdx] = { ...cardapioItems[existingIdx], ...itemData };
       } else {
@@ -2996,16 +3013,16 @@
       // Force sync with client cache safely
       const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
       cardapioItems.forEach(item => {
-        const cat = item.categoria || 'marmitas';
-        if (!categorized[cat]) categorized[cat] = [];
-        categorized[cat].push({
+        const c = item.categoria || 'marmitas';
+        if (!categorized[c]) categorized[c] = [];
+        categorized[c].push({
           id: item.id,
           name: item.nome,
           description: item.descricao || '',
           price: parseFloat(item.preco) || 0,
-          type: item.tipo || 'direct',
-          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
-          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
+          type: item.tipo || item.type || 'direct',
+          sizes: item.sizes || [],
+          misturas: item.misturas || [],
           image: item.image || 'img/marmita_milanesa.jpg',
           disponivel: item.disponivel !== false,
           ordem: item.ordem || 0
@@ -3018,9 +3035,25 @@
 
       if (supabaseClient) {
         try {
+          const dbPayload = {
+            id: id,
+            loja_id: 'marmitaria',
+            categoria: cat,
+            nome: nome,
+            descricao: desc,
+            tipo: type,
+            sizes: sizes,
+            misturas: misturas,
+            preco: preco,
+            image: image,
+            disponivel: disponivel,
+            ordem: ordem,
+            updated_at: new Date().toISOString()
+          };
+
           const { error } = await supabaseClient
             .from('cardapio')
-            .upsert(itemData);
+            .upsert(dbPayload);
 
           if (error) {
             console.warn('Supabase upsert error:', error.message);

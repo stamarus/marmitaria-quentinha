@@ -865,7 +865,7 @@
               name: item.nome,
               description: item.descricao || '',
               price: parseFloat(item.preco) || 0,
-              type: item.tipo || 'direct',
+              type: item.tipo || item.type || 'direct',
               sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
               misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
               image: item.image || 'img/marmita_milanesa.jpg',
