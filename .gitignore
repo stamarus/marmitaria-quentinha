@@ -1,0 +1,4 @@
+.env
+.env.local
+supabase_query.py
+temp_*
