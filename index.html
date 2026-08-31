@@ -954,18 +954,34 @@
           priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
         }
 
+        card.className = `bg-white rounded-2xl p-3.5 shadow-sm border ${isCompletelyUnavailable ? 'border-red-200 bg-red-50/10 opacity-75' : 'border-warm-100'} flex space-x-3 items-start hover:shadow-md transition relative overflow-hidden`;
+
         card.innerHTML = `
-          <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 flex-shrink-0 mt-0.5" onerror="this.src='watermarked_img_14074362198608020855.jpg'">
+          <!-- Imagem com Tarja Vermelha de Esgotado se indisponível -->
+          <div class="relative flex-shrink-0 w-24 h-24 mt-0.5">
+            <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover border border-gray-100 ${isCompletelyUnavailable ? 'grayscale contrast-125' : ''}" onerror="this.src='watermarked_img_14074362198608020855.jpg'">
+            ${isCompletelyUnavailable ? `
+              <div class="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
+                <div class="bg-red-600 text-white font-black text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow-lg transform -rotate-12 border border-white/40">
+                  ESGOTADO
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
           <div class="flex-1 min-w-0 flex flex-col justify-between min-h-[6rem]">
             <div>
-              <h3 class="font-bold text-gray-900 text-sm leading-snug">${item.name}</h3>
-              <p class="text-gray-500 text-xs mt-1 leading-relaxed">${item.description}</p>
+              <div class="flex items-center justify-between gap-1">
+                <h3 class="font-bold text-gray-900 text-sm leading-snug ${isCompletelyUnavailable ? 'line-through text-gray-500' : ''}">${item.name}</h3>
+                ${isCompletelyUnavailable ? '<span class="bg-red-100 text-red-700 text-[9px] font-black uppercase px-1.5 py-0.5 rounded flex-shrink-0">Esgotado</span>' : ''}
+              </div>
+              <p class="text-gray-500 text-xs mt-1 leading-relaxed line-clamp-2">${item.description}</p>
             </div>
             <div class="flex items-center justify-between mt-3 pt-1">
               <span class="font-extrabold text-brand-700 text-sm">${priceFormatted}</span>
               ${isCompletelyUnavailable ? `
-                <button disabled class="bg-red-100 text-red-700 font-black px-3 py-1.5 rounded-xl text-xs cursor-not-allowed opacity-80 flex items-center space-x-1 border border-red-200">
-                  <span>🔴 Esgotado</span>
+                <button disabled class="bg-red-600 text-white font-black px-3 py-1.5 rounded-xl text-xs cursor-not-allowed opacity-90 shadow-sm">
+                  ESGOTADO
                 </button>
               ` : `
                 <button onclick="handleItemClick('${item.id}', '${currentCategory}')" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center space-x-1 border border-brand-200/60 transition active:scale-95">
@@ -983,6 +999,13 @@
     }
 
     // CATEGORY SELECTION
+    function scrollCategoryTabs(amount) {
+      const container = document.getElementById('categoryTabsContainer');
+      if (container) {
+        container.scrollBy({ left: amount, behavior: 'smooth' });
+      }
+    }
+
     function selectCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -1048,7 +1071,7 @@
         
         const isFeijoada = (item.id && item.id.includes('feijoada')) || currentCategory === 'feijoada';
         const sidesToUse = isFeijoada ? DEFAULT_FEIJOADA_SIDES : DEFAULT_MARMITA_SIDES;
-        selectedSides = [...sidesToUse];
+        selectedSides = [];
 
         // Render Sizes (P, M, G)
         const sizeContainer = document.getElementById('sizeOptions');
@@ -1104,10 +1127,11 @@
               </div>
             `;
           }
+          const isChecked = selectedSides.includes(side);
           return `
-            <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
-              <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
-              <span class="text-gray-700 font-medium">${side}</span>
+            <label class="flex items-center space-x-2 p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}">
+              <input type="checkbox" value="${side}" ${isChecked ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+              <span class="text-xs">${side}</span>
             </label>
           `;
         }).join('');
@@ -1263,6 +1287,34 @@
     }
 
     // CHECKOUT MODAL
+    
+    // BUSCA AUTOMÁTICA DE CEP VIA VIACEP
+    async function handleCepInput(val) {
+      const cleanCep = val.replace(/\D/g, '');
+      if (cleanCep.length === 8) {
+        document.getElementById('cepStatusText').innerHTML = '<span class="text-brand-600 font-bold animate-pulse">Buscando endereço...</span>';
+        try {
+          const resp = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+          const data = await resp.json();
+          if (!data.erro) {
+            document.getElementById('custStreet').value = data.logradouro || '';
+            document.getElementById('custNeighborhood').value = data.bairro || '';
+            document.getElementById('cepStatusText').innerHTML = '<span class="text-emerald-600 font-bold">✓ Endereço preenchido!</span>';
+            document.getElementById('custNumber').focus();
+          } else {
+            document.getElementById('cepStatusText').innerHTML = '<span class="text-rose-600 font-bold">CEP não localizado</span>';
+          }
+        } catch(e) {
+          document.getElementById('cepStatusText').innerText = 'Preencha manualmente';
+        }
+      }
+    }
+
+    function consultarCepManual() {
+      const cep = document.getElementById('custCep').value;
+      handleCepInput(cep);
+    }
+
     function openCheckoutModal() {
       renderCheckoutItems();
       document.getElementById('pixKeyDisplay').innerText = storeConfig.pixKey;
