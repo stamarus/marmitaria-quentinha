@@ -767,10 +767,10 @@
       const curM = now.getMinutes();
       const curTotalMin = curH * 60 + curM;
 
-      const [openH, openM] = (config.hora_abertura || '11:00').split(':').map(Number);
-      const [closeH, closeM] = (config.hora_fechamento || '14:30').split(':').map(Number);
-      const openTotalMin = openH * 60 + openM;
-      const closeTotalMin = closeH * 60 + closeM;
+            let [openH, openM] = (config.hora_abertura || '11:00').split(':').map(x => parseInt(x) || 0);
+      let [closeH, closeM] = (config.hora_fechamento || '14:30').split(':').map(x => parseInt(x) || 0);
+      const openTotalMin = (openH || 0) * 60 + (openM || 0);
+      const closeTotalMin = (closeH || 0) * 60 + (closeM || 0);
 
       if (curTotalMin >= openTotalMin && curTotalMin <= closeTotalMin) {
         return { isOpen: true, statusText: `Aberto (Fecha às ${config.hora_fechamento || '14:30'})`, badgeClass: 'text-emerald-600', dotClass: 'bg-emerald-500 animate-pulse' };
