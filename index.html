@@ -783,7 +783,7 @@
       const status = checkStoreOpenStatus(storeConfig);
       const badge = document.getElementById('storeStatusBadge');
       if (badge) {
-        badge.className = `inline-flex items-center ${status.badgeClass} font-semibold`;
+        badge.className = `inline-flex items-center ${status.badgeClass} font-semibold cursor-pointer hover:opacity-80 transition`;
         badge.innerHTML = `<span class="w-2 h-2 rounded-full ${status.dotClass} mr-1.5"></span> ${status.statusText}`;
       }
 
@@ -1731,6 +1731,32 @@
         </a>
         <button type="button" onclick="closeDevModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-xl text-xs transition">
           Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- HOURS MODAL -->
+  <div id="hoursModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col relative animate-scale-up">
+      <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+        <h3 class="font-bold text-gray-800 text-lg flex items-center space-x-2">
+          <i data-lucide="clock" class="w-5 h-5 text-brand-600"></i>
+          <span>Horários de Atendimento</span>
+        </h3>
+        <button onclick="closeHoursModal()" class="text-gray-400 hover:bg-gray-200 p-2 rounded-full transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <div class="space-y-3" id="hoursModalContent">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+      <div class="p-5 border-t border-gray-100 bg-gray-50 flex justify-center">
+        <button onclick="closeHoursModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg transition text-sm">
+          Entendi
         </button>
       </div>
     </div>
