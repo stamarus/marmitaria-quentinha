@@ -762,7 +762,7 @@
       const workingDays = config.dias_funcionamento || [1, 2, 3, 4, 5, 6];
       const isWorkingDay = workingDays.includes(currentDayNum) || workingDays.includes(String(currentDayNum)) || workingDays.includes(currentDayStr);
 
-      if (!isWorkingDay) { {
+      if (!isWorkingDay) {
         return { isOpen: false, statusText: `Fechado hoje (Abre às ${config.hora_abertura || '11:00'})`, badgeClass: 'text-amber-700', dotClass: 'bg-amber-500' };
       }
 
