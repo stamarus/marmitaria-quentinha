@@ -200,9 +200,15 @@
             <button onclick="switchTab('hoje')" id="tabBtn_hoje" class="px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap">
               📅 Pedidos
             </button>
-            <button onclick="switchTab('historico')" id="tabBtn_historico" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              📜 Histórico
-            </button>
+                      <button onclick="switchTab('historico')" id="tab_historico" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center space-x-2 tab-btn">
+            <i data-lucide="history" class="w-4 h-4"></i>
+            <span>Histórico</span>
+          </button>
+          
+          <button onclick="switchTab('mercado')" id="tab_mercado" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:text-gray-900 transition flex items-center space-x-2 tab-btn">
+            <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+            <span>Lista de Mercado</span>
+          </button>
             <button onclick="switchTab('cardapio')" id="tabBtn_cardapio" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
               🍽️ Cardápio
             </button>
@@ -329,11 +335,21 @@
             <p class="text-xs text-gray-500 mt-0.5">Selecione uma data para auditar faturamento e pedidos passados</p>
           </div>
 
-          <div class="flex items-center space-x-2">
-            <input type="date" id="historyDateInput" class="p-2.5 rounded-xl border border-gray-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 focus:outline-none bg-gray-50" onchange="loadHistoricalOrders()">
-            <button onclick="loadHistoricalOrders()" class="bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition">
-              Filtrar
-            </button>
+                    <div class="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
+            <div class="flex space-x-1">
+              <button onclick="setHistoryFilter('1')" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-bold text-gray-700 transition">1 dia</button>
+              <button onclick="setHistoryFilter('7')" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-bold text-gray-700 transition">7 dias</button>
+              <button onclick="setHistoryFilter('15')" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-bold text-gray-700 transition">15 dias</button>
+              <button onclick="setHistoryFilter('30')" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-bold text-gray-700 transition">30 dias</button>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="date" id="historyStartDate" class="p-2.5 rounded-xl border border-gray-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 bg-gray-50">
+              <span class="text-gray-500 text-xs font-bold">até</span>
+              <input type="date" id="historyEndDate" class="p-2.5 rounded-xl border border-gray-300 text-xs font-bold focus:ring-2 focus:ring-brand-500 bg-gray-50">
+              <button onclick="loadHistoricalOrders()" class="bg-brand-700 hover:bg-brand-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition">
+                Filtrar
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1338,7 +1354,7 @@
       if (tab === 'hoje') {
         loadOrders();
       } else if (tab === 'historico') {
-        const dateInput = document.getElementById('historyDateInput');
+        const dateInput = document.getElementById('historyStartDate');
         if (!dateInput.value) {
           const d = new Date();
           d.setDate(d.getDate() - 1);
@@ -1954,16 +1970,34 @@
       }
     }
 
+        function setHistoryFilter(days) {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - parseInt(days) + 1);
+      
+      const tzOffset = end.getTimezoneOffset() * 60000;
+      const endIso = new Date(end - tzOffset).toISOString().split('T')[0];
+      const startIso = new Date(start - tzOffset).toISOString().split('T')[0];
+      
+      document.getElementById('historyEndDate').value = endIso;
+      document.getElementById('historyStartDate').value = startIso;
+      
+      loadHistoricalOrders();
+    }
+
     async function loadHistoricalOrders() {
       if (!supabaseClient) return;
 
-      const dateStr = document.getElementById('historyDateInput').value;
-      if (!dateStr) return;
+      const startStr = document.getElementById('historyStartDate').value;
+      const endStr = document.getElementById('historyEndDate').value;
+      
+      if (!startStr || !endStr) return;
 
-      const start = new Date(dateStr + 'T00:00:00');
-      const end = new Date(dateStr + 'T23:59:59');
+      const start = new Date(startStr + 'T00:00:00-03:00');
+      const end = new Date(endStr + 'T23:59:59-03:00');
 
       try {
+
         const { data, error } = await supabaseClient
           .from('pedidos')
           .select('*')
