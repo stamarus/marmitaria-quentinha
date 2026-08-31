@@ -1275,7 +1275,7 @@
           const resp = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
           const data = await resp.json();
           if (!data.erro) {
-            document.getElementById('custStreet').value = data.logradouro || '';
+            document.getElementById('custAddress').value = data.logradouro || '';
             document.getElementById('custNeighborhood').value = data.bairro || '';
             document.getElementById('cepStatusText').innerHTML = '<span class="text-emerald-600 font-bold">✓ Endereço preenchido!</span>';
             document.getElementById('custNumber').focus();
