@@ -1486,12 +1486,13 @@
       msg += `----------------------------------------\n`;
       msg += `_Pedido gerado pelo Cardápio Digital._`;
 
-      // SAVE ORDER TO SUPABASE IN REALTIME
+            // SAVE ORDER TO SUPABASE IN REALTIME
       if (supabaseClient) {
         supabaseClient.from('pedidos').insert([{
+          loja_id: 'marmitaria',
           cliente_nome: name,
           cliente_telefone: phone,
-          tipo_entrega: deliveryType,
+          tipo_entrega: deliveryType,,
           endereco: address,
           complemento: comp,
           itens: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price, details: i.details })),
