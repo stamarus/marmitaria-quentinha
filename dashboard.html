@@ -1114,7 +1114,7 @@
     function playOrderBeep() {
       if (!audioEnabled) return;
       try {
-        const audio = new Audio('alerta.ogg');
+        const audio = new Audio('audio/Chegou-pedido-01.mp3');
         audio.play().catch(e => console.warn('Audio play error:', e));
       } catch(e) {
         console.warn('Audio play error:', e);
