@@ -940,6 +940,15 @@
             const minPrice = Math.min(...availSizes.map(s => s.price));
             priceFormatted = `A partir de R$ ${minPrice.toFixed(2).replace('.', ',')}`;
           }
+        } else if (item.type === 'marmita_10' && item.misturas && item.misturas.length > 0) {
+          const normMisturas = item.misturas.map(m => typeof m === 'string' ? { name: m, available: true } : { name: m.name || '', available: m.available !== false }).filter(m => m.name);
+          const availMisturas = normMisturas.filter(m => m.available !== false);
+          if (normMisturas.length > 0 && availMisturas.length === 0) {
+            isCompletelyUnavailable = true;
+            priceFormatted = '<span class="text-rose-600 text-xs font-bold">🔴 Misturas Esgotadas</span>';
+          } else {
+            priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
+          }
         } else {
           priceFormatted = `R$ ${item.price.toFixed(2).replace('.', ',')}`;
         }
@@ -1132,20 +1141,45 @@
         document.getElementById('modalBadge').innerText = 'Marmita Econômica (350g) - R$ 10,00';
         stepAcompNum.innerText = '2';
 
-        selectedMistura = (item.misturas && item.misturas[0]) || 'Bistequinha';
+        const allMisturas = (item.misturas || []).map(m => typeof m === 'string' ? { name: m, available: true } : { name: m.name || m.title || '', available: m.available !== false }).filter(m => m.name);
+        const availMisturas = allMisturas.filter(m => m.available !== false);
+
+        if (availMisturas.length === 0) {
+          alert('Desculpe, todas as opções de mistura para esta marmita estão esgotadas no momento.');
+          return;
+        }
+
+        // Default to first available mistura
+        selectedMistura = (availMisturas[0] && availMisturas[0].name) || 'Bistequinha';
         selectedSides = [];
 
         // Render Misturas
         const misturaContainer = document.getElementById('misturaOptions');
-        misturaContainer.innerHTML = (item.misturas || []).map(mist => `
-          <label class="flex items-center justify-between p-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer">
-            <div class="flex items-center space-x-2">
-              <input type="radio" name="misturaSelection" value="${mist}" ${mist === selectedMistura ? 'checked' : ''} onchange="selectedMistura='${mist}'" class="text-brand-600 focus:ring-brand-500">
-              <span class="text-xs font-bold text-gray-800">${mist}</span>
-            </div>
-            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Inclusa</span>
-          </label>
-        `).join('');
+        misturaContainer.innerHTML = allMisturas.map(mist => {
+          const isAvail = mist.available !== false;
+          if (!isAvail) {
+            return `
+              <div class="flex items-center justify-between p-2.5 rounded-xl border border-dashed border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold text-gray-400 line-through">${mist.name}</span>
+                </div>
+                <span class="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold uppercase">Esgotada</span>
+              </div>
+            `;
+          }
+
+          const isChecked = mist.name === selectedMistura;
+          const cleanName = mist.name.replace(/'/g, "\\'");
+          return `
+            <label class="flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold shadow-xs' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-800'}">
+              <div class="flex items-center space-x-2">
+                <input type="radio" name="misturaSelection" value="${mist.name}" ${isChecked ? 'checked' : ''} onchange="selectedMistura='${cleanName}'; openCustomModal(currentModalItem);" class="text-brand-600 focus:ring-brand-500">
+                <span class="text-xs font-bold">${mist.name}</span>
+              </div>
+              <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Inclusa</span>
+            </label>
+          `;
+        }).join('');
 
         // Render Marmita 10 Sides
         sideContainer.innerHTML = DEFAULT_MARMITA10_SIDES.map(side => `

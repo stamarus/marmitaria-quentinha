@@ -946,13 +946,27 @@
         </div>
 
         <!-- Section Misturas for Marmita 10 -->
-        <div id="sectionMisturas" class="hidden space-y-2 p-3.5 bg-brand-50/70 rounded-2xl border border-brand-200">
+        <div id="sectionMisturas" class="hidden space-y-2.5 p-3.5 bg-brand-50/70 rounded-2xl border border-brand-200">
           <div class="flex items-center space-x-1.5 font-bold text-brand-900 text-xs">
             <i data-lucide="chef-hat" class="w-4 h-4 text-brand-700"></i>
             <span>Opções de Misturas (Separadas por vírgula)</span>
           </div>
-          <input type="text" id="editItemMisturas" placeholder="Ex: Bistequinha, Calabresa, Omelete, Frango a Passarinho" value="Bistequinha, Calabresa, Omelete, Linguiça Toscana, Frango a Passarinho" class="w-full p-2.5 rounded-xl border border-brand-300 font-medium bg-white focus:ring-2 focus:ring-brand-500 text-xs">
+          <input type="text" id="editItemMisturas" oninput="handleMisturasTextInput(this.value)" placeholder="Ex: Bistequinha, Calabresa, Omelete, Frango a Passarinho" value="Bistequinha, Calabresa, Omelete, Linguiça Toscana, Frango a Passarinho" class="w-full p-2.5 rounded-xl border border-brand-300 font-medium bg-white focus:ring-2 focus:ring-brand-500 text-xs">
           <p class="text-[10px] text-gray-500">O cliente poderá escolher 1 dessas opções de mistura na hora de pedir.</p>
+
+          <!-- Dynamic Checklist of Misturas -->
+          <div class="pt-2 border-t border-brand-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-brand-900 flex items-center gap-1.5">
+                <i data-lucide="list-checks" class="w-3.5 h-3.5 text-brand-700"></i>
+                <span>Disponibilidade de Cada Mistura</span>
+              </span>
+              <span class="text-[10px] text-gray-500 italic">Desmarque para pausar hoje</span>
+            </div>
+            <div id="editMisturasChecklist" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
         </div>
 
         <!-- Foto do Produto: Upload Direto & Preview -->
@@ -2712,7 +2726,7 @@
         };
         const catBadge = catNames[item.categoria] || item.categoria;
 
-        // Size pills with granular 1-click toggles
+        // Size pills or Mistura pills with granular 1-click toggles
         let sizesSectionHtml = '';
         if ((item.type === 'marmita_sizes' || item.tipo === 'marmita_sizes') && Array.isArray(item.sizes) && item.sizes.length > 0) {
           sizesSectionHtml = `
@@ -2735,6 +2749,38 @@
                     </button>
                   `;
                 }).join('')}
+              </div>
+            </div>
+          `;
+        } else if ((item.categoria === 'marmita10' || item.type === 'marmita_10' || item.tipo === 'marmita_10') && Array.isArray(item.misturas) && item.misturas.length > 0) {
+          const normMisturas = item.misturas.map(m => typeof m === 'string' ? { name: m, available: true } : { name: m.name || '', available: m.available !== false }).filter(m => m.name);
+          const ativasCount = normMisturas.filter(m => m.available).length;
+          sizesSectionHtml = `
+            <div class="pt-2 border-t border-gray-100 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-gray-400 uppercase">Preço Unitário</span>
+                <span class="text-sm font-black text-brand-700">R$ ${(parseFloat(item.preco) || 10).toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-[10px] font-bold text-gray-400 uppercase">
+                  <span>Misturas (${ativasCount}/${normMisturas.length} ativas)</span>
+                  <span class="text-[9px] text-gray-400 font-normal lowercase">(clique p/ pausar)</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                  ${normMisturas.map(m => {
+                    const isAvail = m.available !== false;
+                    const cleanName = m.name.replace(/'/g, "\\'");
+                    return `
+                      <button type="button" onclick="toggleMisturaDisponibilidade('${item.id}', '${cleanName}')" title="${isAvail ? 'Clique para pausar mistura ' + m.name : 'Clique para ativar mistura ' + m.name}" class="p-1.5 rounded-lg text-left border transition ${isAvail ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-red-50/80 border-red-200 text-red-800 opacity-60'}">
+                        <div class="flex items-center justify-between text-[10px] font-black leading-tight">
+                          <span class="truncate pr-1">${m.name}</span>
+                          <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${isAvail ? 'bg-emerald-500' : 'bg-red-500'}"></span>
+                        </div>
+                        <div class="text-[9px] ${isAvail ? 'text-emerald-700 font-bold' : 'text-red-600 font-extrabold'} mt-0.5">${isAvail ? '🟢 Ativa' : '🔴 Pausada'}</div>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
               </div>
             </div>
           `;
@@ -2855,6 +2901,61 @@
       showToast(`Tamanho ${sizeId} ${newAvail ? 'ativado' : 'pausado / esgotado'}`);
     }
 
+    // TOGGLE GRANULAR MISTURA AVAILABILITY DIRECTLY FROM CARD
+    async function toggleMisturaDisponibilidade(itemId, misturaName) {
+      const idx = cardapioItems.findIndex(i => i.id === itemId);
+      if (idx === -1) return;
+
+      const item = cardapioItems[idx];
+      if (!Array.isArray(item.misturas)) return;
+
+      // Normalize misturas to object array
+      item.misturas = item.misturas.map(m => typeof m === 'string' ? { name: m, available: true } : { name: m.name || '', available: m.available !== false }).filter(m => m.name);
+
+      const mObj = item.misturas.find(m => m.name.toLowerCase() === misturaName.toLowerCase());
+      if (!mObj) return;
+
+      const newAvail = mObj.available === false ? true : false;
+      mObj.available = newAvail;
+
+      localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
+      
+      // Force sync with client cache safely
+      const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
+      cardapioItems.forEach(it => {
+        const cat = it.categoria || 'marmitas';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push({
+          id: it.id,
+          name: it.nome,
+          description: it.descricao || '',
+          price: parseFloat(it.preco) || 0,
+          type: it.tipo || it.type || 'direct',
+          sizes: it.sizes || [],
+          misturas: it.misturas || [],
+          image: it.image || 'img/marmita_milanesa.jpg',
+          disponivel: it.disponivel !== false,
+          ordem: it.ordem || 0
+        });
+      });
+      localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
+      renderCardapioGrid();
+
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('cardapio')
+            .update({ misturas: item.misturas })
+            .eq('id', itemId);
+          if (error) console.warn('Erro ao atualizar mistura no Supabase:', error.message);
+        } catch(e) {
+          console.warn('Erro ao atualizar mistura no Supabase:', e);
+        }
+      }
+
+      showToast(`Mistura "${mObj.name}" ${newAvail ? 'ativada' : 'pausada / esgotada'}`);
+    }
+
     // TOGGLE OVERALL ITEM AVAILABILITY
     async function toggleItemDisponibilidade(itemId) {
       const idx = cardapioItems.findIndex(i => i.id === itemId);
@@ -2901,6 +3002,57 @@
       }
 
       showToast(newDisponivel ? 'Prato ativado no cardápio' : 'Prato pausado / esgotado');
+    }
+
+    // --- MISTURAS CHECKLIST & MODAL STATE ---
+    let editMisturasState = {};
+
+    function handleMisturasTextInput(val) {
+      const names = val.split(',').map(m => m.trim()).filter(Boolean);
+      // Preserve existing states or set new to true
+      names.forEach(n => {
+        if (editMisturasState[n] === undefined) {
+          editMisturasState[n] = true;
+        }
+      });
+      renderMisturasChecklist();
+    }
+
+    function toggleMisturaCheckbox(name) {
+      const current = editMisturasState[name] !== false;
+      editMisturasState[name] = !current;
+      renderMisturasChecklist();
+    }
+
+    function renderMisturasChecklist() {
+      const container = document.getElementById('editMisturasChecklist');
+      if (!container) return;
+
+      const rawVal = document.getElementById('editItemMisturas').value;
+      const names = rawVal.split(',').map(m => m.trim()).filter(Boolean);
+
+      if (names.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-gray-400 italic col-span-2 py-1">Digite as opções de misturas separadas por vírgula acima para configurar a disponibilidade.</p>`;
+        return;
+      }
+
+      container.innerHTML = names.map(name => {
+        const isAvail = editMisturasState[name] !== false;
+        const cleanName = name.replace(/'/g, "\\'");
+        return `
+          <div onclick="toggleMisturaCheckbox('${cleanName}')" class="p-2 rounded-xl border transition cursor-pointer flex items-center justify-between ${isAvail ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950 shadow-xs' : 'bg-rose-50/70 border-rose-300 text-rose-900 opacity-75'}">
+            <div class="flex items-center space-x-2 truncate pr-1">
+              <input type="checkbox" ${isAvail ? 'checked' : ''} onclick="event.stopPropagation(); toggleMisturaCheckbox('${cleanName}')" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+              <span class="text-xs font-bold truncate ${isAvail ? '' : 'line-through text-gray-400'}">${name}</span>
+            </div>
+            <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase flex-shrink-0 ${isAvail ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+              ${isAvail ? 'Ativa' : 'Pausada'}
+            </span>
+          </div>
+        `;
+      }).join('');
+      
+      lucide.createIcons();
     }
 
     // IMAGE UPLOAD & CANVAS COMPRESSOR (ANY DEVICE)
@@ -2965,11 +3117,23 @@
         document.getElementById('editImagePreview').src = item.image || 'watermarked_img_14074362198608020855.jpg';
         document.getElementById('editItemDisponivel').checked = item.disponivel !== false;
 
+        editMisturasState = {};
+        let misturasNames = [];
         if (item.misturas && Array.isArray(item.misturas)) {
-          document.getElementById('editItemMisturas').value = item.misturas.join(', ');
-        } else {
-          document.getElementById('editItemMisturas').value = 'Bistequinha, Calabresa, Omelete, Linguiça Toscana, Frango a Passarinho';
+          item.misturas.forEach(m => {
+            const name = (typeof m === 'string' ? m : (m.name || m.title || '')).trim();
+            if (name) {
+              misturasNames.push(name);
+              editMisturasState[name] = typeof m === 'object' ? (m.available !== false) : true;
+            }
+          });
         }
+        if (misturasNames.length === 0) {
+          misturasNames = ['Bistequinha', 'Calabresa', 'Omelete', 'Iscas de Frango à Milanesa'];
+          misturasNames.forEach(n => editMisturasState[n] = true);
+        }
+        document.getElementById('editItemMisturas').value = misturasNames.join(', ');
+        renderMisturasChecklist();
 
         if ((item.type === 'marmita_sizes' || item.tipo === 'marmita_sizes') && Array.isArray(item.sizes) && item.sizes.length > 0) {
           const p = item.sizes.find(s => s.id === 'P') || { price: 15.00, available: true };
@@ -3001,7 +3165,12 @@
         document.getElementById('editItemImage').value = 'img/marmita_milanesa.jpg';
         document.getElementById('editImagePreview').src = 'img/marmita_milanesa.jpg';
         document.getElementById('editItemDisponivel').checked = true;
-        document.getElementById('editItemMisturas').value = 'Bistequinha, Calabresa, Omelete, Linguiça Toscana, Frango a Passarinho';
+        
+        editMisturasState = {};
+        const defaultMisturas = ['Bistequinha', 'Calabresa', 'Omelete', 'Iscas de Frango à Milanesa'];
+        defaultMisturas.forEach(n => editMisturasState[n] = true);
+        document.getElementById('editItemMisturas').value = defaultMisturas.join(', ');
+        renderMisturasChecklist();
 
         document.getElementById('editPriceP').value = '15.00';
         document.getElementById('editPriceM').value = '22.90';
@@ -3038,6 +3207,7 @@
         if (secMisturas) {
           if (cat === 'marmita10') {
             secMisturas.classList.remove('hidden');
+            renderMisturasChecklist();
           } else {
             secMisturas.classList.add('hidden');
           }
@@ -3080,7 +3250,11 @@
         type = 'marmita_10';
         preco = parseFloat(document.getElementById('editPriceSingle').value) || 10.00;
         const rawMisturas = document.getElementById('editItemMisturas').value;
-        misturas = rawMisturas ? rawMisturas.split(',').map(m => m.trim()).filter(Boolean) : ['Bistequinha', 'Calabresa', 'Omelete', 'Linguiça Toscana', 'Frango a Passarinho'];
+        const parsedNames = rawMisturas ? rawMisturas.split(',').map(m => m.trim()).filter(Boolean) : ['Bistequinha', 'Calabresa', 'Omelete', 'Iscas de Frango à Milanesa'];
+        misturas = parsedNames.map(n => ({
+          name: n,
+          available: editMisturasState[n] !== false
+        }));
       } else {
         type = 'direct';
         preco = parseFloat(document.getElementById('editPriceSingle').value) || 0;
