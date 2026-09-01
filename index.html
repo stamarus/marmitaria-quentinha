@@ -1422,16 +1422,109 @@
       document.getElementById('hoursModal').classList.remove('hidden');
     }
 
-    function closeHoursModal() {
-      document.getElementById('hoursModal').classList.add('hidden');
+    // PRE-FLIGHT CART VALIDATION (CHECKS SOLD OUT DISHES, SIZES, MISTURAS, GUARNIÇÕES)
+    function validateCartItems() {
+      const clean = (s) => (s || '').toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+      
+      const guarnicoesDb = (MENU_ITEMS && MENU_ITEMS.guarnicoes) || [];
+      const allMenuItems = [];
+      Object.keys(MENU_ITEMS || {}).forEach(k => {
+        if (Array.isArray(MENU_ITEMS[k])) {
+          allMenuItems.push(...MENU_ITEMS[k]);
+        }
+      });
+
+      const invalidItems = [];
+
+      cart.forEach((cartItem, idx) => {
+        let hasSoldOut = false;
+        let reasons = [];
+
+        // 1. Check if the dish itself is paused
+        const originalId = (cartItem.id || '').split('_')[0];
+        const menuItem = allMenuItems.find(m => m.id === originalId || clean(m.name) === clean(cartItem.name.split('(')[0]));
+        if (menuItem && menuItem.disponivel === false) {
+          hasSoldOut = true;
+          reasons.push(`Prato ${menuItem.name} esgotado`);
+        }
+
+        // 2. Check if size is paused
+        if (menuItem && menuItem.type === 'marmita_sizes' && cartItem.details) {
+          const matchSize = cartItem.details.match(/Tamanho:\s*([^|]+)/i);
+          if (matchSize) {
+            const sizeName = matchSize[1].trim();
+            const foundSize = (menuItem.sizes || []).find(s => clean(s.name) === clean(sizeName) || s.id === sizeName);
+            if (foundSize && foundSize.available === false) {
+              hasSoldOut = true;
+              reasons.push(`Tamanho ${sizeName} esgotado`);
+            }
+          }
+        }
+
+        // 3. Check if mistura in marmita 10 is paused
+        if (menuItem && menuItem.type === 'marmita_10' && cartItem.details) {
+          const matchMistura = cartItem.details.match(/Mistura:\s*([^|]+)/i);
+          if (matchMistura) {
+            const mistName = matchMistura[1].trim();
+            const allMist = (menuItem.misturas || []).map(m => typeof m === 'string' ? { name: m, available: true } : { name: m.name, available: m.available !== false });
+            const foundMist = allMist.find(m => clean(m.name) === clean(mistName));
+            if (foundMist && foundMist.available === false) {
+              hasSoldOut = true;
+              reasons.push(`Mistura ${mistName} esgotada`);
+            }
+          }
+        }
+
+        // 4. Check if any side in Acompanhamentos is paused
+        if (cartItem.details && cartItem.details.includes('Acompanhamentos:')) {
+          const matchSides = cartItem.details.match(/Acompanhamentos:\s*([^|]+)/i);
+          if (matchSides) {
+            const rawSides = matchSides[1].trim();
+            if (rawSides && rawSides.toLowerCase() !== 'nenhum') {
+              const sidesList = rawSides.split(',').map(s => s.trim()).filter(Boolean);
+              sidesList.forEach(side => {
+                const target = clean(side);
+                const foundG = guarnicoesDb.find(g => {
+                  const gName = clean(g.name || g.nome || '');
+                  const gId = clean(g.id || '');
+                  return gName === target || (target.length >= 4 && gName.includes(target)) || (gName.length >= 4 && target.includes(gName)) || (gId.length >= 4 && gId.includes(target));
+                });
+                if (foundG && foundG.disponivel === false) {
+                  hasSoldOut = true;
+                  reasons.push(`Acompanhamento ${side} esgotado`);
+                }
+              });
+            }
+          }
+        }
+
+        if (hasSoldOut) {
+          invalidItems.push({
+            cartItem: cartItem,
+            index: idx,
+            reasons: reasons
+          });
+        }
+      });
+
+      return invalidItems;
     }
 
     function openCheckoutModal() {
+      const invalidItems = validateCartItems();
       renderCheckoutItems();
       document.getElementById('pixKeyDisplay').innerText = storeConfig.pixKey;
       updateStoreStatusUI();
       document.getElementById('checkoutModal').classList.remove('hidden');
       lucide.createIcons();
+
+      if (invalidItems.length > 0) {
+        setTimeout(() => {
+          alert("Sinto muito, mas você possui itens esgotados no seu carrinho!\nRevise para poder concluir seu pedido!");
+        }, 100);
+      }
     }
 
     function closeCheckoutModal() {
@@ -1447,13 +1540,20 @@
         return;
       }
 
+      const invalidItems = validateCartItems();
+      const invalidIndices = invalidItems.map(i => i.index);
+
       cart.forEach((item, index) => {
+        const isInvalid = invalidIndices.includes(index);
         const row = document.createElement('div');
-        row.className = 'flex justify-between items-start border-b border-gray-100 pb-2 text-xs';
+        row.className = `flex justify-between items-start border-b border-gray-100 pb-2 text-xs p-2 rounded-xl transition ${isInvalid ? 'bg-red-50/80 border border-red-200' : ''}`;
         row.innerHTML = `
           <div class="flex-1 pr-2">
-            <p class="font-bold text-gray-900">${item.qty}x ${item.name}</p>
-            <p class="text-[11px] text-gray-500 leading-tight">${item.details || ''}</p>
+            <div class="flex items-center space-x-1.5 flex-wrap">
+              <p class="font-bold text-gray-900 ${isInvalid ? 'line-through text-red-900' : ''}">${item.qty}x ${item.name}</p>
+              ${isInvalid ? '<span class="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.2 rounded uppercase">Esgotado</span>' : ''}
+            </div>
+            <p class="text-[11px] ${isInvalid ? 'text-red-700' : 'text-gray-500'} leading-tight mt-0.5">${item.details || ''}</p>
             <p class="font-semibold text-brand-700 text-xs mt-0.5">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</p>
           </div>
           <button onclick="removeItem(${index})" class="text-gray-400 hover:text-red-600 p-1">
@@ -1543,6 +1643,14 @@
 
     // SEND ORDER TO WHATSAPP
     function sendOrderToWhatsApp() {
+      // PRE-FLIGHT CHECK FOR SOLD OUT ITEMS
+      const invalidItems = validateCartItems();
+      if (invalidItems.length > 0) {
+        alert("Sinto muito, mas você possui itens esgotados no seu carrinho!\nRevise para poder concluir seu pedido!");
+        renderCheckoutItems();
+        return;
+      }
+
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
       
