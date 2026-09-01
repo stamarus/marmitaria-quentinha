@@ -276,27 +276,38 @@
         <!-- TABS & ACTIONS -->
         <div class="flex items-center space-x-2 sm:space-x-3">
           
-          <nav class="flex space-x-1 bg-gray-100 p-1 rounded-xl text-xs font-bold overflow-x-auto hide-scrollbar">
-            <button onclick="switchTab('hoje')" id="tabBtn_hoje" class="px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap">
-              📅 Pedidos
+          <!-- TABS CONTAINER WITH NAVIGATION ARROWS -->
+          <div class="flex items-center bg-gray-100 p-1 rounded-xl">
+            <button type="button" onclick="scrollNavTabs(-160)" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-800 hover:bg-white/80 transition flex-shrink-0 active:scale-95" title="Voltar opções">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
             </button>
-            <button onclick="switchTab('historico')" id="tabBtn_historico" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              📜 Histórico
+
+            <nav id="navTabsContainer" class="flex space-x-1 text-xs font-bold overflow-x-auto hide-scrollbar scroll-smooth px-1 max-w-[240px] xs:max-w-[320px] sm:max-w-md md:max-w-lg lg:max-w-none">
+              <button onclick="switchTab('hoje')" id="tabBtn_hoje" class="px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap">
+                📅 Pedidos
+              </button>
+              <button onclick="switchTab('historico')" id="tabBtn_historico" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+                📜 Histórico
+              </button>
+              <button onclick="switchTab('mercado')" id="tabBtn_mercado" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+                🛒 Lista de Mercado
+              </button>
+              <button onclick="switchTab('cardapio')" id="tabBtn_cardapio" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+                🍽️ Cardápio
+              </button>
+              <button onclick="switchTab('config')" id="tabBtn_config" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
+                ⚙️ Config
+              </button>
+              <button onclick="switchTab('bugs')" id="tabBtn_bugs" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap flex items-center space-x-1.5">
+                <span>🐛 Chamados</span>
+                <span id="badgeBugsOpen" class="hidden bg-rose-600 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
+              </button>
+            </nav>
+
+            <button type="button" onclick="scrollNavTabs(160)" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-800 hover:bg-white/80 transition flex-shrink-0 active:scale-95" title="Avançar opções">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </button>
-            <button onclick="switchTab('mercado')" id="tabBtn_mercado" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              🛒 Lista de Mercado
-            </button>
-            <button onclick="switchTab('cardapio')" id="tabBtn_cardapio" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              🍽️ Cardápio
-            </button>
-            <button onclick="switchTab('config')" id="tabBtn_config" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              ⚙️ Config
-            </button>
-            <button onclick="switchTab('bugs')" id="tabBtn_bugs" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap flex items-center space-x-1.5">
-              <span>🐛 Chamados</span>
-              <span id="badgeBugsOpen" class="hidden bg-rose-600 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
-            </button>
-          </nav>
+          </div>
 
           <!-- SOUND TOGGLE -->
           <button onclick="toggleAudio()" id="audioToggleBtn" class="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 flex items-center space-x-1.5 text-xs font-bold transition shadow-sm" title="Alerta Sonoro">
@@ -1540,6 +1551,13 @@
       }, 1000);
     }
 
+    function scrollNavTabs(amount) {
+      const nav = document.getElementById('navTabsContainer');
+      if (nav) {
+        nav.scrollBy({ left: amount, behavior: 'smooth' });
+      }
+    }
+
     function switchTab(tab) {
       const tabs = ['hoje', 'historico', 'mercado', 'cardapio', 'config', 'bugs'];
       tabs.forEach(t => {
@@ -1547,7 +1565,10 @@
         const btn = document.getElementById('tabBtn_' + t);
         if (t === tab) {
           if (view) view.classList.remove('hidden');
-          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap flex items-center space-x-1.5';
+          if (btn) {
+            btn.className = 'px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap flex items-center space-x-1.5';
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
         } else {
           if (view) view.classList.add('hidden');
           if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap flex items-center space-x-1.5';
