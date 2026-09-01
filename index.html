@@ -586,10 +586,11 @@
     // DEFAULT SIDES FOR TRADITIONAL MARMITAS
     const DEFAULT_MARMITA_SIDES = [
       'Arroz',
-      'Feijão Caseiro',
+      'Feijão Preto Caseiro',
       'Purê de Batata Cremoso',
       'Farofa da Casa',
-      'Macarrão Especial',
+      'Macarrão ao Alho e Óleo',
+      'Macarrão ao Molho Sugo',
       'Salada Fresca'
     ];
 
@@ -606,7 +607,7 @@
     // DEFAULT SIDES FOR MARMITA R$ 10
     const DEFAULT_MARMITA10_SIDES = [
       'Arroz',
-      'Feijão Caseiro',
+      'Feijão Preto Caseiro',
       'Farofa da Casa'
     ];
 
@@ -616,33 +617,33 @@
         {
           id: 'frango_milanesa',
           name: 'Filé de Frango à Milanesa',
-          description: 'Filé de frango empanado super crocante e suculento. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          description: 'Filé de frango empanado super crocante e suculento. Acompanha arroz, feijão preto, purê de batata, farofa, macarrão e salada.',
           image: 'img/marmita_milanesa.jpg',
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
-            { id: 'P', name: 'Marmita P', desc: 'Porção individual econômica', price: 15.00, available: true },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta e reforçada', price: 22.90, popular: true, available: true },
+            { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 15.00, available: true },
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 22.90, popular: true, available: true },
             { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 26.90, available: true }
           ]
         },
         {
           id: 'frango_parmegiana',
           name: 'Filé de Frango à Parmegiana',
-          description: 'Filé de frango empanado coberto com molho de tomate caseiro e queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          description: 'Filé de frango empanado coberto com molho de tomate caseiro e queijo derretido. Acompanha arroz, feijão preto, purê de batata, farofa, macarrão e salada.',
           image: 'img/marmita_parmegiana.jpg',
           type: 'marmita_sizes',
           disponivel: true,
           sizes: [
             { id: 'P', name: 'Marmita P', desc: 'Porção individual', price: 18.00, available: true },
-            { id: 'M', name: 'Marmita M', desc: 'Porção farta com bastante queijo', price: 25.90, popular: true, available: true },
-            { id: 'G', name: 'Marmita G', desc: 'Porção grande reforçada', price: 29.90, available: true }
+            { id: 'M', name: 'Marmita M', desc: 'Porção farta', price: 25.90, popular: true, available: true },
+            { id: 'G', name: 'Marmita G', desc: 'Porção grande família', price: 29.90, available: true }
           ]
         },
         {
           id: 'frango_barbecue',
           name: 'Filé de Frango Milanesa c/ Molho Barbecue',
-          description: 'Filé de frango crocante finalizado com molho barbecue especial da casa. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          description: 'Filé de frango crocante finalizado com molho barbecue especial da casa. Acompanha arroz, feijão preto, purê de batata, farofa, macarrão e salada.',
           image: 'img/marmita_barbecue.jpg',
           type: 'marmita_sizes',
           disponivel: true,
@@ -655,7 +656,7 @@
         {
           id: 'omelete_queijo',
           name: 'Marmita Omelete com Queijo',
-          description: 'Omelete fofinho e temperado, recheado com queijo derretido. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          description: 'Omelete fofinho e temperado, recheado com queijo derretido. Acompanha arroz, feijão preto, purê de batata, farofa, macarrão e salada.',
           image: 'img/marmita_omelete.jpg',
           type: 'marmita_sizes',
           disponivel: true,
@@ -668,7 +669,7 @@
         {
           id: 'calabresa_acebolada',
           name: 'Calabresa Acebolada',
-          description: 'Calabresa defumada fatiada e dourada na chapa com cebola suculenta. Acompanha arroz, feijão, purê de batata, farofa, macarrão e salada.',
+          description: 'Calabresa defumada fatiada e dourada na chapa com cebola suculenta. Acompanha arroz, feijão preto, purê de batata, farofa, macarrão e salada.',
           image: 'img/marmita_calabresa.jpg',
           type: 'marmita_sizes',
           disponivel: true,
@@ -682,18 +683,17 @@
       marmita10: [
         {
           id: 'marmita_economica_10',
-          name: 'Marmita Econômica (350g)',
-          description: 'Marmitinha de 350 gramas com arroz, feijão caseiro, farofa e 1 opção de mistura à sua escolha.',
+          name: 'Marmita Econômica (300g)',
+          description: 'Marmitinha de 300 gramas com arroz, feijão preto caseiro, farofa e 1 opção de mistura à sua escolha.',
           image: 'img/marmita_economica.jpg',
           type: 'marmita_10',
           price: 10.00,
           disponivel: true,
           misturas: [
-            'Bistequinha',
-            'Calabresa',
+            'Bisteca Suína',
+            'Calabresa Acebolada',
             'Omelete',
-            'Linguiça Toscana',
-            'Frango a Passarinho'
+            'Iscas de Frango à Milanesa'
           ]
         }
       ],
@@ -862,6 +862,7 @@
             
             categorized[cat].push({
               id: item.id,
+              categoria: cat,
               name: item.nome,
               description: item.descricao || '',
               price: parseFloat(item.preco) || 0,
