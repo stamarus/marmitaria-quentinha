@@ -2506,15 +2506,77 @@
         </div>
       `;
 
-      let printArea = document.getElementById('thermalReceiptPrintArea');
-      if (!printArea) {
-        printArea = document.createElement('div');
-        printArea.id = 'thermalReceiptPrintArea';
-        document.body.appendChild(printArea);
+      // 100% ISOLATED IFRAME PRINTING (ELIMINATES EXTRA BLANK PAGES & OVERFLOW)
+      let printFrame = document.getElementById('thermalPrintIframe');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'thermalPrintIframe';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        document.body.appendChild(printFrame);
       }
 
-      printArea.innerHTML = receiptHtml;
-      window.print();
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Pedido #${order.id}</title>
+          <style>
+            @page {
+              size: auto;
+              margin: 0mm !important;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+              color: #000000 !important;
+              font-family: 'Segoe UI', Arial, Helvetica, sans-serif, monospace !important;
+              font-size: 13px !important;
+              line-height: 1.25 !important;
+              width: 100% !important;
+              max-width: 80mm !important;
+            }
+            * {
+              box-sizing: border-box !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .receipt-wrapper {
+              padding: 3mm 4mm 1mm 4mm !important;
+              width: 100% !important;
+              max-width: 80mm !important;
+              margin: 0 auto !important;
+              color: #000000 !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt-wrapper">
+            ${receiptHtml}
+          </div>
+        </body>
+        </html>
+      `);
+      frameDoc.close();
+
+      setTimeout(() => {
+        try {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+        } catch(e) {
+          console.warn('Iframe print fallback:', e);
+          window.print();
+        }
+      }, 250);
     }
 
     // ==========================================
