@@ -1102,13 +1102,31 @@
           `;
         }).join('');
 
-        // Check availability from both MENU_ITEMS.guarnicoes and storeConfig
-        const guarnicoesDb = MENU_ITEMS.guarnicoes || [];
+        // Check availability from both MENU_ITEMS.guarnicoes and storeConfig with full accent & substring normalization
         const isSideAvailable = (sideName) => {
-          const found = guarnicoesDb.find(g => g.name.toLowerCase() === sideName.toLowerCase() || sideName.toLowerCase().includes(g.name.toLowerCase()));
+          if (!sideName) return true;
+          const clean = (s) => (s || '').toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "");
+          
+          const target = clean(sideName);
+          const guarnicoesDb = (MENU_ITEMS && MENU_ITEMS.guarnicoes) || [];
+          
+          // Check in Supabase cardapio guarnicoes
+          const found = guarnicoesDb.find(g => {
+            const gName = clean(g.name || g.nome || '');
+            const gId = clean(g.id || '');
+            return gName === target || (target.length >= 4 && gName.includes(target)) || (gName.length >= 4 && target.includes(gName)) || (gId.length >= 4 && gId.includes(target));
+          });
+          
           if (found && found.disponivel === false) return false;
-          const gStatus = storeConfig.guarnicoes_status || {};
-          if (gStatus[sideName] === false) return false;
+
+          // Fallback check in storeConfig.guarnicoes_status
+          const gStatus = (storeConfig && storeConfig.guarnicoes_status) || {};
+          for (const [k, v] of Object.entries(gStatus)) {
+            if (clean(k) === target && v === false) return false;
+          }
+          
           return true;
         };
 
@@ -1120,16 +1138,17 @@
           const isAvail = isSideAvailable(side);
           if (!isAvail) {
             return `
-              <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
+              <div class="flex items-center justify-between p-2.5 rounded-xl border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
                 <span class="line-through font-medium">${side}</span>
                 <span class="text-[9px] font-black uppercase bg-red-100 px-1.5 py-0.5 rounded">Esgotado</span>
               </div>
             `;
           }
           const isChecked = selectedSides.includes(side);
+          const cleanName = side.replace(/'/g, "\\'");
           return `
             <label class="flex items-center space-x-2 p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}">
-              <input type="checkbox" value="${side}" ${isChecked ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+              <input type="checkbox" value="${side}" ${isChecked ? 'checked' : ''} onchange="toggleSide('${cleanName}')" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
               <span class="text-xs">${side}</span>
             </label>
           `;
@@ -1181,13 +1200,51 @@
           `;
         }).join('');
 
-        // Render Marmita 10 Sides
-        sideContainer.innerHTML = DEFAULT_MARMITA10_SIDES.map(side => `
-          <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
-            <input type="checkbox" value="${side}" ${selectedSides.includes(side) ? 'checked' : ''} onchange="toggleSide('${side}')" class="rounded text-brand-600 focus:ring-brand-500">
-            <span class="text-gray-700 font-medium">${side}</span>
-          </label>
-        `).join('');
+        // Helper to check side availability in Marmita 10
+        const isSideAvailableM10 = (sideName) => {
+          if (!sideName) return true;
+          const clean = (s) => (s || '').toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "");
+          
+          const target = clean(sideName);
+          const guarnicoesDb = (MENU_ITEMS && MENU_ITEMS.guarnicoes) || [];
+          
+          const found = guarnicoesDb.find(g => {
+            const gName = clean(g.name || g.nome || '');
+            const gId = clean(g.id || '');
+            return gName === target || (target.length >= 4 && gName.includes(target)) || (gName.length >= 4 && target.includes(gName)) || (gId.length >= 4 && gId.includes(target));
+          });
+          
+          if (found && found.disponivel === false) return false;
+
+          const gStatus = (storeConfig && storeConfig.guarnicoes_status) || {};
+          for (const [k, v] of Object.entries(gStatus)) {
+            if (clean(k) === target && v === false) return false;
+          }
+          return true;
+        };
+
+        // Render Marmita 10 Sides with pause/availability support
+        sideContainer.innerHTML = DEFAULT_MARMITA10_SIDES.map(side => {
+          const isAvail = isSideAvailableM10(side);
+          if (!isAvail) {
+            return `
+              <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-red-200 bg-red-50/50 text-xs text-red-700 opacity-60 cursor-not-allowed">
+                <span class="line-through font-medium">${side}</span>
+                <span class="text-[9px] font-black uppercase bg-red-100 px-1.5 py-0.5 rounded">Esgotado</span>
+              </div>
+            `;
+          }
+          const isChecked = selectedSides.includes(side);
+          const cleanName = side.replace(/'/g, "\\'");
+          return `
+            <label class="flex items-center space-x-2 p-2 rounded-lg border border-gray-100 bg-gray-50 text-xs cursor-pointer hover:bg-gray-100">
+              <input type="checkbox" value="${side}" ${isChecked ? 'checked' : ''} onchange="toggleSide('${cleanName}')" class="rounded text-brand-600 focus:ring-brand-500">
+              <span class="text-gray-700 font-medium">${side}</span>
+            </label>
+          `;
+        }).join('');
       }
 
       updateModalPrice();

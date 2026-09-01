@@ -2528,10 +2528,13 @@
       { id: 'guarnicao_macarrao_alho', name: 'Macarrão ao Alho e Óleo', icon: '🍝', label: 'Macarrão Alho/Óleo' },
       { id: 'guarnicao_macarrao_sugo', name: 'Macarrão ao Molho Sugo', icon: '🍅', label: 'Macarrão Sugo' },
       { id: 'guarnicao_pure', name: 'Purê de Batata Cremoso', icon: '🥔', label: 'Purê de Batata' },
-      { id: 'guarnicao_farofa', name: 'Farofa da Casa', icon: '🌾', label: 'Farofa' },
-      { id: 'guarnicao_salada', name: 'Salada Fresca', icon: '🥗', label: 'Salada' },
+      { id: 'guarnicao_farofa', name: 'Farofa da Casa', icon: '🌾', label: 'Farofa da Casa' },
+      { id: 'guarnicao_salada', name: 'Salada Fresca', icon: '🥗', label: 'Salada Fresca' },
       { id: 'guarnicao_feijao', name: 'Feijão Preto Caseiro', icon: '🫘', label: 'Feijão Preto' },
-      { id: 'guarnicao_arroz', name: 'Arroz', icon: '🍚', label: 'Arroz' }
+      { id: 'guarnicao_arroz', name: 'Arroz', icon: '🍚', label: 'Arroz Branco' },
+      { id: 'guarnicao_couve', name: 'Couve Refogada', icon: '🥬', label: 'Couve Refogada' },
+      { id: 'guarnicao_vinagrete', name: 'Vinagrete Especial', icon: '🧅', label: 'Vinagrete' },
+      { id: 'guarnicao_torresmo', name: 'Torresmo Crocante', icon: '🥓', label: 'Torresmo' }
     ];
 
     function renderGuarnicoesGrid() {
@@ -2564,7 +2567,7 @@
       if (item) {
         item.disponivel = newDisponivel;
       } else {
-        cardapioItems.push({
+        item = {
           id: guarnicaoId,
           loja_id: 'marmitaria',
           categoria: 'guarnicoes',
@@ -2572,26 +2575,27 @@
           disponivel: newDisponivel,
           tipo: 'side',
           preco: 0
-        });
+        };
+        cardapioItems.push(item);
       }
 
       localStorage.setItem('marmitaria_cardapio_admin', JSON.stringify(cardapioItems));
       // Force sync with client cache safely
       const categorized = { marmitas: [], marmita10: [], feijoada: [], adicionais: [], bebidas: [], guarnicoes: [] };
-      cardapioItems.forEach(item => {
-        const cat = item.categoria || 'marmitas';
+      cardapioItems.forEach(it => {
+        const cat = it.categoria || 'marmitas';
         if (!categorized[cat]) categorized[cat] = [];
         categorized[cat].push({
-          id: item.id,
-          name: item.nome,
-          description: item.descricao || '',
-          price: parseFloat(item.preco) || 0,
-          type: item.tipo || 'direct',
-          sizes: typeof item.sizes === 'string' ? JSON.parse(item.sizes) : (item.sizes || []),
-          misturas: typeof item.misturas === 'string' ? JSON.parse(item.misturas) : (item.misturas || []),
-          image: item.image || 'img/marmita_milanesa.jpg',
-          disponivel: item.disponivel !== false,
-          ordem: item.ordem || 0
+          id: it.id,
+          name: it.nome,
+          description: it.descricao || '',
+          price: parseFloat(it.preco) || 0,
+          type: it.tipo || 'direct',
+          sizes: typeof it.sizes === 'string' ? JSON.parse(it.sizes) : (it.sizes || []),
+          misturas: typeof it.misturas === 'string' ? JSON.parse(it.misturas) : (it.misturas || []),
+          image: it.image || 'img/marmita_milanesa.jpg',
+          disponivel: it.disponivel !== false,
+          ordem: it.ordem || 0
         });
       });
       localStorage.setItem('marmitaria_cached_cardapio', JSON.stringify(categorized));
@@ -2603,6 +2607,7 @@
             .from('cardapio')
             .upsert({
               id: guarnicaoId,
+              loja_id: 'marmitaria',
               categoria: 'guarnicoes',
               nome: sideName,
               disponivel: newDisponivel,
