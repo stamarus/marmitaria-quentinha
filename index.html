@@ -1168,8 +1168,11 @@
           return;
         }
 
-        // Default to first available mistura
-        selectedMistura = (availMisturas[0] && availMisturas[0].name) || 'Bistequinha';
+        // Default to first available mistura IF not already selected or if previously selected is now unavailable
+        const isCurrentStillAvail = availMisturas.some(m => m.name === selectedMistura);
+        if (!selectedMistura || !isCurrentStillAvail) {
+          selectedMistura = (availMisturas[0] && availMisturas[0].name) || '';
+        }
         selectedSides = [];
 
         // Render Misturas
@@ -1190,9 +1193,9 @@
           const isChecked = mist.name === selectedMistura;
           const cleanName = mist.name.replace(/'/g, "\\'");
           return `
-            <label class="flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold shadow-xs' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-800'}">
+            <label onclick="selectMistura('${cleanName}')" class="mistura-radio-label flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer ${isChecked ? 'border-brand-600 bg-brand-50/70 text-brand-950 font-bold shadow-xs' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-800'}">
               <div class="flex items-center space-x-2">
-                <input type="radio" name="misturaSelection" value="${mist.name}" ${isChecked ? 'checked' : ''} onchange="selectedMistura='${cleanName}'; openCustomModal(currentModalItem);" class="text-brand-600 focus:ring-brand-500">
+                <input type="radio" name="misturaSelection" value="${mist.name}" ${isChecked ? 'checked' : ''} onchange="selectMistura('${cleanName}')" class="text-brand-600 focus:ring-brand-500">
                 <span class="text-xs font-bold">${mist.name}</span>
               </div>
               <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Inclusa</span>
@@ -1250,6 +1253,23 @@
       updateModalPrice();
       document.getElementById('customModal').classList.remove('hidden');
       lucide.createIcons();
+    }
+
+    function selectMistura(mistName) {
+      selectedMistura = mistName;
+      const allRadios = document.querySelectorAll('input[name="misturaSelection"]');
+      allRadios.forEach(r => {
+        const isChecked = r.value === mistName;
+        r.checked = isChecked;
+        const parentLabel = r.closest('label');
+        if (parentLabel) {
+          if (isChecked) {
+            parentLabel.className = 'mistura-radio-label flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer border-brand-600 bg-brand-50/70 text-brand-950 font-bold shadow-xs';
+          } else {
+            parentLabel.className = 'mistura-radio-label flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer border-gray-200 bg-white hover:bg-gray-50 text-gray-800';
+          }
+        }
+      });
     }
 
     function selectSize(sizeId) {
