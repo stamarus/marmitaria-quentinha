@@ -67,149 +67,14 @@
 
 
   
-    /* ESTILO PARA IMPRESSÃO A4 (LISTA DE COMPRAS DE MERCADO) */
+    /* ESTILO PARA IMPRESSÃO */
     @media print {
-      body.printing-grocery > *:not(#groceryPrintArea) {
-        display: none !important;
-      }
-      body.printing-grocery #groceryPrintArea {
-        display: block !important;
-        visibility: visible !important;
-        position: static !important;
-        width: 100% !important;
-        max-width: 210mm !important;
-        margin: 0 auto !important;
-        padding: 10mm !important;
+      body {
         background: #ffffff !important;
         color: #000000 !important;
       }
-    }
-
-  
-    @media print {
-      body.printing-market * {
-        visibility: hidden;
-      }
-      body.printing-market #viewMercado,
-      body.printing-market #viewMercado * {
-        visibility: visible;
-      }
-      body.printing-market #viewMercado {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      body.printing-market #viewMercado button,
-      body.printing-market #viewMercado input[type="text"],
-      body.printing-market #viewMercado p.text-xs {
+      .no-print {
         display: none !important;
-      }
-      body.printing-market #viewMercado h2 {
-        font-size: 16pt;
-        text-align: center;
-        margin-bottom: 20px;
-        border-bottom: 1px dashed #000;
-        padding-bottom: 10px;
-      }
-      body.printing-market #viewMercado ul {
-        margin-top: 10px;
-      }
-      body.printing-market #viewMercado li {
-        border: none !important;
-        border-bottom: 1px dotted #ccc !important;
-        padding: 8px 0 !important;
-        margin: 0 !important;
-      }
-    }
-  </style>
-
-
-  <style>
-
-    /* ESTILO PARA IMPRESSÃO TÉRMICA DE ALTO CONTRASTE (58mm / 80mm) - COMPACTO SEM AVANÇO */
-    @media print {
-      html, body {
-        height: auto !important;
-        min-height: 0 !important;
-        max-height: max-content !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        background: #ffffff !important;
-      }
-      body > *:not(#thermalReceiptPrintArea) {
-        display: none !important;
-      }
-      #thermalReceiptPrintArea, #thermalReceiptPrintArea * {
-        visibility: visible !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color: #000000 !important;
-        text-shadow: 0 0 0.3px #000000 !important;
-      }
-      #thermalReceiptPrintArea {
-        display: block !important;
-        position: static !important;
-        width: 100% !important;
-        max-width: 80mm !important;
-        margin: 0 !important;
-        padding: 2mm 2mm 0 2mm !important;
-        color: #000000 !important;
-        background: #ffffff !important;
-        font-family: 'Segoe UI', Arial, Helvetica, sans-serif, monospace !important;
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        line-height: 1.25 !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-      }
-      @page {
-        margin: 0 !important;
-        size: auto !important;
-      }
-    }
-  
-    @media print {
-      body.printing-market * {
-        visibility: hidden;
-      }
-      body.printing-market #viewMercado,
-      body.printing-market #viewMercado * {
-        visibility: visible;
-      }
-      body.printing-market #viewMercado {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      body.printing-market #viewMercado button,
-      body.printing-market #viewMercado input[type="text"],
-      body.printing-market #viewMercado p.text-xs {
-        display: none !important;
-      }
-      body.printing-market #viewMercado h2 {
-        font-size: 16pt;
-        text-align: center;
-        margin-bottom: 20px;
-        border-bottom: 1px dashed #000;
-        padding-bottom: 10px;
-      }
-      body.printing-market #viewMercado ul {
-        margin-top: 10px;
-      }
-      body.printing-market #viewMercado li {
-        border: none !important;
-        border-bottom: 1px dotted #ccc !important;
-        padding: 8px 0 !important;
-        margin: 0 !important;
       }
     }
   </style>
@@ -1558,11 +1423,96 @@
     }
 
     function printGroceryListA4() {
-      document.body.classList.add('printing-grocery');
-      window.print();
+      if (groceryList.length === 0) return alert('A lista de compras está vazia!');
+      const dateStr = new Date().toLocaleDateString('pt-BR');
+      
+      let rowsHtml = groceryList.map(item => `
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 8px 10px; text-align: center; width: 40px;">
+            <div style="width: 16px; height: 16px; border: 2px solid #000; border-radius: 3px; display: inline-block; text-align: center; line-height: 14px; font-weight: bold; font-size: 11px;">${item.checked ? '✓' : ''}</div>
+          </td>
+          <td style="padding: 8px 10px; font-weight: bold; font-size: 13px; color: #111; ${item.checked ? 'text-decoration: line-through; color: #9ca3af;' : ''}">${item.name}</td>
+          <td style="padding: 8px 10px; font-weight: bold; font-size: 13px; color: #991b1b;">${item.qty}</td>
+          <td style="padding: 8px 10px; font-size: 12px; color: #4b5563;">${item.cat || 'Geral'}</td>
+          <td style="padding: 8px 10px; text-align: right; font-size: 12px; color: #9ca3af; width: 120px;">[ R$ _________ ]</td>
+        </tr>
+      `).join('');
+
+      let printFrame = document.getElementById('groceryPrintIframe');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'groceryPrintIframe';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        document.body.appendChild(printFrame);
+      }
+
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Lista de Compras - Marmitaria Quentinha Caseira</title>
+          <style>
+            @page { size: A4; margin: 12mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #111; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th { background: #f3f4f6; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #374151; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+          </style>
+        </head>
+        <body>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #991b1b; padding-bottom: 10px;">
+            <div>
+              <h1 style="font-size: 18px; font-weight: 900; margin: 0; color: #991b1b; text-transform: uppercase;">Marmitaria Quentinha Caseira</h1>
+              <p style="font-size: 13px; font-weight: bold; margin: 3px 0 0 0; color: #374151;">📋 Lista de Compras & Insumos do Mercado</p>
+            </div>
+            <div style="text-align: right;">
+              <p style="font-size: 12px; font-weight: bold; margin: 0;">Data: ${dateStr}</p>
+              <p style="font-size: 11px; color: #6b7280; margin: 2px 0 0 0;">Total: ${groceryList.length} itens</p>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 40px;">OK</th>
+                <th>Item / Insumo</th>
+                <th>Quantidade</th>
+                <th>Categoria</th>
+                <th style="text-align: right;">Valor Pago</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div style="margin-top: 25px; border-top: 1px dashed #9ca3af; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #6b7280;">
+            <span>Marmitaria Quentinha Caseira - Xaxim</span>
+            <span>Controle de Compras & Estoque</span>
+          </div>
+        </body>
+        </html>
+      `);
+      frameDoc.close();
+
       setTimeout(() => {
-        document.body.classList.remove('printing-grocery');
-      }, 1000);
+        try {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+        } catch(e) {
+          console.warn('Iframe print fallback:', e);
+          window.print();
+        }
+      }, 250);
     }
 
     function scrollNavTabs(amount) {
@@ -3691,11 +3641,81 @@
 
     function printMarketList() {
       if (marketItems.length === 0) return alert('A lista de mercado está vazia!');
-      document.body.classList.add('printing-market');
-      window.print();
+      const dateStr = new Date().toLocaleDateString('pt-BR');
+      
+      let rowsHtml = marketItems.map(item => `
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 10px 12px; text-align: center; width: 40px;">
+            <div style="width: 18px; height: 18px; border: 2px solid #000; border-radius: 4px; display: inline-block; text-align: center; line-height: 16px; font-weight: bold; font-size: 12px;">${item.done ? '✓' : ''}</div>
+          </td>
+          <td style="padding: 10px 12px; font-weight: bold; font-size: 15px; ${item.done ? 'text-decoration: line-through; color: #9ca3af;' : 'color: #111;'}">${item.name}</td>
+        </tr>
+      `).join('');
+
+      let printFrame = document.getElementById('marketPrintIframe');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'marketPrintIframe';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        document.body.appendChild(printFrame);
+      }
+
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.open();
+      frameDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Lista de Mercado - Marmitaria</title>
+          <style>
+            @page { size: auto; margin: 10mm; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #111; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th { background: #f3f4f6; padding: 10px 12px; text-align: left; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #374151; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+          </style>
+        </head>
+        <body>
+          <div style="border-bottom: 2px solid #991b1b; padding-bottom: 10px;">
+            <h1 style="font-size: 20px; font-weight: 900; margin: 0; color: #991b1b; text-transform: uppercase;">Marmitaria Quentinha Caseira</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <p style="font-size: 14px; font-weight: bold; margin: 0; color: #374151;">🛒 Lista de Mercado</p>
+              <p style="font-size: 13px; font-weight: bold; margin: 0; color: #6b7280;">Data: ${dateStr}</p>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align: center; width: 40px;">OK</th>
+                <th>Item</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `);
+      frameDoc.close();
+
       setTimeout(() => {
-        document.body.classList.remove('printing-market');
-      }, 1000);
+        try {
+          printFrame.contentWindow.focus();
+          printFrame.contentWindow.print();
+        } catch(e) {
+          console.warn('Iframe print fallback:', e);
+          window.print();
+        }
+      }, 250);
     }
 
     function addMarketItem() {
