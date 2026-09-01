@@ -3572,7 +3572,7 @@
         if (bug.bug_date) {
           try {
             const d = new Date(bug.bug_date);
-            dateFormatted = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            dateFormatted = d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
           } catch(e) {}
         }
 
@@ -3580,7 +3580,7 @@
         if (bug.bug_fix_date) {
           try {
             const fd = new Date(bug.bug_fix_date);
-            fixDateFormatted = fd.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            fixDateFormatted = fd.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
           } catch(e) {}
         }
 
