@@ -290,7 +290,11 @@
               🍽️ Cardápio
             </button>
             <button onclick="switchTab('config')" id="tabBtn_config" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap">
-              ⚙️ Horários & Config
+              ⚙️ Config
+            </button>
+            <button onclick="switchTab('bugs')" id="tabBtn_bugs" class="px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap flex items-center space-x-1.5">
+              <span>🐛 Chamados</span>
+              <span id="badgeBugsOpen" class="hidden bg-rose-600 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
             </button>
           </nav>
 
@@ -750,7 +754,85 @@
 
       </div>
 
-    </main>
+      <!-- VIEW 6: CHAMADOS & BUGS -->
+      <div id="viewBugs" class="hidden space-y-6">
+        
+        <!-- Header & Top Actions -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-lg font-extrabold text-gray-900 flex items-center space-x-2">
+                <i data-lucide="bug" class="w-5 h-5 text-rose-600"></i>
+                <span>Central de Chamados & Sugestões</span>
+              </h2>
+              <span class="bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-rose-200" id="totalBugsCount">0 chamados</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Acompanhe todos os erros, pedidos de ajustes de cardápio e melhorias com atualização de status em tempo real.</p>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="loadBugs(true)" class="bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1.5 border border-brand-200 transition active:scale-95 shadow-sm">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>Atualizar Lista</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Metrics -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total de Chamados</p>
+              <p class="text-2xl font-black text-gray-900 mt-1" id="statBugsTotal">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center">
+              <i data-lucide="inbox" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-rose-100 bg-rose-50/30 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Abertos / Em Análise</p>
+              <p class="text-2xl font-black text-rose-700 mt-1" id="statBugsAbertos">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center">
+              <i data-lucide="alert-circle" class="w-5 h-5"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-emerald-100 bg-emerald-50/30 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Resolvidos / Concluídos</p>
+              <p class="text-2xl font-black text-emerald-700 mt-1" id="statBugsResolvidos">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex space-x-2 pb-1">
+          <button onclick="filterBugs('all')" id="btnFilterBug_all" class="bug-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-brand-700 text-white shadow-sm transition">
+            Todos os Chamados
+          </button>
+          <button onclick="filterBugs('open')" id="btnFilterBug_open" class="bug-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🔴 Abertos
+          </button>
+          <button onclick="filterBugs('resolved')" id="btnFilterBug_resolved" class="bug-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition">
+            🟢 Resolvidos
+          </button>
+        </div>
+
+        <!-- Bugs List Container -->
+        <div id="bugsListContainer" class="space-y-3">
+          <div class="bg-white rounded-2xl p-8 border border-gray-200 text-center text-gray-400 text-xs">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-brand-600"></i>
+            <span>Carregando chamados...</span>
+          </div>
+        </div>
+
+      </div>
 
   </div>
 
@@ -1459,16 +1541,16 @@
     }
 
     function switchTab(tab) {
-      const tabs = ['hoje', 'historico', 'mercado', 'cardapio', 'config'];
+      const tabs = ['hoje', 'historico', 'mercado', 'cardapio', 'config', 'bugs'];
       tabs.forEach(t => {
         const view = document.getElementById('view' + t.charAt(0).toUpperCase() + t.slice(1));
         const btn = document.getElementById('tabBtn_' + t);
         if (t === tab) {
           if (view) view.classList.remove('hidden');
-          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap';
+          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg bg-white text-brand-700 shadow-sm transition whitespace-nowrap flex items-center space-x-1.5';
         } else {
           if (view) view.classList.add('hidden');
-          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap';
+          if (btn) btn.className = 'px-3 sm:px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition whitespace-nowrap flex items-center space-x-1.5';
         }
       });
 
@@ -1486,6 +1568,8 @@
         loadCardapio();
       } else if (tab === 'config') {
         populateConfigUI();
+      } else if (tab === 'bugs') {
+        loadBugs();
       }
       lucide.createIcons();
     }
@@ -1494,6 +1578,7 @@
       loadOrders();
       loadCardapio();
       loadStoreConfig();
+      loadBugs(false);
       showToast('Dados atualizados com sucesso');
     }
 
@@ -1503,6 +1588,7 @@
       loadStoreConfig();
       loadCardapio();
       loadOrders();
+      loadBugs(false);
       setupRealtime();
       setInterval(loadOrders, 10000);
       setInterval(updateStoreStatusBadge, 30000);
@@ -1539,22 +1625,9 @@
           return;
         }
 
-        let hasNew = false;
-        if (data) {
-          data.forEach(order => {
-            if (!knownOrderIds.has(order.id) && (order.status === 'pendente' || order.status === 'em_preparo')) {
-              hasNew = true;
-            }
-            knownOrderIds.add(order.id);
-          });
-        }
-
-        if (hasNew && knownOrderIds.size > (data ? data.length : 0)) {
-          playOrderBeep();
-        }
-
         allOrders = data || [];
         renderTodayDashboard(allOrders);
+        updateOrderNotificationBeep();
 
       } catch(err) {
         console.error(err);
@@ -1586,6 +1659,13 @@
         .channel('loja_config_changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'loja_config' }, () => {
           loadStoreConfig(false);
+        })
+        .subscribe();
+
+      supabaseClient
+        .channel('bug_reports_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'bug_reports' }, () => {
+          loadBugs(false);
         })
         .subscribe();
     }
@@ -3387,6 +3467,204 @@
     function saveMarketList() {
       localStorage.setItem('marmitaria_market_list', JSON.stringify(marketItems));
       renderMarketList();
+    }
+    
+    // ==========================================
+    // 5. CENTRAL DE CHAMADOS & BUGS LOGIC
+    // ==========================================
+    let bugReportsList = [];
+    let currentBugFilter = 'all';
+
+    async function loadBugs(showToastFeedback = false) {
+      if (!supabaseClient) return;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('bug_reports')
+          .select('*')
+          .order('bug_id', { ascending: false });
+
+        if (error) {
+          console.warn('Erro ao carregar chamados:', error);
+          return;
+        }
+
+        bugReportsList = data || [];
+
+        // Update Counters
+        const total = bugReportsList.length;
+        const abertos = bugReportsList.filter(b => b.resolvido !== 'YES' && b.status !== 'resolved' && b.status !== 'close').length;
+        const resolvidos = total - abertos;
+
+        const statTotalEl = document.getElementById('statBugsTotal');
+        const statAbertosEl = document.getElementById('statBugsAbertos');
+        const statResolvidosEl = document.getElementById('statBugsResolvidos');
+        const totalCountEl = document.getElementById('totalBugsCount');
+        const badgeBugsOpenEl = document.getElementById('badgeBugsOpen');
+
+        if (statTotalEl) statTotalEl.innerText = total;
+        if (statAbertosEl) statAbertosEl.innerText = abertos;
+        if (statResolvidosEl) statResolvidosEl.innerText = resolvidos;
+        if (totalCountEl) totalCountEl.innerText = `${total} chamado${total !== 1 ? 's' : ''}`;
+
+        if (badgeBugsOpenEl) {
+          if (abertos > 0) {
+            badgeBugsOpenEl.innerText = abertos;
+            badgeBugsOpenEl.classList.remove('hidden');
+          } else {
+            badgeBugsOpenEl.classList.add('hidden');
+          }
+        }
+
+        renderBugsList();
+
+        if (showToastFeedback) {
+          showToast('Lista de chamados atualizada!');
+        }
+      } catch(e) {
+        console.error('Erro ao buscar bugs:', e);
+      }
+    }
+
+    function filterBugs(filter) {
+      currentBugFilter = filter;
+      document.querySelectorAll('.bug-filter-btn').forEach(btn => {
+        btn.className = 'bug-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition';
+      });
+
+      const activeBtn = document.getElementById(`btnFilterBug_${filter}`);
+      if (activeBtn) {
+        activeBtn.className = 'bug-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-brand-700 text-white shadow-sm transition';
+      }
+
+      renderBugsList();
+    }
+
+    function renderBugsList() {
+      const container = document.getElementById('bugsListContainer');
+      if (!container) return;
+
+      let filtered = [...bugReportsList];
+      if (currentBugFilter === 'open') {
+        filtered = filtered.filter(b => b.resolvido !== 'YES' && b.status !== 'resolved' && b.status !== 'close');
+      } else if (currentBugFilter === 'resolved') {
+        filtered = filtered.filter(b => b.resolvido === 'YES' || b.status === 'resolved' || b.status === 'close');
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-12 border border-gray-200 text-center">
+            <div class="w-12 h-12 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="check-circle" class="w-6 h-6 text-emerald-500"></i>
+            </div>
+            <h3 class="text-sm font-bold text-gray-800">Nenhum chamado encontrado</h3>
+            <p class="text-xs text-gray-500 mt-1">Nenhum registro para o filtro selecionado no momento.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(bug => {
+        const isResolved = bug.resolvido === 'YES' || bug.status === 'resolved' || bug.status === 'close';
+        
+        let dateFormatted = 'Data não informada';
+        if (bug.bug_date) {
+          try {
+            const d = new Date(bug.bug_date);
+            dateFormatted = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          } catch(e) {}
+        }
+
+        let fixDateFormatted = '';
+        if (bug.bug_fix_date) {
+          try {
+            const fd = new Date(bug.bug_fix_date);
+            fixDateFormatted = fd.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          } catch(e) {}
+        }
+
+        return `
+          <div class="bg-white rounded-2xl p-5 border transition shadow-sm ${isResolved ? 'border-gray-200 hover:border-emerald-200' : 'border-rose-200 bg-rose-50/10 hover:border-rose-300'}">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+              
+              <div class="flex items-center space-x-3">
+                <span class="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black font-mono ${isResolved ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                  #${bug.bug_id}
+                </span>
+                
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider ${isResolved ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
+                      ${isResolved ? '🟢 Resolvido' : '🔴 Aberto'}
+                    </span>
+                    <span class="text-xs text-gray-500 font-medium">${dateFormatted}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-2 self-end sm:self-auto">
+                <button onclick="toggleBugStatus(${bug.bug_id}, '${isResolved ? 'resolved' : 'open'}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 active:scale-95 ${isResolved ? 'bg-gray-100 text-gray-700 hover:bg-rose-50 hover:text-rose-700 border border-gray-200' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}">
+                  <i data-lucide="${isResolved ? 'rotate-ccw' : 'check'}" class="w-3.5 h-3.5"></i>
+                  <span>${isResolved ? 'Reabrir Chamado' : 'Marcar como Resolvido'}</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Description -->
+            <div class="pt-3">
+              <p class="text-xs text-gray-800 leading-relaxed font-medium bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                ${bug.bug_desc || 'Sem descrição informada.'}
+              </p>
+            </div>
+
+            ${isResolved && fixDateFormatted ? `
+              <div class="mt-3 flex items-center space-x-1.5 text-[11px] font-bold text-emerald-700">
+                <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Correção aplicada em: ${fixDateFormatted}</span>
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function toggleBugStatus(bugId, currentStatus) {
+      if (!supabaseClient) return;
+
+      const willBeResolved = currentStatus !== 'resolved';
+      const updatePayload = willBeResolved ? {
+        status: 'resolved',
+        resolvido: 'YES',
+        bug_fix_date: new Date().toISOString()
+      } : {
+        status: 'new',
+        resolvido: 'NO',
+        bug_fix_date: null
+      };
+
+      try {
+        const { error } = await supabaseClient
+          .from('bug_reports')
+          .update(updatePayload)
+          .eq('bug_id', bugId);
+
+        if (error) {
+          showToast('Erro ao atualizar status do chamado');
+          console.error(error);
+          return;
+        }
+
+        showToast(willBeResolved ? `Chamado #${bugId} marcado como resolvido!` : `Chamado #${bugId} reaberto!`);
+        loadBugs(false);
+      } catch(e) {
+        console.error(e);
+      }
     }
     
     // Call render once on load
