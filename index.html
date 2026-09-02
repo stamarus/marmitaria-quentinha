@@ -1776,7 +1776,30 @@
     }
 
     // ADMIN AUTH & CONFIG LOGIC
-    const ADMIN_PASSWORD = 'M4rm1t4r14';
+    const ADMIN_PASS_HASH_FALLBACK = 'ab19fd8ec0bcc96890de302f3e9936884d797e5d6d34f06bbb2e9f6e9e2bb87a';
+
+    // Gera SHA-256 hex de uma string (Web Crypto API nativa)
+    async function sha256Hex(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Busca o hash da senha admin do Supabase (fallback para constante local)
+    async function getAdminPassHash() {
+      if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('loja_config')
+            .select('admin_pass_hash')
+            .eq('loja_id', 'marmitaria')
+            .maybeSingle();
+          if (!error && data && data.admin_pass_hash) return data.admin_pass_hash;
+        } catch (e) {
+          console.warn('Erro ao buscar admin_pass_hash:', e);
+        }
+      }
+      return ADMIN_PASS_HASH_FALLBACK;
+    }
 
     function openAdminModal() {
       if (sessionStorage.getItem('marmitaria_admin_auth') === 'true') {
@@ -1794,10 +1817,11 @@
       document.getElementById('adminAuthModal').classList.add('hidden');
     }
 
-    function handleAdminAuth(e) {
+    async function handleAdminAuth(e) {
       e.preventDefault();
       const pass = document.getElementById('adminAuthPassInput').value.trim();
-      if (pass === ADMIN_PASSWORD) {
+      const [inputHash, storedHash] = await Promise.all([sha256Hex(pass), getAdminPassHash()]);
+      if (inputHash === storedHash) {
         sessionStorage.setItem('marmitaria_admin_auth', 'true');
         closeAdminAuthModal();
         showAdminConfigModal();

@@ -1,4 +1,6 @@
 .env
 .env.local
 supabase_query.py
+backup_marmitaria.py
+clean_console_logs.py
 temp_*
