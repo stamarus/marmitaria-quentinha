@@ -183,6 +183,13 @@
     </p>
     
     <div>
+      <button type="button" onclick="openBenefitsModal()" class="text-xs text-brand-700 hover:text-brand-800 font-bold underline inline-flex items-center gap-1 transition cursor-pointer">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-600"></i>
+        <span>Gostou desse app? Clique aqui pra eu te mostrar os benefícios dele!</span>
+      </button>
+    </div>
+
+    <div>
       <button type="button" onclick="openBugModal()" class="text-xs text-gray-400 hover:text-amber-600 font-medium underline inline-flex items-center gap-1 transition cursor-pointer">
         <i data-lucide="bug" class="w-3.5 h-3.5 text-amber-500"></i>
         <span>Encontrou um erro? Informe aqui!</span>
@@ -1928,6 +1935,18 @@
       }
     }
 
+    // BENEFITS / BRIEF MODAL LOGIC
+    function openBenefitsModal() {
+      const modal = document.getElementById('benefitsModal');
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeBenefitsModal() {
+      const modal = document.getElementById('benefitsModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
     // BUG REPORTER LOGIC
     function openBugModal() {
       const now = new Date();
@@ -2098,6 +2117,111 @@
       <div class="p-5 border-t border-gray-100 bg-gray-50 flex justify-center">
         <button onclick="closeHoursModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white px-5 py-3 rounded-xl font-bold shadow-lg transition text-sm">
           Entendi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENEFITS / BRIEF MODAL (Por que este app vale a pena) -->
+  <div id="benefitsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col relative animate-scale-up max-h-[92vh]">
+      <!-- Header -->
+      <div class="p-5 border-b border-brand-100 bg-gradient-to-br from-brand-800 via-brand-700 to-brand-600 text-white relative overflow-hidden flex-shrink-0">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+        <div class="flex items-center justify-between relative">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center border border-white/25">
+              <i data-lucide="rocket" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-serif font-bold text-lg leading-tight">Por que este app é diferente?</h3>
+              <p class="text-[11px] text-white/80">Seu delivery próprio, sem intermediários</p>
+            </div>
+          </div>
+          <button onclick="closeBenefitsModal()" class="text-white/80 hover:bg-white/15 p-2 rounded-full transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body (scrollable) -->
+      <div class="p-5 space-y-4 overflow-y-auto hide-scrollbar">
+        <!-- Resumo executivo -->
+        <div class="space-y-2.5">
+          <div class="flex items-start space-x-2.5">
+            <div class="w-6 h-6 rounded-lg bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="store" class="w-3.5 h-3.5"></i>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed"><strong class="text-gray-900">Marketplaces (iFood / 99 Food)</strong> vendem tráfego intermediado, cobrando comissões agressivas de <strong class="text-red-600">12% a 27%</strong> por pedido.</p>
+          </div>
+          <div class="flex items-start space-x-2.5">
+            <div class="w-6 h-6 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed"><strong class="text-gray-900">SaaS tradicionais (Menudino / Anota AI)</strong> cobram mensalidades salgadas de <strong class="text-amber-600">R$ 150 a R$ 450/mês</strong>.</p>
+          </div>
+          <div class="flex items-start space-x-2.5">
+            <div class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed"><strong class="text-gray-900">Sua arquitetura própria</strong> elimina intermediários: custo próximo de <strong class="text-emerald-600">R$ 0</strong>, dinheiro direto no Pix/balcão, tempo real e base de clientes <strong class="text-emerald-600">100% sua</strong>.</p>
+          </div>
+        </div>
+
+        <!-- Tabela comparativa -->
+        <div class="border border-warm-200 rounded-2xl overflow-hidden">
+          <table class="w-full text-[11px]">
+            <thead>
+              <tr class="bg-warm-100 text-warm-800">
+                <th class="text-left font-bold p-2.5">Critério</th>
+                <th class="text-center font-bold p-2.5">iFood/99</th>
+                <th class="text-center font-bold p-2.5">SaaS</th>
+                <th class="text-center font-bold p-2.5 bg-emerald-100 text-emerald-800">Seu App</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-warm-100">
+              <tr>
+                <td class="p-2.5 font-semibold text-gray-700">Comissão/Pedido</td>
+                <td class="p-2.5 text-center text-red-600">🔴 12–27%</td>
+                <td class="p-2.5 text-center text-emerald-600">🟢 0%</td>
+                <td class="p-2.5 text-center bg-emerald-50/60 font-bold text-emerald-700">🟢 0%</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-semibold text-gray-700">Mensalidade</td>
+                <td class="p-2.5 text-center text-red-600">🔴 R$ 130–200</td>
+                <td class="p-2.5 text-center text-red-600">🔴 R$ 150–450</td>
+                <td class="p-2.5 text-center bg-emerald-50/60 font-bold text-emerald-700">🟢 R$ 0–25</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-semibold text-gray-700">Recebimento</td>
+                <td class="p-2.5 text-center text-amber-600">🟡 7–30 dias</td>
+                <td class="p-2.5 text-center text-amber-600">🟡 taxa 2–4%</td>
+                <td class="p-2.5 text-center bg-emerald-50/60 font-bold text-emerald-700">🟢 Instantâneo</td>
+              </tr>
+              <tr>
+                <td class="p-2.5 font-semibold text-gray-700">Dono dos Contatos</td>
+                <td class="p-2.5 text-center text-red-600">🔴 iFood</td>
+                <td class="p-2.5 text-center text-amber-600">🟡 Parcial</td>
+                <td class="p-2.5 text-center bg-emerald-50/60 font-bold text-emerald-700">🟢 100% Loja</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Destaque de economia -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-center">
+          <p class="text-xs text-emerald-800 font-bold leading-relaxed">
+            <i data-lucide="trending-up" class="w-4 h-4 inline mb-0.5"></i>
+            Economia de até <span class="text-emerald-700 text-sm">R$ 90.000+/ano</span> em taxas.
+          </p>
+          <p class="text-[11px] text-emerald-700 mt-1">O dono deixa de queimar dinheiro e ganha um canal de vendas direto e perpétuo! 🚀</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 border-t border-gray-100 flex-shrink-0">
+        <button onclick="closeBenefitsModal()" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+          Entendi, quero esse app!
         </button>
       </div>
     </div>
